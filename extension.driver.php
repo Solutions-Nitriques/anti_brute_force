@@ -1,11 +1,20 @@
 <?php
+	/*
+	Copyight: Solutions Nitriques 2011
+	License: MIT, see the LICENCE file
+	*/
 
 	if(!defined("__IN_SYMPHONY__")) die("<h2>Error</h2><p>You cannot directly access this file</p>");
 
-	/*
-	Copyight: Solutions Nitriques 2011
-	License: MIT
-	*/
+	// facade
+	require_once(EXTENSIONS . '/anti_brute_force/lib/class.ABF.php');
+
+	/**
+	 *
+	 * Anti Brute Force Decorator/Extension
+	 * @author nicolasbrassard
+	 *
+	 */
 	class extension_anti_brute_force extends Extension {
 
 		/**
@@ -85,25 +94,42 @@
 		}
 
 		public function authorLoginFailure($context) {
-
+			var_dump($context);
+			die();
+			ABF::instance()->registerFailure();
 		}
 
 		public function authorLoginSuccess($context) {
-
+			ABF::instance()->unregisterFailure();
+			ABF::instance()->removeExpiredEntries();
 		}
 
 		public function install() {
+			$intalled = ABF::instance()->install();
 
-			// set default values
-			$default_values = array(
-				'settings' => array (
-					self::SETTING_GROUP => array (
-						self::SETTING_LENGTH => 60,
-						self::SETTING_FAILED_COUNT => 5
+			if ($intalled) {
+				// set default values
+				$default_values = array(
+					'settings' => array (
+						self::SETTING_GROUP => array (
+							self::SETTING_LENGTH => 60,
+							self::SETTING_FAILED_COUNT => 5
+						)
 					)
-				)
-			);
-			$this->save($default_values);
+				);
+				$this->save($default_values);
+			}
+
+			return $intalled;
+		}
+
+		public function update($previousVersion) {
+			$about = $this->about();
+			return ABF::instance()->update($previousVersion,$about['version']);
+		}
+
+		public function uninstall() {
+			return ABF::instance()->uninstall();
 		}
 
 		/**

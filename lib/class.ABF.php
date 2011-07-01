@@ -18,6 +18,12 @@
 	class ABF implements Singleton {
 
 		/**
+		 * Short hand
+		 * @var MySQL
+		 */
+		private $db = Symphony::Database;
+
+		/**
 		 * Singleton implementation
 		 */
 		// singleton instance
@@ -25,10 +31,10 @@
 
 		// single ton method
 		public static function instance() {
-			if (self::I == null) {
+			if (self::$I == null) {
 				self::$I = new self();
 			}
-			return self::I;
+			return self::$I;
 		}
 
 		// do not allow external creation
@@ -56,8 +62,6 @@
 
 		}
 
-		/** Symphony setting
-
 
 		/**
 		 * Database Data Definition Queries
@@ -65,19 +69,24 @@
 
 		public function install() {
 
+			return true;
 		}
 
-		public function update($previousVersion) {
+		public function update($previousVersion, $currentVersion) {
 			switch ($previousVersion) {
+				case $currentVersion:
+					break;
 				case '1.0':
 					break;
 				default:
-					$this->install();
+					return $this->install();
 			}
+			return false;
 		}
 
 		public function uninstall() {
 
+			return true;
 		}
 
 	}
