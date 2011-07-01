@@ -25,10 +25,10 @@
 		'Fail count limit' =>
 		'Limite d\'erreurs',
 
-		'Blocked length <small>in minutes</small>' =>
-		'Durée d\'expulsion <small>minutes</small>',
+		'Blocked length <em>in minutes</em>' =>
+		'Durée d\'expulsion <em>minutes</em>',
 
-		'"%s" is not a valid integer' =>
-		'"%s" n\'est pas un entier valide'
+		'"%s" is not a valid positive integer' =>
+		'"%s" n\'est pas un entier positif'
 
 	);

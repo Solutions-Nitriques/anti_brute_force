@@ -127,27 +127,33 @@
 			$wrapper = new XMLElement('div');
 			$wrapper->setAttribute('class', 'group');
 
-			// wrapper into fieldset
-			$fieldset->appendChild($wrapper);
+			// error wrapper
+			$err_wrapper = new XMLElement('div');
 
 			// append labels to field set
 			$wrapper->appendChild($this->generateField(self::SETTING_FAILED_COUNT, 'Fail count limit'));
-			$wrapper->appendChild($this->generateField(self::SETTING_LENGTH, 'Blocked length <small>in minutes</small>'));
+			$wrapper->appendChild($this->generateField(self::SETTING_LENGTH, 'Blocked length <em>in minutes</em>'));
+
+			// append field before errors
+			$err_wrapper->appendChild($wrapper);
 
 			// error management
 			if (count($this->errors) > 0) {
-				foreach ($this->errors as $error) {
-					// set css and anchor
-					$wrapper->setAttribute('id', 'error');
-					$wrapper->setAttribute('class', 'invalid');
+				// set css and anchor
+				$err_wrapper->setAttribute('class', 'invalid');
+				$err_wrapper->setAttribute('id', 'error');
 
+				foreach ($this->errors as $error) {
 					// adds error message
 					$err = new XMLElement('p', $error);
 
 					// append to $wrapper
-					$wrapper->appendChild($err);
+					$err_wrapper->appendChild($err);
 				}
 			}
+
+			// wrapper into fieldset
+			$fieldset->appendChild($err_wrapper);
 
 			// adds the field set to the wrapper
 			$context['wrapper']->appendChild($fieldset);
@@ -194,12 +200,13 @@
 		public function saveOne($context, $key){
 			// get the input
 			$input = $context['settings'][self::SETTING_GROUP][$key];
+			$iVal = intval($input);
 
 			// verify it is a good domain
-			if (is_int($input)) {
+			if (strlen($input) > 0 && is_int($iVal) && $iVal > 0) {
 
 				// set config                    (name, value, group)
-				Symphony::Configuration()->set($key, $input, self::SETTING_GROUP);
+				Symphony::Configuration()->set($key, $iVal, self::SETTING_GROUP);
 
 				// save it
 				Administration::instance()->saveConfig();
@@ -208,8 +215,8 @@
 				// don't save
 
 				// set error message
-				$error = __('"%s" is not a valid integer',  array($input));
-			 	array_push( $this->errors, $error);
+				$error = __('"%s" is not a valid positive integer',  array($input));
+			 	array_push($this->errors, $error);
 
 				//echo $error;die;
 
