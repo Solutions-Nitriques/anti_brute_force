@@ -1,0 +1,11 @@
+### Anti Brute Force ###
+## Secure your Symphony backend login page against brute force attacks ##
+
+- Unzip 
+- (re)Name the folder anti_brute_force
+- Enable/Install just like any other extension
+- (optional) Go to the setting page to customize settings
+
+Voila !
+
+http://www.nitriques.com/open-source/
