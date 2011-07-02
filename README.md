@@ -25,7 +25,7 @@ After **x** failed attempt, the IP address will be banned for **y** min.
 
 http://www.nitriques.com/open-source/
 
-### Hisotry ###
+### History ###
 
 - 1.0 - 2011-07-01  
   First release

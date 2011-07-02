@@ -155,7 +155,7 @@
 
 		public function install() {
 			$sql = "
-				CREATE TABLE IF NOT EXISTS $tbl (
+				CREATE TABLE IF NOT EXISTS $this->tbl (
 					`IP` VARCHAR( 16 ) NOT NULL ,
 					`LastAttempt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 					`FailedCount` INT( 5 ) NOT NULL DEFAULT  '1',
@@ -183,7 +183,7 @@
 
 		public function uninstall() {
 			$sql = "
-				DROP TABLE IF EXISTS $tbl
+				DROP TABLE IF EXISTS $this->tbl
 			";
 
 			$results = ASDCLoader::instance()->query($sql);
