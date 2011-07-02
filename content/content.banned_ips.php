@@ -22,8 +22,9 @@
 			$this->_cols = array(
 				'IP' => __('IP Address'),
 				'Username' => __('Username'),
-				'LastAttempt' => __('Last Attempt'),
 				'FailedCount' => __('Failed Count'),
+				'LastAttempt' => __('Last Attempt'),
+				'Source' => __('Source'),
 				'UA' => __('User Agent (browser)')
 			);
 		}

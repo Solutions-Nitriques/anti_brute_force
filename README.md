@@ -31,7 +31,7 @@ http://www.nitriques.com/open-source/
 
 ### History ###
 
-- 1.0.1 - 2011-07-02
+- 1.0.1 - 2011-07-02  
   Fix Issues #1 (typo) and #2 (no more ASDC)
 
 - 1.0 - 2011-07-01  

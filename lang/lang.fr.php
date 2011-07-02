@@ -59,6 +59,9 @@
 		'Nom d\'usager',
 
 		'Failures remove successfuly' =>
-		'Échecs supprimés'
+		'Échecs supprimés',
+
+		'Source' =>
+		'Source'
 
 	);

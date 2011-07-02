@@ -100,7 +100,7 @@
 
 		public function authorLoginFailure($context) {
 			// register failure in DB
-			ABF::instance()->registerFailure($context['username']);
+			ABF::instance()->registerFailure($context['username'], self::EXT_NAME);
 		}
 
 		public function authorLoginSuccess($context) {

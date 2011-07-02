@@ -64,12 +64,14 @@
 		/**
 		 *
 		 * Register a failure - insert or update - for a IP
-		 * @param string $username
+		 * @param string $username - the username input
+		 * @param string $source - the source of the ban, normally the name of the extension
 		 * @param string $ip @optional - will take current user's ip
 		 */
-		public function registerFailure($username, $ip='') {
+		public function registerFailure($username, $source, $ip='') {
 			$ip = strlen($ip) < 8 ? $this->getIP() : $ip;
 			$username = MySQL::cleanValue($username);
+			$source = MySQL::cleanValue($source);
 			$ua = MySQL::cleanValue($this->getUA());
 			$results = $this->getFailureByIp($ip);
 			$ret = false;
@@ -81,7 +83,9 @@
 						SET `LastAttempt` = NOW(),
 						    `FailedCount` = `FailedCount` + 1,
 						    `Username` = '$username',
-						    `UA` = '$ua'
+						    `UA` = '$ua',
+						    `Source` = '$source',
+						    `Hash` = UUID()
 						WHERE IP = '$ip'
 						LIMIT 1
 				");
@@ -90,9 +94,9 @@
 				// INSERT
 				$ret = Symphony::Database()->query("
 					INSERT INTO $this->tbl
-						(`IP`, `LastAttempt`, `Username`, `FailedCount`, `UA`)
+						(`IP`, `LastAttempt`, `Username`, `FailedCount`, `UA`, `Source`, `Hash`)
 						VALUES
-						('$ip', NOW(), '$username', 1, '$ua')
+						('$ip', NOW(),        '$username', 1,            '$ua','$source', UUID())
 				");
 			}
 
@@ -208,8 +212,10 @@
 					`IP` VARCHAR( 16 ) NOT NULL ,
 					`LastAttempt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 					`FailedCount` INT( 5 ) NOT NULL DEFAULT  '1',
-					`UA` VARCHAR( 1024 ) NULL ,
-					`Username` VARCHAR( 100 ) NULL ,
+					`UA` VARCHAR( 1024 ) NULL,
+					`Username` VARCHAR( 100 ) NULL,
+					`Source` VARCHAR( 100 ) NULL,
+					`Hash` VARCHAR( 36 ) NOT NULL,
 					PRIMARY KEY (  `IP` )
 				) ENGINE = MYISAM
 			";
