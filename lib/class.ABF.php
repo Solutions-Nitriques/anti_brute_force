@@ -61,8 +61,9 @@
 			return true;
 		}
 
-		public function registerFailure() {
-			$ip = $this->getIP();
+		public function registerFailure($username, $ip='') {
+			$ip = strlen($ip) < 8 ? $this->getIP() : $ip;
+			$username = ASDCLoader::instance()->escape($username);
 			$results = $this->getFailureByIp();
 
 			if ($results != null && $results->length() > 0) {
@@ -78,7 +79,8 @@
 				ASDCLoader::instance()->query("
 					UPDATE $this->tbl
 						SET `LastAttempt` = NOW(),
-						    `FailedCount` = `FailedCount` + 1
+						    `FailedCount` = `FailedCount` + 1,
+						    `Username` = '$username'
 						WHERE IP = '$ip'
 						LIMIT 1
 				");
@@ -98,9 +100,9 @@
 				$ua = ASDCLoader::instance()->escape($this->getUA());
 				ASDCLoader::instance()->query("
 					INSERT INTO $this->tbl
-						(IP, LastAttempt, FailedCount, UA)
+						(IP, LastAttempt, Username, FailedCount, UA)
 						VALUES
-						('$ip', NOW(), 1, '$ua')
+						('$ip', NOW(), '$username', 1, '$ua')
 				");
 			}
 		}
@@ -140,6 +142,18 @@
 			return ASDCLoader::instance()->query($sql);
 		}
 
+		public function getFailures($orderedBy='') {
+			$order = '';
+			if (strlen($orderedBy) > 0) {
+				$order .= (' ORDER BY ' . $orderedBy);
+			}
+			$sql ="
+				SELECT * FROM $this->tbl $order
+			" ;
+
+			return ASDCLoader::instance()->query($sql);
+		}
+
 		private function getIP() {
 			return $_SERVER["REMOTE_ADDR"];
 		}
@@ -160,6 +174,7 @@
 					`LastAttempt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 					`FailedCount` INT( 5 ) NOT NULL DEFAULT  '1',
 					`UA` VARCHAR( 1024 ) NULL ,
+					`Username` VARCHAR( 100 ) NULL ,
 					PRIMARY KEY (  `IP` )
 				) ENGINE = MYISAM
 			";

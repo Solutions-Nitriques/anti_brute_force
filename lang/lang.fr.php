@@ -38,6 +38,25 @@
 		false,
 
 		'Banned IP address' =>
+		false,
+
+		'Banned IPs' =>
+		false,
+
+		'IP Address' =>
+		false,
+
+		'Last Attempt' =>
+		false,
+
+		'Failed Count' =>
+		false,
+
+		'User Agent'=>
+		false,
+
+		'Username' =>
 		false
+
 
 	);

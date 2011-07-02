@@ -301,4 +301,17 @@
 				$context['errors'][self::SETTING_GROUP][$key] = $error;
 			}
 		}
+
+		/**
+		 * Add a link to the Banned IPs Administration page
+		 */
+		public function fetchNavigation() {
+			return array(
+				array(
+					'location'	=> __('System'),
+					'name'	=> __('Banned IPs'),
+					'link'	=> '/banned_ips/'
+				)
+			);
+		}
 	}
