@@ -14,11 +14,12 @@ After **x** failed attempt, the IP address will be banned for **y** min.
 
 ### INSTALLATION ###
 
-- Install ASDC
-- Unzip the anti_brute_force file
+- Install *ASDC*
+- Unzip the anti_brute_force.zip file
 - (re)Name the folder anti_brute_force
-- Enable/Install just like any other extension
-- (optional) Go to the setting page to customize settings
+- Put into the extension directory
+- Enable/install just like any other extension
+- (optional) Go to the *Preferences* page to customize settings
 
 *Voila !*
 
