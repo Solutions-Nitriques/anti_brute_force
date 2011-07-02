@@ -62,6 +62,12 @@
 		'Échecs supprimés',
 
 		'Source' =>
-		'Source'
+		'Source',
+
+		'Enter your email address to be sent a remote unban link with further instructions.' =>
+		false,
+
+		'Email Address' =>
+		false
 
 	);

@@ -224,7 +224,13 @@
 
 			return $label;
 		}
-		private static function getConfigVal($key) {
+
+		/**
+		 *
+		 * Utility function that returns settings from this extensions settings group
+		 * @param string $key
+		 */
+		public static function getConfigVal($key) {
 			return Symphony::Configuration()->get($key, self::SETTING_GROUP);
 		}
 
