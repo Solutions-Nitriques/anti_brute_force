@@ -24,7 +24,7 @@
 				'Username' => __('Username'),
 				'LastAttempt' => __('Last Attempt'),
 				'FailedCount' => __('Failed Count'),
-				'UA' => __('User Agent')
+				'UA' => __('User Agent (browser)')
 			);
 		}
 

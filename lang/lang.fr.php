@@ -17,49 +17,48 @@
 	$dictionary = array(
 
 		'Secure your backend login page against brute force attacks' =>
-		'S�curisez la page de connection contre les attaques "brute force"',
+		'Sécurisez la page de connection contre les attaques "brute force"',
 
 		'Define here when and how IP are blocked' =>
-		'Comment et pour combien de temps les IP sont bloqu�es',
+		'Comment et pour combien de temps les IP sont bloquées',
 
 		'Fail count limit' =>
 		'Limite d\'erreurs',
 
 		'Blocked length <em>in minutes</em>' =>
-		'Dur�e d\'expulsion <em>minutes</em>',
+		'Durée d\'expulsion <em>minutes</em>',
 
 		'"%s" is not a valid positive integer' =>
 		'"%s" n\'est pas un entier positif',
 
-		'Your IP address is currently banned, due to typing too many worng username/passwords' =>
-		false,
+		'Your IP address is currently banned, due to typing too many worng usernames/passwords' =>
+		'Votre adresse IP est bannie pour avoir essayer trop de mauvais noms d\'usager et/ou mot de passes',
 
 		'You can ask your administrator to unlock your account or wait %s minutes' =>
-		false,
+		'Demandez à votre administrateur de débloquer votre compte ou attendez %s minutes',
 
 		'Banned IP address' =>
-		false,
+		'Adresse IP bannie',
 
 		'Banned IPs' =>
-		false,
+		'Adresses IP bannies',
 
 		'IP Address' =>
-		false,
+		'Adresse IP',
 
 		'Last Attempt' =>
-		false,
+		'Dernière tentative',
 
 		'Failed Count' =>
-		false,
+		'Nombre d\'échec',
 
-		'User Agent'=>
-		false,
+		'User Agent (browser)'=>
+		'User Agent (fureteur)',
 
 		'Username' =>
-		false,
+		'Nom d\'usager',
 
 		'Failures remove successfuly' =>
-		false
-
+		'Échecs supprimés'
 
 	);
