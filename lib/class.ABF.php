@@ -111,7 +111,7 @@
 		public function throwBannedException($length) {
 			// banned throw exception
 			throw new SymphonyErrorPage(
-				__('Your IP address is currently banned, due to typing too many worng usernames/passwords')
+				__('Your IP address is currently banned, due to typing too many wrong usernames/passwords')
 				. '<br/><br/>' .
 				__('You can ask your administrator to unlock your account or wait %s minutes', array($length)),
 				__('Banned IP address')

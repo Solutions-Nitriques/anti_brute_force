@@ -31,7 +31,7 @@
 		'"%s" is not a valid positive integer' =>
 		'"%s" n\'est pas un entier positif',
 
-		'Your IP address is currently banned, due to typing too many worng usernames/passwords' =>
+		'Your IP address is currently banned, due to typing too many wrong usernames/passwords' =>
 		'Votre adresse IP est bannie pour avoir essayer trop de mauvais noms d\'usager et/ou mot de passes',
 
 		'You can ask your administrator to unlock your account or wait %s minutes' =>
