@@ -7,6 +7,8 @@
 	License: MIT
 	*/
 
+	require_once (EXTENSIONS . '/asdc/lib/class.asdc.php');
+
 	/**
 	 *
 	 * Symphony CMS leaverage the Decorator pattern with their Extension class.
@@ -18,10 +20,10 @@
 	class ABF implements Singleton {
 
 		/**
-		 * Short hand
-		 * @var MySQL
+		 * Short hand fot the table name
+		 * @var unknown_type
 		 */
-		private $db = Symphony::Database;
+		private $tbl = 'tbl_anti_brute_force';
 
 		/**
 		 * Singleton implementation
@@ -38,28 +40,112 @@
 		}
 
 		// do not allow external creation
-		private function __construct() {}
+		private function __construct(){}
 
 
 		/**
 		 * Public methods
 		 */
 
-		public function isCurrentlyBanned() {
+
+		public function isCurrentlyBanned($length, $failedCount) {
+
+			$results = $this->getFailureByIp("
+				AND UNIX_TIMESTAMP(LastAttempt) + (60 * $length) > UNIX_TIMESTAMP()
+				AND FailedCount >= $failedCount");
+
+			if ($results != null) {
+				return $results->length() > 0;
+			}
 
 			return true;
 		}
 
 		public function registerFailure() {
+			$ip = $this->getIP();
+			$results = $this->getFailureByIp();
 
+			if ($results != null && $results->length() > 0) {
+				// UPDATE
+				/*ASDCLoader::instance()->update( array(
+						'LastAttempt' => 'NOW()',
+						'FailedCount' => 'FailedCount + 1'
+					),
+					$this->tbl,
+					"IP = $ip"
+				);*/
+
+				ASDCLoader::instance()->query("
+					UPDATE $this->tbl
+						SET `LastAttempt` = NOW(),
+						    `FailedCount` = `FailedCount` + 1
+						WHERE IP = '$ip'
+						LIMIT 1
+				");
+
+			} else {
+				// INSERT
+				/*ASDCLoader::instance()->insert( array(
+						'IP' => $ip,
+						'LastAttempt' => 'NOW()',
+						'FailedCount' => 1,
+						'UA' => $this->getUA()
+					),
+					$this->tbl,
+					"IP = $ip"
+				);*/
+
+				$ua = ASDCLoader::instance()->escape($this->getUA());
+				ASDCLoader::instance()->query("
+					INSERT INTO $this->tbl
+						(IP, LastAttempt, FailedCount, UA)
+						VALUES
+						('$ip', NOW(), 1, '$ua')
+				");
+			}
 		}
 
-		public function unregisterFailure() {
-
+		public function throwBannedException($length) {
+			// banned throw exception
+			throw new SymphonyErrorPage(
+				__('Your IP address is currently banned, due to typing too many worng username/passwords')
+				. '<br/><br/>' .
+				__('You can ask your administrator to unlock your account or wait %s minutes', array($length)),
+				__('Banned IP address')
+			);
 		}
 
-		public function removeExpiredEntries() {
+		public function unregisterFailure($ip='') {
+			$ip = strlen($ip) < 8 ? $this->getIP() : $ip;
+			ASDCLoader::instance()->delete($this->tbl, "IP = '$ip'");
+		}
 
+		public function removeExpiredEntries($length) {
+			ASDCLoader::instance()->delete($this->tbl, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
+		}
+
+		/**
+		 * Database Data queries
+		 */
+		public function getFailureByIp($additionalWhere='') {
+			$ip = $this->getIP();
+			$where = "IP = '$ip'";
+			if (strlen($additionalWhere) > 0) {
+				$where .= $additionalWhere;
+			}
+			$sql ="
+				SELECT * FROM $this->tbl WHERE $where LIMIT 1
+			" ;
+
+			return ASDCLoader::instance()->query($sql);
+		}
+
+		private function getIP() {
+			return $_SERVER["REMOTE_ADDR"];
+		}
+
+		private function getUA() {
+			return $_ENV["HTTP_USER_AGENT"];
 		}
 
 
@@ -68,6 +154,17 @@
 		 */
 
 		public function install() {
+			$sql = "
+				CREATE TABLE IF NOT EXISTS $tbl (
+					`IP` VARCHAR( 16 ) NOT NULL ,
+					`LastAttempt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+					`FailedCount` INT( 5 ) NOT NULL DEFAULT  '1',
+					`UA` VARCHAR( 1024 ) NULL ,
+					PRIMARY KEY (  `IP` )
+				) ENGINE = MYISAM
+			";
+
+			$results = ASDCLoader::instance()->query($sql);
 
 			return true;
 		}
@@ -85,6 +182,11 @@
 		}
 
 		public function uninstall() {
+			$sql = "
+				DROP TABLE IF EXISTS $tbl
+			";
+
+			$results = ASDCLoader::instance()->query($sql);
 
 			return true;
 		}

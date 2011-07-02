@@ -68,6 +68,29 @@
 	 		);
 		}
 
+		public function __construct($args) {
+			parent::__construct($args);
+
+			// Include ASDC, if it exists...
+			if(!class_exists('ASDCLoader')) {
+				try {
+					if((include_once(EXTENSIONS . '/asdc/lib/class.asdc.php')) === FALSE) {
+						// if the include did not raise any exception , raise a dummy one
+						throw new Exception();
+					}
+
+				} catch (Exception $e) {
+					throw new SymphonyErrorPage(
+						__('Please make sure that the ASDC extension is installed and enabled at %s.', array('<code>' . EXTENSIONS . '/asdc/</code>'))
+						. '<br/><br/>' .
+						__('It\'s available at %s.', array('<a href="https://github.com/pointybeard/asdc/tree">github.com/pointybeard/asdc/tree</a>')),
+						__('ASDC not found')
+					);
+				}
+
+			}
+		}
+
 		public function getSubscribedDelegates(){
 			return array(
 				array(
@@ -89,19 +112,38 @@
 					'page'      => '/system/preferences/',
 					'delegate'  => 'Save',
 					'callback'  => 'save'
+				),
+				array(
+					'page'      => '/backend/',
+					'delegate'  => 'AdminPagePreGenerate',
+					'callback'  => 'adminPagePreGenerate'
 				)
 			);
 		}
 
 		public function authorLoginFailure($context) {
-			var_dump($context);
-			die();
+			// register failure in DB
 			ABF::instance()->registerFailure();
 		}
 
 		public function authorLoginSuccess($context) {
+			// unregister any result with current IP
 			ABF::instance()->unregisterFailure();
-			ABF::instance()->removeExpiredEntries();
+		}
+
+		public function adminPagePreGenerate($context) {
+			$length = self::getConfigVal(self::SETTING_LENGTH);
+
+			// clean on login page
+			if ($context['oPage'] instanceof contentLogin) {
+				// clean database before check
+				ABF::instance()->removeExpiredEntries($length);
+			}
+
+			// check if banned
+			if (ABF::instance()->isCurrentlyBanned($length,self::getConfigVal(self::SETTING_FAILED_COUNT))) {
+				ABF::instance()->throwBannedException($length);
+			}
 		}
 
 		public function install() {
@@ -109,7 +151,7 @@
 
 			if ($intalled) {
 				// set default values
-				$default_values = array(
+				$pseudo_context = array(
 					'settings' => array (
 						self::SETTING_GROUP => array (
 							self::SETTING_LENGTH => 60,
@@ -117,7 +159,7 @@
 						)
 					)
 				);
-				$this->save($default_values);
+				$this->save($pseudo_context);
 			}
 
 			return $intalled;
@@ -210,11 +252,17 @@
 
 		/**
 		 * Delegate handle that saves the preferences
+		 * Saves settings and cleans the database acconding to the new settings
 		 * @param array $context
 		 */
 		public function save($context){
-			$this->saveOne($context, self::SETTING_LENGTH);
-			$this->saveOne($context, self::SETTING_FAILED_COUNT);
+			$this->saveOne($context, self::SETTING_LENGTH, false);
+			$this->saveOne($context, self::SETTING_FAILED_COUNT, true);
+
+			if (count($this->errors) == 0) {
+				// clean old entry after save, since this may affects some banned IP
+				ABF::instance()->removeExpiredEntries(self::getConfigVal(self::SETTING_LENGTH));
+			}
 		}
 
 		/**
@@ -222,8 +270,9 @@
 		 * Save one parameter
 		 * @param array $context
 		 * @param string $key
+		 * @param string $autoSave @optional
 		 */
-		public function saveOne($context, $key){
+		public function saveOne($context, $key, $autoSave=true){
 			// get the input
 			$input = $context['settings'][self::SETTING_GROUP][$key];
 			$iVal = intval($input);
@@ -235,22 +284,21 @@
 				Symphony::Configuration()->set($key, $iVal, self::SETTING_GROUP);
 
 				// save it
-				Administration::instance()->saveConfig();
+				if ($autoSave) {
+					Administration::instance()->saveConfig();
+				}
 
 			} else {
 				// don't save
 
 				// set error message
 				$error = __('"%s" is not a valid positive integer',  array($input));
-			 	array_push($this->errors, $error);
 
-				//echo $error;die;
+				// append to local array
+				array_push($this->errors, $error);
 
 				// add an error into the stack
 				$context['errors'][self::SETTING_GROUP][$key] = $error;
 			}
 		}
-
 	}
-
-?>

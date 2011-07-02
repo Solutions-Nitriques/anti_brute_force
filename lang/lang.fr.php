@@ -29,6 +29,15 @@
 		'Durée d\'expulsion <em>minutes</em>',
 
 		'"%s" is not a valid positive integer' =>
-		'"%s" n\'est pas un entier positif'
+		'"%s" n\'est pas un entier positif',
+
+		'Your IP address is currently banned, due to typing too many worng username/passwords' =>
+		false,
+
+		'You can ask your administrator to unlock your account or wait %s minutes' =>
+		false,
+
+		'Banned IP address' =>
+		false
 
 	);
