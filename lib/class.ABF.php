@@ -148,7 +148,7 @@
 		 * @param string $additionalWhere @optional additional SQL filters
 		 */
 		public function getFailureByIp($ip='', $additionalWhere='') {
-			$ip = strlen($ip) >= 8? $ip: $this->getIP();
+			$ip = strlen($ip) < 8 ? $this->getIP() : $ip;
 			$where = "IP = '$ip'";
 			if (strlen($additionalWhere) > 0) {
 				$where .= $additionalWhere;
