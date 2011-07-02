@@ -56,7 +56,7 @@
 		 */
 		public function isCurrentlyBanned($length, $failedCount) {
 
-			$results = $this->getFailureByIp("
+			$results = $this->getFailureByIp(null, "
 				AND UNIX_TIMESTAMP(LastAttempt) + (60 * $length) > UNIX_TIMESTAMP()
 				AND FailedCount >= $failedCount");
 
@@ -144,10 +144,11 @@
 		/**
 		 *
 		 * Method that returns failures based on IP address and other filters
-		 * @param $additionalWhere - addiyional SQL filters
+		 * @param string $ip the ip in the select query
+		 * @param string $additionalWhere @optional additional SQL filters
 		 */
-		public function getFailureByIp($additionalWhere='') {
-			$ip = $this->getIP();
+		public function getFailureByIp($ip='', $additionalWhere='') {
+			$ip = strlen($ip) >= 8? $ip: $this->getIP();
 			$where = "IP = '$ip'";
 			if (strlen($additionalWhere) > 0) {
 				$where .= $additionalWhere;
