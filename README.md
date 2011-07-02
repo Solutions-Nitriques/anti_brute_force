@@ -1,6 +1,6 @@
 # Anti Brute Force #
 
-Version: 1.0
+Version: 1.0.1
 
 ## Secure your Symphony backend login page against brute force attacks ##
 
@@ -15,13 +15,10 @@ Prevents ***people and software*** to brute force your authors accounts.
 
 ### REQUIREMENTS ###
 
-- This Extension relies on the "Advanced Symphony Database Connector" (ASDC) library. Read more about it 
-  at https://github.com/symphonycms/asdc and grab the latest stable version using 
-  "git clone git://github.com/symphonycms/asdc.git". 
+- Symphony CMS version 2.2 and up (as of the day of the last release of this extension)
 
 ### INSTALLATION ###
 
-- Install *ASDC*
 - Unzip the anti_brute_force.zip file
 - (re)Name the folder anti_brute_force
 - Put into the extension directory
@@ -33,6 +30,9 @@ Prevents ***people and software*** to brute force your authors accounts.
 http://www.nitriques.com/open-source/
 
 ### History ###
+
+- 1.0.1 - 2011-07-02
+  Fix Issues #1 (typo) and #2 (no more ASDC)
 
 - 1.0 - 2011-07-01  
   First release: Block login, Admin content page, ABF Facade/Singleton
