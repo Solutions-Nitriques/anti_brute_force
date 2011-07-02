@@ -3,7 +3,8 @@
 ## Secure your Symphony backend login page against brute force attacks ##
 
 Prevents people and software to brute force your authors, account.  
-After *x* failed attempt, the IP address will be banned for *y* min.
+After **x** failed attempt, the IP address will be banned for **y** min.  
+**x** and **y** are settings in the preferences page
 
 ### REQUIREMENTS ###
 
@@ -11,7 +12,7 @@ After *x* failed attempt, the IP address will be banned for *y* min.
   at https://github.com/symphonycms/asdc and grab the latest stable version using 
   "git clone git://github.com/symphonycms/asdc.git". 
 
-[INSTALLATION]
+### INSTALLATION ###
 
 - Install ASDC
 - Unzip the anti_brute_force file
@@ -19,11 +20,11 @@ After *x* failed attempt, the IP address will be banned for *y* min.
 - Enable/Install just like any other extension
 - (optional) Go to the setting page to customize settings
 
-** Voila ! **
+*Voila !*
 
 http://www.nitriques.com/open-source/
 
-[Hisotry]
+### Hisotry ###
 
 - 1.0 - 2011-07-01  
   First release
