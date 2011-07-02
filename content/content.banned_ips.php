@@ -8,7 +8,7 @@
 	Copyight: Solutions Nitriques 2011
 	License: MIT
 
-	Based on: https://github.com/eKoeS/edui/
+	Based on content pages on https://github.com/eKoeS/edui/
 	*/
 
 	class contentExtensionAnti_brute_forceBanned_ips extends AdministrationPage {
@@ -28,6 +28,9 @@
 			);
 		}
 
+		/**
+		 * Builds the content view
+		 */
 		public function __viewIndex() {
 			$title = __('Banned IPs');
 
@@ -58,6 +61,10 @@
 			$this->addActions();
 		}
 
+		/**
+		 *
+		 * Utility method that build the header of the table element
+		 */
 		private function buildTableHeader() {
 			$a = array();
 			foreach ($this->_cols as $key => $value) {
@@ -139,6 +146,9 @@
 			return $a;
 		}
 
+		/**
+		 * Utility method that generates the 'action' panel
+		 */
 		private function addActions() {
 			$tableActions = new XMLElement('div');
 			$tableActions->setAttribute('class', 'actions');
@@ -157,6 +167,9 @@
 			$this->Form->appendChild($tableActions);
 		}
 
+		/**
+		 * Method that handles user actions on the page
+		 */
 		public function __actionIndex() {
 			// if actions were launch
 			if (isset($_POST['action']) && is_array($_POST['action'])) {
@@ -174,6 +187,10 @@
 
 		}
 
+		/**
+		 * Apply action
+		 * @param $action
+		 */
 		public function __actionApply($action) {
 			if (isset($_POST['with-selected'])) {
 				switch ($_POST['with-selected']) {
@@ -184,6 +201,9 @@
 			}
 		}
 
+		/**
+		 * Utility method that deletes selected failures
+		 */
 		private function __delete() {
 			if (isset($_POST['ip']) && is_array($_POST['ip'])) {
 				try {

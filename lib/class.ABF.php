@@ -47,7 +47,13 @@
 		 * Public methods
 		 */
 
-
+		/**
+		 *
+		 * Check to see if the current user IP address is banned,
+		 * based on the parameters passed to the method
+		 * @param int/string $length
+		 * @param int/string $failedCount
+		 */
 		public function isCurrentlyBanned($length, $failedCount) {
 
 			$results = $this->getFailureByIp("
@@ -61,52 +67,47 @@
 			return true;
 		}
 
+		/**
+		 *
+		 * Register a failure - insert or update - for a IP
+		 * @param string $username
+		 * @param string $ip @optional - will take current user's ip
+		 */
 		public function registerFailure($username, $ip='') {
 			$ip = strlen($ip) < 8 ? $this->getIP() : $ip;
 			$username = ASDCLoader::instance()->escape($username);
-			$results = $this->getFailureByIp();
+			$ua = ASDCLoader::instance()->escape($this->getUA());
+			$results = $this->getFailureByIp($ip);
 
 			if ($results != null && $results->length() > 0) {
 				// UPDATE
-				/*ASDCLoader::instance()->update( array(
-						'LastAttempt' => 'NOW()',
-						'FailedCount' => 'FailedCount + 1'
-					),
-					$this->tbl,
-					"IP = $ip"
-				);*/
-
 				ASDCLoader::instance()->query("
 					UPDATE $this->tbl
 						SET `LastAttempt` = NOW(),
 						    `FailedCount` = `FailedCount` + 1,
-						    `Username` = '$username'
+						    `Username` = '$username',
+						    `UA` = '$ua'
 						WHERE IP = '$ip'
 						LIMIT 1
 				");
 
 			} else {
 				// INSERT
-				/*ASDCLoader::instance()->insert( array(
-						'IP' => $ip,
-						'LastAttempt' => 'NOW()',
-						'FailedCount' => 1,
-						'UA' => $this->getUA()
-					),
-					$this->tbl,
-					"IP = $ip"
-				);*/
-
-				$ua = ASDCLoader::instance()->escape($this->getUA());
 				ASDCLoader::instance()->query("
 					INSERT INTO $this->tbl
-						(IP, LastAttempt, Username, FailedCount, UA)
+						(`IP`, `LastAttempt`, `Username`, `FailedCount`, `UA`)
 						VALUES
 						('$ip', NOW(), '$username', 1, '$ua')
 				");
 			}
 		}
 
+		/**
+		 *
+		 * Utility function that throw a properly formatted SymphonyErrorPage Exception
+		 * @param string $length - length of block in minutes
+		 * @throws SymphonyErrorPage
+		 */
 		public function throwBannedException($length) {
 			// banned throw exception
 			throw new SymphonyErrorPage(
@@ -117,17 +118,33 @@
 			);
 		}
 
+		/**
+		 *
+		 * Unregister IP from the banned table - even if max failed count is not reach
+		 * @param string $ip  - will take current user's ip
+		 */
 		public function unregisterFailure($ip='') {
 			$ip = strlen($ip) < 8 ? $this->getIP() : $ip;
 			ASDCLoader::instance()->delete($this->tbl, "IP = '$ip'");
 		}
 
+		/**
+		 *
+		 * Enter description here ...
+		 * @param string/int $length
+		 */
 		public function removeExpiredEntries($length) {
 			ASDCLoader::instance()->delete($this->tbl, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
 		}
 
 		/**
 		 * Database Data queries
+		 */
+
+		/**
+		 *
+		 * Method that returns failures based on IP address and other filters
+		 * @param $additionalWhere - addiyional SQL filters
 		 */
 		public function getFailureByIp($additionalWhere='') {
 			$ip = $this->getIP();
@@ -142,6 +159,11 @@
 			return ASDCLoader::instance()->query($sql);
 		}
 
+		/**
+		 *
+		 * Method that returns all failures, optionally ordered
+		 * @param string $orderedBy @optional
+		 */
 		public function getFailures($orderedBy='') {
 			$order = '';
 			if (strlen($orderedBy) > 0) {
@@ -154,6 +176,9 @@
 			return ASDCLoader::instance()->query($sql);
 		}
 
+		/**
+		 * Utilities
+		 */
 		private function getIP() {
 			return $_SERVER["REMOTE_ADDR"];
 		}
