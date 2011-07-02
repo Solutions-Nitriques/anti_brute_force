@@ -7,8 +7,6 @@
 	License: MIT
 	*/
 
-	require_once (EXTENSIONS . '/asdc/lib/class.asdc.php');
-
 	/**
 	 *
 	 * Symphony CMS leaverage the Decorator pattern with their Extension class.
@@ -60,11 +58,7 @@
 				AND UNIX_TIMESTAMP(LastAttempt) + (60 * $length) > UNIX_TIMESTAMP()
 				AND FailedCount >= $failedCount");
 
-			if ($results != null) {
-				return $results->length() > 0;
-			}
-
-			return true;
+			return count($results) > 0;
 		}
 
 		/**
@@ -75,13 +69,14 @@
 		 */
 		public function registerFailure($username, $ip='') {
 			$ip = strlen($ip) < 8 ? $this->getIP() : $ip;
-			$username = ASDCLoader::instance()->escape($username);
-			$ua = ASDCLoader::instance()->escape($this->getUA());
+			$username = MySQL::cleanValue($username);
+			$ua = MySQL::cleanValue($this->getUA());
 			$results = $this->getFailureByIp($ip);
+			$ret = false;
 
-			if ($results != null && $results->length() > 0) {
+			if ($results != null && count($results) > 0) {
 				// UPDATE
-				ASDCLoader::instance()->query("
+				$ret = Symphony::Database()->query("
 					UPDATE $this->tbl
 						SET `LastAttempt` = NOW(),
 						    `FailedCount` = `FailedCount` + 1,
@@ -93,13 +88,15 @@
 
 			} else {
 				// INSERT
-				ASDCLoader::instance()->query("
+				$ret = Symphony::Database()->query("
 					INSERT INTO $this->tbl
 						(`IP`, `LastAttempt`, `Username`, `FailedCount`, `UA`)
 						VALUES
 						('$ip', NOW(), '$username', 1, '$ua')
 				");
 			}
+
+			return $ret;
 		}
 
 		/**
@@ -125,7 +122,7 @@
 		 */
 		public function unregisterFailure($ip='') {
 			$ip = strlen($ip) < 8 ? $this->getIP() : $ip;
-			ASDCLoader::instance()->delete($this->tbl, "IP = '$ip'");
+			return Symphony::Database()->delete($this->tbl, "IP = '$ip'");
 		}
 
 		/**
@@ -134,7 +131,7 @@
 		 * @param string/int $length
 		 */
 		public function removeExpiredEntries($length) {
-			ASDCLoader::instance()->delete($this->tbl, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
+			return Symphony::Database()->delete($this->tbl, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
 		}
 
 		/**
@@ -157,7 +154,13 @@
 				SELECT * FROM $this->tbl WHERE $where LIMIT 1
 			" ;
 
-			return ASDCLoader::instance()->query($sql);
+			$rets = array();
+
+			if (Symphony::Database()->query($sql)) {
+				$rets = Symphony::Database()->fetch();
+			}
+
+			return $rets;
 		}
 
 		/**
@@ -174,7 +177,13 @@
 				SELECT * FROM $this->tbl $order
 			" ;
 
-			return ASDCLoader::instance()->query($sql);
+			$rets = array();
+
+			if (Symphony::Database()->query($sql)) {
+				$rets = Symphony::Database()->fetch();
+			}
+
+			return $rets;
 		}
 
 		/**
@@ -205,9 +214,7 @@
 				) ENGINE = MYISAM
 			";
 
-			$results = ASDCLoader::instance()->query($sql);
-
-			return true;
+			return Symphony::Database()->query($sql);
 		}
 
 		public function update($previousVersion, $currentVersion) {
@@ -227,9 +234,7 @@
 				DROP TABLE IF EXISTS $this->tbl
 			";
 
-			$results = ASDCLoader::instance()->query($sql);
-
-			return true;
+			return Symphony::Database()->query($sql);
 		}
 
 	}

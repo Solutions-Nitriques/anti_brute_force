@@ -85,7 +85,7 @@
 			$data = ABF::instance()->getFailures('IP ASC');
 
 			// update flag
-			$this->_hasData = $data != null &&  $data->length() > 0;
+			$this->_hasData = $data != null && count($data) > 0;
 
 			if (!$this->_hasData) {
 				// no data
@@ -104,13 +104,13 @@
 				);
 			} else {
 
-				$datarow = null;
 				$index = 0;
 
-				while ($datarow = $data->current()) {
+				foreach ($data as $datarow) {
+
+					$cols = array();
 
 					$datarow = get_object_vars($datarow);
-					$cols = array();
 
 					foreach ($this->_cols as $key => $value) {
 						$val = $datarow[$key];

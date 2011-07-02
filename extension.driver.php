@@ -68,29 +68,6 @@
 	 		);
 		}
 
-		public function __construct($args) {
-			parent::__construct($args);
-
-			// Include ASDC, if it exists...
-			if(!class_exists('ASDCLoader')) {
-				try {
-					if((include_once(EXTENSIONS . '/asdc/lib/class.asdc.php')) === FALSE) {
-						// if the include did not raise any exception , raise a dummy one
-						throw new Exception();
-					}
-
-				} catch (Exception $e) {
-					throw new SymphonyErrorPage(
-						__('Please make sure that the ASDC extension is installed and enabled at %s.', array('<code>' . EXTENSIONS . '/asdc/</code>'))
-						. '<br/><br/>' .
-						__('It\'s available at %s.', array('<a href="https://github.com/pointybeard/asdc/tree">github.com/pointybeard/asdc/tree</a>')),
-						__('ASDC not found')
-					);
-				}
-
-			}
-		}
-
 		public function getSubscribedDelegates(){
 			return array(
 				array(
@@ -142,6 +119,7 @@
 
 			// check if banned
 			if (ABF::instance()->isCurrentlyBanned($length,self::getConfigVal(self::SETTING_FAILED_COUNT))) {
+				// block access
 				ABF::instance()->throwBannedException($length);
 			}
 		}
