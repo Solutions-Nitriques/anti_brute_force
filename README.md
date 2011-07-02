@@ -1,12 +1,11 @@
-### Anti Brute Force ###
-------------------------------------
+# Anti Brute Force #
 
 ## Secure your Symphony backend login page against brute force attacks ##
 
-Prevents people and software to brute force your authors, account.
+Prevents people and software to brute force your authors, account.  
 After *x* failed attempt, the IP address will be banned for *y* min.
 
-[REQUIREMENTS]
+### REQUIREMENTS ###
 
 - This Extension relies on the "Advanced Symphony Database Connector" (ASDC) library. Read more about it 
   at https://github.com/symphonycms/asdc and grab the latest stable version using 
