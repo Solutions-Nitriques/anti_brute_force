@@ -48,14 +48,14 @@
 				Widget::TableHead($aTableHead), // header
 				NULL, // footer
 				Widget::TableBody($aTableBody), // body
-				'selectable' // id
+				'selectable' // class
+				// id
+				// attributes
 			);
 
 			$this->Form->appendChild($table);
 
-			if ($this->_hasData) {
-				$this->addActions();
-			}
+			$this->addActions();
 		}
 
 		private function buildTableHeader() {
@@ -67,6 +67,12 @@
 			return $a;
 		}
 
+		/**
+		 *
+		 * Utility method that build the body of the table element
+		 *
+		 * ** I wish templating Admin Page was simplier !!!
+		 */
 		private function buildTableBody() {
 			$a = array();
 			$data = ABF::instance()->getFailures('IP ASC');
@@ -92,6 +98,7 @@
 			} else {
 
 				$datarow = null;
+				$index = 0;
 
 				while ($datarow = $data->current()) {
 
@@ -101,18 +108,31 @@
 					foreach ($this->_cols as $key => $value) {
 						$val = $datarow[$key];
 						$css = 'col';
+						$hasValue = strlen($val) > 0;
 
-						if (strlen($val) == 0) {
+						if (!$hasValue) {
 							$val = __('None');
 							$css = 'inactive';
 						}
 
 						$td = Widget::TableData($val, $css);
+
+						// add the hidden checkbox for selectacle row
+						if ($key == 'IP' && $hasValue) {
+							$chk = Widget::Input(
+								"ip[$val]", //name
+								NULL,
+								'checkbox'
+							);
+							$td->appendChild($chk);
+						}
+
 						array_push($cols, $td);
 					}
 
-					array_push($a, Widget::TableRow($cols));
+					array_push($a, Widget::TableRow($cols, $index % 2 == 0 ? 'even' : 'odd'));
 
+					$index++;
 				}
 			}
 
@@ -123,13 +143,16 @@
 			$tableActions = new XMLElement('div');
 			$tableActions->setAttribute('class', 'actions');
 
-			$options = array(
-				array(NULL, false, __('With Selected...')),
-				array('delete', false, __('Delete'), 'confirm'),
-			);
+			if ($this->_hasData) {
 
-			$tableActions->appendChild(Widget::Select('with-selected', $options));
-			$tableActions->appendChild(Widget::Input('action[apply]', __('Apply'), 'submit'));
+				$options = array(
+					array(NULL, false, __('With Selected...')),
+					array('delete', false, __('Delete'), 'confirm'),
+				);
+
+				$tableActions->appendChild(Widget::Select('with-selected', $options));
+				$tableActions->appendChild(Widget::Input('action[apply]', __('Apply'), 'submit'));
+			}
 
 			$this->Form->appendChild($tableActions);
 		}
@@ -138,16 +161,44 @@
 			// if actions were launch
 			if (isset($_POST['action']) && is_array($_POST['action'])) {
 
-				var_dump($_POST['action']);
-				die();
-
 				// for each action
 				foreach ($_POST['action'] as $key => $action) {
-
+					switch ($key) {
+						case 'apply':
+							$this->__actionApply($action);
+							break;
+					}
 				}
 
 			}
 
+		}
+
+		public function __actionApply($action) {
+			if (isset($_POST['with-selected'])) {
+				switch ($_POST['with-selected']) {
+					case 'delete':
+						$this->__delete();
+						break;
+				}
+			}
+		}
+
+		private function __delete() {
+			if (isset($_POST['ip']) && is_array($_POST['ip'])) {
+				try {
+					foreach ($_POST['ip'] as $ip => $value) {
+						ABF::instance()->unregisterFailure($ip);
+					}
+
+					$this->pageAlert(__('Failures remove successfuly'), Alert::SUCCESS);
+
+				} catch (Exception $e) {
+
+					$this->pageAlert(__('Error') . ': ' . $e->getMessage(), Alert::ERROR);
+
+				}
+			}
 		}
 
 	}

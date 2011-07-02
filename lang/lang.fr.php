@@ -56,6 +56,9 @@
 		false,
 
 		'Username' =>
+		false,
+
+		'Failures remove successfuly' =>
 		false
 
 

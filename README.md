@@ -1,10 +1,17 @@
 # Anti Brute Force #
 
+Version: 1.0
+
 ## Secure your Symphony backend login page against brute force attacks ##
 
-Prevents people and software to brute force your authors, account.  
-After **x** failed attempt, the IP address will be banned for **y** min.  
-**x** and **y** are settings in the preferences page
+Prevents ***people and software*** to brute force your authors accounts.  
+
+### SPECS ###
+
+- After **x** failed attempt, the IP address will be banned for **y** min;  
+  **x** and **y** are settings in the preferences page 
+- Admin content page for managing blocked IPs
+- A Facade/Singleton class -ABF- for developers to leverage anti_brute_force capabilities (ex.: email reports)
 
 ### REQUIREMENTS ###
 
@@ -28,4 +35,4 @@ http://www.nitriques.com/open-source/
 ### History ###
 
 - 1.0 - 2011-07-01  
-  First release
+  First release: Block login, Admin content page, ABF Facade/Singleton
