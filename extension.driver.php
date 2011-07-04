@@ -233,7 +233,7 @@
 						self::SETTING_GROUP => array (
 							self::SETTING_LENGTH => 60,
 							self::SETTING_FAILED_COUNT => 5,
-							self::SETTING_AUTO_UNBAN => false
+							self::SETTING_AUTO_UNBAN => 'off'
 						)
 					)
 				);
@@ -330,12 +330,25 @@
 		 * @param string $textKey
 		 */
 		public function generateField($settingName, $textKey, $type = 'text') {
+			$inputText = self::getConfigVal($settingName);
+			$inputAttr = array();
+
+			switch ($type) {
+				case 'checkbox':
+					if ($inputText == 'on') {
+						$inputAttr['checked'] = 'checked';
+					}
+					$inputText = '';
+					break;
+			}
+
 			// create the label and the input field
 			$label = Widget::Label();
 			$input = Widget::Input(
 						'settings[' . self::SETTING_GROUP . '][' . $settingName .']',
-						self::getConfigVal($settingName),
-						$type
+						$inputText,
+						$type,
+						$inputAttr
 					);
 
 			// set the input into the label
