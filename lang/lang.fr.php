@@ -68,6 +68,9 @@
 		false,
 
 		'Email Address' =>
+		false,
+
+		'Users can unban their IP via email' =>
 		false
 
 	);

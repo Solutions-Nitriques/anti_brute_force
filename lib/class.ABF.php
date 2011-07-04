@@ -53,7 +53,9 @@
 		 * @param int/string $failedCount
 		 */
 		public function isCurrentlyBanned($length, $failedCount) {
-
+			if (!isset($length) || !isset($failedCount)) {
+				return false; // no preference, how can we know...
+			}
 			$results = $this->getFailureByIp(null, "
 				AND UNIX_TIMESTAMP(LastAttempt) + (60 * $length) > UNIX_TIMESTAMP()
 				AND FailedCount >= $failedCount");
@@ -122,11 +124,14 @@
 		/**
 		 *
 		 * Unregister IP from the banned table - even if max failed count is not reach
-		 * @param string $ip  - will take current user's ip
+		 * @param string $filter @optional will take current user's ip
+		 * can be the IP address or the hash value
 		 */
-		public function unregisterFailure($ip='') {
-			$ip = strlen($ip) < 8 ? $this->getIP() : $ip;
-			return Symphony::Database()->delete($this->tbl, "IP = '$ip'");
+		public function unregisterFailure($filter='') {
+			// ip is at least 8 char
+			// hash is 36 char
+			$filter = strlen($filter) < 8 ? $this->getIP() : $filter;
+			return Symphony::Database()->delete($this->tbl, "IP = '$filter' OR Hash = '$filter'");
 		}
 
 		/**
@@ -215,7 +220,7 @@
 					`UA` VARCHAR( 1024 ) NULL,
 					`Username` VARCHAR( 100 ) NULL,
 					`Source` VARCHAR( 100 ) NULL,
-					`Hash` VARCHAR( 36 ) NOT NULL,
+					`Hash` CHAR( 36 ) NOT NULL,
 					PRIMARY KEY (  `IP` )
 				) ENGINE = MYISAM
 			";

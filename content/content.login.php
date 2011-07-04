@@ -28,21 +28,31 @@
 		 */
 		public function view(){
 			// if not banned, redirect
-			$banned = ABF::instance()->isCurrentlyBanned(
-							extension_anti_brute_force::getConfigVal(extension_anti_brute_force::SETTING_LENGTH),
-							extension_anti_brute_force::getConfigVal(extension_anti_brute_force::SETTING_FAILED_COUNT)
+			/*$banned = ABF::instance()->isCurrentlyBanned(
+						extension_anti_brute_force::getConfigVal(extension_anti_brute_force::SETTING_LENGTH),
+						extension_anti_brute_force::getConfigVal(extension_anti_brute_force::SETTING_FAILED_COUNT)
 					);
 			if ($banned) {
 				redirect(SYMPHONY_URL);
+			}*/
+
+			// if this is the unban request
+			if (isset($this->_context) && is_array($this->_context) && count($this->_context) > 0) {
+				// check if we have a hash present
+
+				redirect(SYMPHONY_URL);
+				die();
+
+			} else {
+
+				$this->Form = Widget::Form('', 'post');
+
+				$this->Form->appendChild(new XMLElement('h1', __('Symphony')));
+
+				$this->__buildFormContent();
+
+				$this->Body->appendChild($this->Form);
 			}
-
-			$this->Form = Widget::Form('', 'post');
-
-			$this->Form->appendChild(new XMLElement('h1', __('Symphony')));
-
-			$this->__buildFormContent();
-
-			$this->Body->appendChild($this->Form);
 		}
 
 		private function __buildFormContent() {
@@ -66,7 +76,7 @@
 			$this->Form->appendChild($fieldset);
 
 			$div = new XMLElement('div', NULL, array('class' => 'actions'));
-			$div->appendChild(new XMLElement('button', __('Send Email'), array('name' => 'action[unban]', 'type' => 'submit')));
+			$div->appendChild(new XMLElement('button', __('Send Email'), array('name' => 'action[send-email]', 'type' => 'submit')));
 			$this->Form->appendChild($div);
 		}
 
@@ -78,8 +88,26 @@
 
 			if(isset($_POST['action'])){
 
+				switch ($_POST['action']) {
+					case 'send-email':
 
+						break;
+				}
+
+
+			} else {
+
+				// set error flag
+				$this->_email_sent = false;
 			}
+
+		}
+
+		private function __sendEmail() {
+
+		}
+
+		private function __unban($hash) {
 
 		}
 	}

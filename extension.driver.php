@@ -36,16 +36,28 @@
 		const SETTING_FAILED_COUNT = 'failed-count';
 
 		/**
+		 * Key of the auto unband via email setting
+		 * @var string
+		 */
+		const SETTING_AUTO_UNBAN = 'auto-unban';
+
+		/**
 		 * Key of the group of setting
 		 * @var string
 		 */
-		const SETTING_GROUP = 'force-domain';
+		const SETTING_GROUP = 'anti-brute-force';
 
 		/**
 		 * private variable for holding the errors encountered when saving
 		 * @var array
 		 */
 		protected $errors = array();
+
+		/**
+		 * Flag to check if ban check was done
+		 * @var boolean
+		 */
+		protected $banCheckDone = false;
 
 		/**
 		 * Credits for the extension
@@ -68,6 +80,12 @@
 	 		);
 		}
 
+		/**
+		 *
+		 * Symphony utility function that permits to
+		 * implement the Observer/Observable pattern.
+		 * We register here delegate that will be fired by Symphony
+		 */
 		public function getSubscribedDelegates(){
 			return array(
 				array(
@@ -94,20 +112,70 @@
 					'page'      => '/backend/',
 					'delegate'  => 'AdminPagePreGenerate',
 					'callback'  => 'adminPagePreGenerate'
+				),
+				array(
+					'page'      => '/backend/',
+					'delegate'  => 'InitaliseAdminPageHead',
+					'callback'  => 'initaliseAdminPageHead'
 				)
 			);
 		}
 
+		/**
+		 * Delegate fired to add a link to the Banned IPs Administration page
+		 */
+		public function fetchNavigation() {
+			return array(
+				array(
+					'location'	=> __('System'),
+					'name'	=> __('Banned IPs'),
+					'link'	=> '/banned_ips/'
+				)
+			);
+		}
+
+		/**
+		 * Delegate fired when the HEAD section must be build
+		 * @param array $context
+		 */
+		public function initaliseAdminPageHead($context) {
+			// do it here since it is called before
+			// processing $_POST['action']
+			$this->doBanCheck();
+		}
+
+		/**
+		 *
+		 * Delegate fired when a login fails
+		 * @param array $context
+		 */
 		public function authorLoginFailure($context) {
 			// register failure in DB
 			ABF::instance()->registerFailure($context['username'], self::EXT_NAME);
 		}
 
+		/**
+		 *
+		 * Delegate fired when a author is logged in correctly
+		 * @param array $context
+		 */
 		public function authorLoginSuccess($context) {
 			// unregister any result with current IP
 			ABF::instance()->unregisterFailure();
+
+			// Since user can still post data to the login page
+			// we don't want them to be able to know that the guessed right.
+			// So, if user is loggued in but still ban, we logout them
+			if (Symphony::instance()->isLoggedIn && $this->isCurrentlyBanned) {
+				Symphony::instance()->logout();
+			}
 		}
 
+		/**
+		 *
+		 * Delegate fired when the body of the page must be build
+		 * @param array $context
+		 */
 		public function adminPagePreGenerate($context) {
 			$length = self::getConfigVal(self::SETTING_LENGTH);
 
@@ -117,13 +185,44 @@
 				ABF::instance()->removeExpiredEntries($length);
 			}
 
-			// check if banned
-			if (ABF::instance()->isCurrentlyBanned($length,self::getConfigVal(self::SETTING_FAILED_COUNT))) {
-				// block access
-				ABF::instance()->throwBannedException($length);
+			// just to be sure
+			$this->doBanCheck();
+		}
+
+		/**
+		 *
+		 * Utility function that returns <code>>true</code>
+		 * if the current IP address is banned.
+		 */
+		public function isCurrentlyBanned() {
+			$length = self::getConfigVal(self::SETTING_LENGTH);
+			return ABF::instance()->isCurrentlyBanned($length,self::getConfigVal(self::SETTING_FAILED_COUNT));
+		}
+
+		/**
+		 * Do the actual ban check: throw exception if banned
+		 * Can be called only once; wont do anything after that
+		 */
+		public function doBanCheck() {
+			$length = self::getConfigVal(self::SETTING_LENGTH);
+
+			// if no already done...
+			if (!$this->banCheckDone) {
+
+				// check if banned
+				if ($this->isCurrentlyBanned()) {
+					// block access
+					ABF::instance()->throwBannedException($length);
+				}
+
+				$this->banCheckDone = true;
 			}
 		}
 
+		/**
+		 *
+		 * Delegate fired when the extension is install
+		 */
 		public function install() {
 			$intalled = ABF::instance()->install();
 
@@ -133,7 +232,8 @@
 					'settings' => array (
 						self::SETTING_GROUP => array (
 							self::SETTING_LENGTH => 60,
-							self::SETTING_FAILED_COUNT => 5
+							self::SETTING_FAILED_COUNT => 5,
+							self::SETTING_AUTO_UNBAN => false
 						)
 					)
 				);
@@ -143,12 +243,24 @@
 			return $intalled;
 		}
 
+		/**
+		 *
+		 * Delegate fired when the extension is updated (when version changes)
+		 * @param string $previousVersion
+		 */
 		public function update($previousVersion) {
 			$about = $this->about();
 			return ABF::instance()->update($previousVersion,$about['version']);
 		}
 
+		/**
+		 *
+		 * Delegate fired when the extension is uninstall
+		 * Cleans settings and Database
+		 */
 		public function uninstall() {
+			Symphony::Configuration()->remove(self::SETTING_GROUP, self::SETTING_GROUP);
+			Administration::instance()->saveConfig();
 			return ABF::instance()->uninstall();
 		}
 
@@ -180,6 +292,13 @@
 			$wrapper->appendChild($this->generateField(self::SETTING_FAILED_COUNT, 'Fail count limit'));
 			$wrapper->appendChild($this->generateField(self::SETTING_LENGTH, 'Blocked length <em>in minutes</em>'));
 
+			$err_wrapper->appendChild($wrapper);
+
+			// create a new wrapper
+			$wrapper = new XMLElement('div');
+			$wrapper->setAttribute('class', 'group');
+			$wrapper->appendChild($this->generateField(self::SETTING_AUTO_UNBAN, 'Users can unban their IP via email', 'checkbox'));
+
 			// append field before errors
 			$err_wrapper->appendChild($wrapper);
 
@@ -210,13 +329,13 @@
 		 * @param string $settingName
 		 * @param string $textKey
 		 */
-		public function generateField($settingName, $textKey) {
+		public function generateField($settingName, $textKey, $type = 'text') {
 			// create the label and the input field
 			$label = Widget::Label();
 			$input = Widget::Input(
 						'settings[' . self::SETTING_GROUP . '][' . $settingName .']',
 						self::getConfigVal($settingName),
-						'text'
+						$type
 					);
 
 			// set the input into the label
@@ -241,7 +360,8 @@
 		 */
 		public function save($context){
 			$this->saveOne($context, self::SETTING_LENGTH, false);
-			$this->saveOne($context, self::SETTING_FAILED_COUNT, true);
+			$this->saveOne($context, self::SETTING_FAILED_COUNT, false);
+			$this->saveOne($context, self::SETTING_FAILED_COUNT, true, 'checkbox');
 
 			if (count($this->errors) == 0) {
 				// clean old entry after save, since this may affects some banned IP
@@ -256,7 +376,7 @@
 		 * @param string $key
 		 * @param string $autoSave @optional
 		 */
-		public function saveOne($context, $key, $autoSave=true){
+		public function saveOne($context, $key, $autoSave = true, $type = 'text'){
 			// get the input
 			$input = $context['settings'][self::SETTING_GROUP][$key];
 			$iVal = intval($input);
@@ -284,18 +404,5 @@
 				// add an error into the stack
 				$context['errors'][self::SETTING_GROUP][$key] = $error;
 			}
-		}
-
-		/**
-		 * Add a link to the Banned IPs Administration page
-		 */
-		public function fetchNavigation() {
-			return array(
-				array(
-					'location'	=> __('System'),
-					'name'	=> __('Banned IPs'),
-					'link'	=> '/banned_ips/'
-				)
-			);
 		}
 	}
