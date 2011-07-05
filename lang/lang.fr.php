@@ -74,8 +74,12 @@
 		false,
 
 		'Alternatively, you can <a href="%s">un-ban your IP by email</a>.' =>
+		false,
+
+		'Please follow this link to unban your IP: ' =>
+		false,
+
+		'If you do not remember your password, follow the "forgot password" link on the login page.' =>
 		false
-
-
 
 	);

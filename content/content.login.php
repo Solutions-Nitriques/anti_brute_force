@@ -27,13 +27,15 @@
 		 * Overrides the view method
 		 */
 		public function view(){
+			// @todo maybe add a check to redirect not-banned users
+
 			// if this is the unban request
 			if (isset($this->_context) && is_array($this->_context) && count($this->_context) > 0) {
 				// check if we have a hash present
 				$hash = $this->_context[0];
 				if (strlen($hash) == 36) {
 					// Sanatize user inputed values... ALWAYS
-					$hash = General::sanatize($hash);
+					$hash = General::sanitize($hash);
 					$this->__unban($hash);
 				}
 
@@ -45,6 +47,8 @@
 				die();
 
 			} else {
+
+				$this->Body->setAttribute('onload', 'document.forms[0].elements.email.focus()');
 
 				$this->Form = Widget::Form('', 'post');
 
@@ -58,12 +62,15 @@
 
 		private function __buildFormContent() {
 			$fieldset = new XMLElement('fieldset');
-			$fieldset->appendChild(new XMLElement('p', __('Enter your email address to be sent a remote unban link with further instructions.')));
 
-			$label = Widget::Label(__('Email Address'));
-			$label->appendChild(Widget::Input('email', $_POST['email']));
+			if (!isset($this->_email_sent) && $this->_email_sent == false) {
 
-			$this->Body->setAttribute('onload', 'document.forms[0].elements.email.focus()');
+				$fieldset->appendChild(new XMLElement('p', __('Enter your email address to be sent a remote unban link with further instructions.')));
+
+				$label = Widget::Label(__('Email Address'));
+				$label->appendChild(Widget::Input('email', $_POST['email']));
+
+			}
 
 			if(isset($this->_email_sent)){
 
@@ -79,15 +86,19 @@
 					$div->appendChild(new XMLElement('p', __('There was a problem locating your account. Please check that you are using the correct email address.')));
 					$fieldset->appendChild($div);
 				}
+
 			} else {
+
 				$fieldset->appendChild($label);
 			}
 
 			$this->Form->appendChild($fieldset);
 
-			$div = new XMLElement('div', NULL, array('class' => 'actions'));
-			$div->appendChild(new XMLElement('button', __('Send Email'), array('name' => 'action[send-email]', 'type' => 'submit')));
-			$this->Form->appendChild($div);
+			if (!isset($this->_email_sent) && $this->_email_sent == false) {
+				$div = new XMLElement('div', NULL, array('class' => 'actions'));
+				$div->appendChild(new XMLElement('button', __('Send Email'), array('name' => 'action[send-email]', 'type' => 'submit')));
+				$this->Form->appendChild($div);
+			}
 		}
 
 		/**
@@ -99,25 +110,49 @@
 			// set error flag
 			$this->_email_sent = false;
 
-			if(isset($_POST['action'])){
+			if(isset($_POST['action']) && is_array($_POST['action'])){
 
-				switch ($_POST['action']) {
-					case 'send-email':
-						$this->__sendEmail();
-						break;
+				foreach ($_POST['action'] as $action => $value) {
+
+					switch ($action) {
+						case 'send-email':
+							$this->__sendEmail();
+							break;
+					}
 				}
 			}
 		}
 
 		private function __sendEmail() {
-			// safe run
-			try {
 
-				// set error flag
-				$this->_email_sent = true;
-			} catch (Exception $e) {
-				// do nothing
-				$this->_email_sent = false;
+			$author = Symphony::Database()->fetchRow(0, "SELECT `id`, `email`, `first_name` FROM `tbl_authors` WHERE `email` = '".MySQL::cleanValue($_POST['email'])."'");
+			$failure = ABF::instance()->getFailureByIp();
+
+			if (is_array($author) && is_array($failure) && isset($failure[0]->Hash)) {
+				// safe run
+				try {
+					$email = Email::create();
+
+					$email->recipients = $author['email'];
+					$email->subject = __('Unban IP link');
+					$email->text_plain =
+							__('Please follow this link to unban your IP: ') .
+							SYMPHONY_URL . ABF::UNBAND_LINK . $failure[0]->Hash . '/' . PHP_EOL .
+							__('If you do not remember your password, follow the "forgot password" link on the login page.') . PHP_EOL .
+							__('The Symphony Team');
+
+					$email->send();
+
+					// set error flag
+					$this->_email_sent = true;
+
+				} catch (Exception $e) {
+					// do nothing
+					$this->_email_sent = false;
+
+					echo $e->getMessage();
+					die;
+				}
 			}
 		}
 

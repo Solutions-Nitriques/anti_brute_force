@@ -29,15 +29,18 @@
 		 * @todo use a dynamic way to get the /symphony/extensionx/ part
 		 * @var string
 		 */
-		const UNBAND_LINK =  '/symphony/extension/anti_brute_force/login/';
+		const UNBAND_LINK =  '/extension/anti_brute_force/login/';
 
 		/**
 		 * Singleton implementation
 		 */
-		// singleton instance
 		private static $I = null;
 
-		// single ton method
+		/**
+		 *
+		 * Singleton method
+		 * @return ABF
+		 */
 		public static function instance() {
 			if (self::$I == null) {
 				self::$I = new self();
@@ -127,7 +130,7 @@
 				__('You can ask your administrator to unlock your account or wait %s minutes', array($length));
 
 			if ($useUnbanViaEmail == true || $useUnbanViaEmail == 'Yes') {
-				$msg .= ('<br/><br/>' . __('Alternatively, you can <a href="%s">un-ban your IP by email</a>.', array(self::UNBAND_LINK)));
+				$msg .= ('<br/><br/>' . __('Alternatively, you can <a href="%s">un-ban your IP by email</a>.', array(SYMPHONY_URL . self::UNBAND_LINK)));
 			}
 
 			// banned throw exception
@@ -149,7 +152,7 @@
 
 		/**
 		 *
-		 * Enter description here ...
+		 * Delete expired entries
 		 * @param string/int $length
 		 */
 		public function removeExpiredEntries($length) {
