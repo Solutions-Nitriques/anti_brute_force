@@ -24,6 +24,14 @@
 		private $tbl = 'tbl_anti_brute_force';
 
 		/**
+		 *
+		 * Holds the path to the "send me unband link" page
+		 * @todo use a dynamic way to get the /symphony/extensionx/ part
+		 * @var string
+		 */
+		const UNBAND_LINK =  '/symphony/extension/anti_brute_force/login/';
+
+		/**
 		 * Singleton implementation
 		 */
 		// singleton instance
@@ -109,16 +117,21 @@
 		 *
 		 * Utility function that throw a properly formatted SymphonyErrorPage Exception
 		 * @param string $length - length of block in minutes
+		 * @param boolean
 		 * @throws SymphonyErrorPage
 		 */
-		public function throwBannedException($length) {
-			// banned throw exception
-			throw new SymphonyErrorPage(
+		public function throwBannedException($length, $useUnbanViaEmail = false) {
+			$msg =
 				__('Your IP address is currently banned, due to typing too many wrong usernames/passwords')
 				. '<br/><br/>' .
-				__('You can ask your administrator to unlock your account or wait %s minutes', array($length)),
-				__('Banned IP address')
-			);
+				__('You can ask your administrator to unlock your account or wait %s minutes', array($length));
+
+			if ($useUnbanViaEmail == true || $useUnbanViaEmail == 'Yes') {
+				$msg .= ('<br/><br/>' . __('Alternatively, you can <a href="%s">un-ban your IP by email</a>.', array(self::UNBAND_LINK)));
+			}
+
+			// banned throw exception
+			throw new SymphonyErrorPage($msg, __('Banned IP address'));
 		}
 
 		/**

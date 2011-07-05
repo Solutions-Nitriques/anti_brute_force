@@ -71,6 +71,11 @@
 		false,
 
 		'Users can unban their IP via email' =>
+		false,
+
+		'Alternatively, you can <a href="%s">un-ban your IP by email</a>.' =>
 		false
+
+
 
 	);

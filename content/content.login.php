@@ -27,19 +27,20 @@
 		 * Overrides the view method
 		 */
 		public function view(){
-			// if not banned, redirect
-			/*$banned = ABF::instance()->isCurrentlyBanned(
-						extension_anti_brute_force::getConfigVal(extension_anti_brute_force::SETTING_LENGTH),
-						extension_anti_brute_force::getConfigVal(extension_anti_brute_force::SETTING_FAILED_COUNT)
-					);
-			if ($banned) {
-				redirect(SYMPHONY_URL);
-			}*/
-
 			// if this is the unban request
 			if (isset($this->_context) && is_array($this->_context) && count($this->_context) > 0) {
 				// check if we have a hash present
+				$hash = $this->_context[0];
+				if (strlen($hash) == 36) {
+					// Sanatize user inputed values... ALWAYS
+					$hash = General::sanatize($hash);
+					$this->__unban($hash);
+				}
 
+				// redirect not matter what
+				// evil users won't be able to detect anything from the response
+				// they *should* still be blocked since guessing a hash is
+				// practicly unfesable
 				redirect(SYMPHONY_URL);
 				die();
 
@@ -64,11 +65,20 @@
 
 			$this->Body->setAttribute('onload', 'document.forms[0].elements.email.focus()');
 
-			if(isset($this->_email_sent) && !$this->_email_sent){
-				$div = new XMLElement('div', NULL, array('class' => 'invalid'));
-				$div->appendChild($label);
-				$div->appendChild(new XMLElement('p', __('There was a problem locating your account. Please check that you are using the correct email address.')));
-				$fieldset->appendChild($div);
+			if(isset($this->_email_sent)){
+
+				if ($this->_email_sent) {
+
+					$div = new XMLElement('div', __('Email sent. Follow the instruction in it.'));
+					$fieldset->appendChild($div);
+
+				} else {
+
+					$div = new XMLElement('div', NULL, array('class' => 'invalid'));
+					$div->appendChild($label);
+					$div->appendChild(new XMLElement('p', __('There was a problem locating your account. Please check that you are using the correct email address.')));
+					$fieldset->appendChild($div);
+				}
 			} else {
 				$fieldset->appendChild($label);
 			}
@@ -86,28 +96,32 @@
 		 */
 		public function action(){
 
+			// set error flag
+			$this->_email_sent = false;
+
 			if(isset($_POST['action'])){
 
 				switch ($_POST['action']) {
 					case 'send-email':
-
+						$this->__sendEmail();
 						break;
 				}
-
-
-			} else {
-
-				// set error flag
-				$this->_email_sent = false;
 			}
-
 		}
 
 		private function __sendEmail() {
+			// safe run
+			try {
 
+				// set error flag
+				$this->_email_sent = true;
+			} catch (Exception $e) {
+				// do nothing
+				$this->_email_sent = false;
+			}
 		}
 
 		private function __unban($hash) {
-
+			ABF::instance()->unregisterFailure($hash);
 		}
 	}

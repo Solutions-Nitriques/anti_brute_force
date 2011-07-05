@@ -166,8 +166,8 @@
 			// Since user can still post data to the login page
 			// we don't want them to be able to know that the guessed right.
 			// So, if user is loggued in but still ban, we logout them
-			if (Symphony::instance()->isLoggedIn && $this->isCurrentlyBanned) {
-				Symphony::instance()->logout();
+			if (Administration::instance()->isLoggedIn && $this->isCurrentlyBanned) {
+				Administration::instance()->logout();
 			}
 		}
 
@@ -178,15 +178,23 @@
 		 */
 		public function adminPagePreGenerate($context) {
 			$length = self::getConfigVal(self::SETTING_LENGTH);
+			$oPage = $context['oPage'];
+			$unBanViaEmail = self::getConfigVal(self::SETTING_AUTO_UNBAN);
 
 			// clean on login page
-			if ($context['oPage'] instanceof contentLogin) {
+			if ($oPage instanceof contentLogin) {
 				// clean database before check
 				ABF::instance()->removeExpiredEntries($length);
 			}
 
-			// just to be sure
-			$this->doBanCheck();
+			// N.B. We must still do it here
+			// since initaliseAdminPageHead is not fired on some requests
+			if (! 	($oPage instanceof contentExtensionAnti_brute_forceLogin) ||
+					($oPage instanceof contentExtensionAnti_brute_forceLogin &&
+					$unBanViaEmail != 'Yes' &&
+					$unBanViaEmail != true) ) {
+				$this->doBanCheck();
+			}
 		}
 
 		/**
@@ -205,6 +213,7 @@
 		 */
 		public function doBanCheck() {
 			$length = self::getConfigVal(self::SETTING_LENGTH);
+			$unbanViaEmail = self::getConfigVal(self::SETTING_AUTO_UNBAN);
 
 			// if no already done...
 			if (!$this->banCheckDone) {
@@ -212,7 +221,7 @@
 				// check if banned
 				if ($this->isCurrentlyBanned()) {
 					// block access
-					ABF::instance()->throwBannedException($length);
+					ABF::instance()->throwBannedException($length, $unbanViaEmail);
 				}
 
 				$this->banCheckDone = true;
