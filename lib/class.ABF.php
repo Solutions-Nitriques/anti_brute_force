@@ -133,7 +133,7 @@
 				$msg .= ('<br/><br/>' . __('Alternatively, you can <a href="%s">un-ban your IP by email</a>.', array(SYMPHONY_URL . self::UNBAND_LINK)));
 			}
 
-			// banned throw exception
+			// banned - throw exception
 			throw new SymphonyErrorPage($msg, __('Banned IP address'));
 		}
 
