@@ -65,8 +65,8 @@
 		public function about() {
 			return array(
 				'name'			=> self::EXT_NAME,
-				'version'		=> '1.0',
-				'release-date'	=> '2011-07-01',
+				'version'		=> '1.1',
+				'release-date'	=> '2011-07-xx',
 				'author'		=> array(
 					'name'			=> 'Solutions Nitriques',
 					'website'		=> 'http://www.nitriques.com/open-source/',
@@ -164,7 +164,7 @@
 			ABF::instance()->unregisterFailure();
 
 			// Since user can still post data to the login page
-			// we don't want them to be able to know that the guessed right.
+			// we don't want them to be able to know they guessed it right.
 			// So, if user is loggued in but still ban, we logout them
 			if (Administration::instance()->isLoggedIn && $this->isCurrentlyBanned) {
 				Administration::instance()->logout();
@@ -380,7 +380,7 @@
 		 * Saves settings and cleans the database acconding to the new settings
 		 * @param array $context
 		 */
-		public function save($context){
+		public function save(&$context){
 			$this->saveOne($context, self::SETTING_LENGTH, false);
 			$this->saveOne($context, self::SETTING_FAILED_COUNT, false);
 			$this->saveOne($context, self::SETTING_FAILED_COUNT, true, 'checkbox');
@@ -398,7 +398,7 @@
 		 * @param string $key
 		 * @param string $autoSave @optional
 		 */
-		public function saveOne($context, $key, $autoSave = true, $type = 'text'){
+		public function saveOne(&$context, $key, $autoSave = true, $type = 'text'){
 			// get the input
 			$input = $context['settings'][self::SETTING_GROUP][$key];
 			$iVal = intval($input);

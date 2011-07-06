@@ -1,6 +1,6 @@
 # Anti Brute Force #
 
-Version: 1.0.2
+Version: 1.1
 
 ## Secure your Symphony backend login page against brute force attacks ##
 
@@ -10,8 +10,11 @@ Prevents ***people and softwares*** to brute force your authors accounts.
 
 - After **x** failed attempt, the IP address will be banned for **y** min;  
   **x** and **y** are settings in the preferences page 
-- Admin content page for managing blocked IPs
-- A Facade/Singleton class -ABF- for developers to leverage anti_brute_force capabilities (ex.: email reports)
+- Features colored list: ***Black list***, **Grey list**, *White list*.
+- Features a "unban via email" capabilities; Must be enabled in the preferences page
+- Backend content page for managing blocked IPs and colored lists
+- A Facade/Singleton class -ABF- for developers to leverage anti_brute_force capabilities
+  (ex.: email reports or use with the member extension)
 
 ### REQUIREMENTS ###
 
@@ -23,17 +26,20 @@ Prevents ***people and softwares*** to brute force your authors accounts.
 ***You must uninstall all previous version and install the new one***
 
 - Unzip the anti_brute_force.zip file
-- (re)Name the folder anti_brute_force
+- (re)Name the folder ***anti_brute_force***
 - Put into the extension directory
 - Enable/install just like any other extension
 - (optional) Go to the *Preferences* page to customize settings
-- (optional) See all the banned ips via System menu -> Banned Ips
+- (optional) See all the banned IPs via System menu -> Banned IPs
 
 *Voila !*
 
 http://www.nitriques.com/open-source/
 
 ### History ###
+
+- 1.1 - 2011-07-xx
+  Colored list feature
 
 - 1.0.2 - 2011-07-02
   New data base scheme

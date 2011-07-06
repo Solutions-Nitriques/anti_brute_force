@@ -9,19 +9,22 @@
 
 	/**
 	 *
-	 * Symphony CMS leaverage the Decorator pattern with their Extension class.
+	 * Symphony CMS leaverages the Decorator pattern with their <code>Extension</code> class.
 	 * This class is a Facade that implements <code>Singleton</code> and the methods
-	 * needed by the Decorator. It offers it's methods via the instance() satic function
+	 * needed by the Decorator. It offers its methods via the <code>instance()</code> satic function
 	 * @author nicolasbrassard
 	 *
 	 */
 	class ABF implements Singleton {
 
 		/**
-		 * Short hand fot the table name
-		 * @var unknown_type
+		 * Short hand for the tables name
+		 * @var string
 		 */
-		private $tbl = 'tbl_anti_brute_force';
+		private $TBL_ABF = 'tbl_anti_brute_force';
+		private $TBL_ABF_WL = 'tbl_anti_brute_force_wl';
+		private $TBL_ABF_GL = 'tbl_anti_brute_force_gl';
+		private $TBL_ABF_BL = 'tbl_anti_brute_force_bl';
 
 		/**
 		 *
@@ -53,7 +56,7 @@
 
 
 		/**
-		 * Public methods
+		 * FAILURES (BANNED IP) Public methods
 		 */
 
 		/**
@@ -92,7 +95,7 @@
 			if ($results != null && count($results) > 0) {
 				// UPDATE
 				$ret = Symphony::Database()->query("
-					UPDATE $this->tbl
+					UPDATE $this->TBL_ABF
 						SET `LastAttempt` = NOW(),
 						    `FailedCount` = `FailedCount` + 1,
 						    `Username` = '$username',
@@ -106,7 +109,7 @@
 			} else {
 				// INSERT
 				$ret = Symphony::Database()->query("
-					INSERT INTO $this->tbl
+					INSERT INTO $this->TBL_ABF
 						(`IP`, `LastAttempt`, `Username`, `FailedCount`, `UA`, `Source`, `Hash`)
 						VALUES
 						('$ip', NOW(),        '$username', 1,            '$ua','$source', UUID())
@@ -147,7 +150,7 @@
 			// ip is at least 8 char
 			// hash is 36 char
 			$filter = strlen($filter) < 8 ? $this->getIP() : $filter;
-			return Symphony::Database()->delete($this->tbl, "IP = '$filter' OR Hash = '$filter'");
+			return Symphony::Database()->delete($this->TBL_ABF, "IP = '$filter' OR Hash = '$filter'");
 		}
 
 		/**
@@ -156,8 +159,11 @@
 		 * @param string/int $length
 		 */
 		public function removeExpiredEntries($length) {
-			return Symphony::Database()->delete($this->tbl, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
+			return Symphony::Database()->delete($this->TBL_ABF, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
 		}
+
+
+
 
 		/**
 		 * Database Data queries
@@ -176,7 +182,7 @@
 				$where .= $additionalWhere;
 			}
 			$sql ="
-				SELECT * FROM $this->tbl WHERE $where LIMIT 1
+				SELECT * FROM $this->TBL_ABF WHERE $where LIMIT 1
 			" ;
 
 			$rets = array();
@@ -199,7 +205,7 @@
 				$order .= (' ORDER BY ' . $orderedBy);
 			}
 			$sql ="
-				SELECT * FROM $this->tbl $order
+				SELECT * FROM $this->TBL_ABF $order
 			" ;
 
 			$rets = array();
@@ -210,6 +216,8 @@
 
 			return $rets;
 		}
+
+
 
 		/**
 		 * Utilities
@@ -223,13 +231,23 @@
 		}
 
 
+
+
 		/**
 		 * Database Data Definition Queries
 		 */
 
+		/**
+		 *
+		 * This method will install the plugin
+		 */
 		public function install() {
+			return $this->install_v1_0() && $this->install_v1_1();
+		}
+
+		private function install_v1_0() {
 			$sql = "
-				CREATE TABLE IF NOT EXISTS $this->tbl (
+				CREATE TABLE IF NOT EXISTS $this->TBL_ABF(
 					`IP` VARCHAR( 16 ) NOT NULL ,
 					`LastAttempt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 					`FailedCount` INT( 5 ) NOT NULL DEFAULT  '1',
@@ -244,11 +262,62 @@
 			return Symphony::Database()->query($sql);
 		}
 
+		private function install_v1_1() {
+			// GREY
+			$sql = "
+				CREATE TABLE IF NOT EXISTS $this->TBL_ABF_GL (
+					`IP` VARCHAR( 16 ) NOT NULL ,
+					`DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+					`FailedCount` INT( 5 ) NOT NULL DEFAULT  '1',
+					`Source` VARCHAR( 100 ) NULL,
+					PRIMARY KEY (  `IP` )
+				) ENGINE = MYISAM
+			";
+
+			$retGL = Symphony::Database()->query($sql);
+
+			//BLACK
+			$sql = "
+				CREATE TABLE IF NOT EXISTS $this->TBL_ABF_BL (
+					`IP` VARCHAR( 16 ) NOT NULL ,
+					`DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+					`Source` VARCHAR( 100 ) NULL,
+					PRIMARY KEY (  `IP` )
+				) ENGINE = MYISAM
+			";
+
+			$retBL = Symphony::Database()->query($sql);
+
+			// WHITE
+			$sql = "
+				CREATE TABLE IF NOT EXISTS $this->TBL_ABF_WL (
+					`IP` VARCHAR( 16 ) NOT NULL ,
+					`DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+					`FailedCount` INT( 5 ) NOT NULL DEFAULT  '1',
+					PRIMARY KEY (  `IP` )
+				) ENGINE = MYISAM
+			";
+
+			$retWL = Symphony::Database()->query($sql);
+
+			return $retGL && $retBL && $retWL;
+		}
+
+		/**
+		 *
+		 * This methode will update the extension according to the
+		 * previous and current version parameters.
+		 * @param string $previousVersion
+		 * @param string $currentVersion
+		 */
 		public function update($previousVersion, $currentVersion) {
 			switch ($previousVersion) {
 				case $currentVersion:
 					break;
+				case '1.1':
+					break;
 				case '1.0':
+					$this->install_v1_1();
 					break;
 				default:
 					return $this->install();
@@ -256,12 +325,40 @@
 			return false;
 		}
 
+		/**
+		 *
+		 * This method will uninstall the extension
+		 */
 		public function uninstall() {
+			// Banned IPs
 			$sql = "
-				DROP TABLE IF EXISTS $this->tbl
+				DROP TABLE IF EXISTS $this->TBL_ABF
 			";
 
-			return Symphony::Database()->query($sql);
+			$retABF = Symphony::Database()->query($sql);
+
+			// Black
+			$sql = "
+				DROP TABLE IF EXISTS $this->TBL_ABF_BL
+			";
+
+			$retABF_BL = Symphony::Database()->query($sql);
+
+			// Grey
+			$sql = "
+				DROP TABLE IF EXISTS $this->TBL_ABF_GL
+			";
+
+			$retABF_GL = Symphony::Database()->query($sql);
+
+			// White
+			$sql = "
+				DROP TABLE IF EXISTS $this->TBL_ABF_WL
+			";
+
+			$retABF_WL = Symphony::Database()->query($sql);
+
+			return $retABF && $retABF_BL && $retABF_GL && $retABF_WL;
 		}
 
 	}
