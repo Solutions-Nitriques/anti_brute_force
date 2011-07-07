@@ -42,6 +42,18 @@
 		const SETTING_AUTO_UNBAN = 'auto-unban';
 
 		/**
+		 * Key of the Grey list threshold setting
+		 * @var string
+		 */
+		const SETTING_GL_THRESHOLD = 'gl-threshold';
+
+		/**
+		 * Key of the Grey list duration setting
+		 * @var string
+		 */
+		const SETTING_GL_DURATION = 'gl-duration';
+
+		/**
 		 * Key of the group of setting
 		 * @var string
 		 */
@@ -242,7 +254,9 @@
 						self::SETTING_GROUP => array (
 							self::SETTING_LENGTH => 60,
 							self::SETTING_FAILED_COUNT => 5,
-							self::SETTING_AUTO_UNBAN => 'off'
+							self::SETTING_AUTO_UNBAN => 'off',
+							self::SETTING_GL_THRESHOLD => 5,
+							self::SETTING_GL_DURATION => 30
 						)
 					)
 				);
@@ -294,14 +308,22 @@
 			$wrapper = new XMLElement('div');
 			$wrapper->setAttribute('class', 'group');
 
-			// error wrapper
-			$err_wrapper = new XMLElement('div');
+			// outter wrapper
+			$out_wrapper = new XMLElement('div');
 
 			// append labels to field set
 			$wrapper->appendChild($this->generateField(self::SETTING_FAILED_COUNT, 'Fail count limit'));
 			$wrapper->appendChild($this->generateField(self::SETTING_LENGTH, 'Blocked length <em>in minutes</em>'));
 
-			$err_wrapper->appendChild($wrapper);
+			$out_wrapper->appendChild($wrapper);
+
+			// create a new wrapper
+			$wrapper = new XMLElement('div');
+			$wrapper->setAttribute('class', 'group');
+			$wrapper->appendChild($this->generateField(self::SETTING_GL_THRESHOLD, 'Grey list threshold'));
+			$wrapper->appendChild($this->generateField(self::SETTING_GL_DURATION, 'Grey list duration <em>in days</em>'));
+
+			$out_wrapper->appendChild($wrapper);
 
 			// create a new wrapper
 			$wrapper = new XMLElement('div');
@@ -309,25 +331,10 @@
 			$wrapper->appendChild($this->generateField(self::SETTING_AUTO_UNBAN, 'Users can unban their IP via email', 'checkbox'));
 
 			// append field before errors
-			$err_wrapper->appendChild($wrapper);
-
-			// error management
-			if (count($this->errors) > 0) {
-				// set css and anchor
-				$err_wrapper->setAttribute('class', 'invalid');
-				$err_wrapper->setAttribute('id', 'error');
-
-				foreach ($this->errors as $error) {
-					// adds error message
-					$err = new XMLElement('p', $error);
-
-					// append to $wrapper
-					$err_wrapper->appendChild($err);
-				}
-			}
+			$out_wrapper->appendChild($wrapper);
 
 			// wrapper into fieldset
-			$fieldset->appendChild($err_wrapper);
+			$fieldset->appendChild($out_wrapper);
 
 			// adds the field set to the wrapper
 			$context['wrapper']->appendChild($fieldset);
@@ -352,6 +359,7 @@
 			}
 
 			// create the label and the input field
+			$wrap = new XMLElement('div');
 			$label = Widget::Label();
 			$input = Widget::Input(
 						'settings[' . self::SETTING_GROUP . '][' . $settingName .']',
@@ -361,9 +369,25 @@
 					);
 
 			// set the input into the label
-			$label->setValue(__($textKey). ' ' . $input->generate());
+			$label->setValue(__($textKey). ' ' . $input->generate() . $err);
 
-			return $label;
+			$wrap->appendChild($label);
+
+			// error management
+			if ($this->hasErrors() && isset($this->errors[$settingName])) {
+				// style
+				$wrap->setAttribute('class', 'invalid');
+				$wrap->setAttribute('id', 'error');
+				// error message
+				$err = new XMLElement('p', $this->errors[$settingName]);
+				$wrap->appendChild($err);
+			}
+
+			return $wrap;
+		}
+
+		private function hasErrors() {
+			return count($this->errors) > 0;
 		}
 
 		/**
@@ -382,6 +406,9 @@
 		 */
 		public function save(&$context){
 			$this->saveOne($context, self::SETTING_LENGTH, false);
+			$this->saveOne($context, self::SETTING_FAILED_COUNT, false);
+			$this->saveOne($context, self::SETTING_GL_DURATION, false);
+			$this->saveOne($context, self::SETTING_GL_THRESHOLD, false);
 			$this->saveOne($context, self::SETTING_FAILED_COUNT, false);
 			$this->saveOne($context, self::SETTING_FAILED_COUNT, true, 'checkbox');
 
@@ -421,7 +448,7 @@
 				$error = __('"%s" is not a valid positive integer',  array($input));
 
 				// append to local array
-				array_push($this->errors, $error);
+				$this->errors[$key] = $error;
 
 				// add an error into the stack
 				$context['errors'][self::SETTING_GROUP][$key] = $error;

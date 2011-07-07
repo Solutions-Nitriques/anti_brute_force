@@ -30,6 +30,10 @@ Prevents ***people and softwares*** to brute force your authors accounts.
 - Put into the extension directory
 - Enable/install just like any other extension
 - (optional) Go to the *Preferences* page to customize settings
+	- Maximum failed count before user gets banned
+	- Banned duration - number of minutes IP is banned
+	- Grey list threshold - maximum number of grey list entries before black list
+	- Grey list duration - in days - before expire
 - (optional) See all the banned IPs via System menu -> Banned IPs
 
 *Voila !*

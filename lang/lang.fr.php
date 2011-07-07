@@ -80,6 +80,13 @@
 		false,
 
 		'If you do not remember your password, follow the "forgot password" link on the login page.' =>
+		false,
+
+		'Grey list threshold' =>
+		false,
+
+		'Grey list duration <em>in days</em>' =>
 		false
+
 
 	);
