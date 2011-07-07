@@ -142,6 +142,11 @@
 					'location'	=> __('System'),
 					'name'	=> __('Banned IPs'),
 					'link'	=> '/banned_ips/'
+				),
+				array(
+					'location'	=> __('System'),
+					'name'	=> __('Colored Lists'),
+					'link'	=> '/colored_lists/'
 				)
 			);
 		}
@@ -220,20 +225,30 @@
 		}
 
 		/**
-		 * Do the actual ban check: throw exception if banned
+		 * Do the actual ban check: throw exception if banned/black listed
 		 * Can be called only once; wont do anything after that
 		 */
 		public function doBanCheck() {
-			$length = self::getConfigVal(self::SETTING_LENGTH);
-			$unbanViaEmail = self::getConfigVal(self::SETTING_AUTO_UNBAN);
-
 			// if no already done...
 			if (!$this->banCheckDone) {
 
-				// check if banned
-				if ($this->isCurrentlyBanned()) {
-					// block access
-					ABF::instance()->throwBannedException($length, $unbanViaEmail);
+				// check if not white listed
+				if (!ABF::instance()->isWhiteListed()) {
+
+					// check if blacklisted
+					if (ABF::instance()->isBlackListed()) {
+						// block access
+						ABF::instance()->throwBlackListedException();
+					}
+
+					// check if banned
+					if ($this->isCurrentlyBanned()) {
+						$length = self::getConfigVal(self::SETTING_LENGTH);
+						$unbanViaEmail = self::getConfigVal(self::SETTING_AUTO_UNBAN);
+
+						// block access
+						ABF::instance()->throwBannedException($length, $unbanViaEmail);
+					}
 				}
 
 				$this->banCheckDone = true;
@@ -304,12 +319,12 @@
 			// append intro paragraph
 			$fieldset->appendChild($p);
 
+			// outter wrapper
+			$out_wrapper = new XMLElement('div');
+
 			// create a wrapper
 			$wrapper = new XMLElement('div');
 			$wrapper->setAttribute('class', 'group');
-
-			// outter wrapper
-			$out_wrapper = new XMLElement('div');
 
 			// append labels to field set
 			$wrapper->appendChild($this->generateField(self::SETTING_FAILED_COUNT, 'Fail count limit'));
@@ -330,7 +345,6 @@
 			$wrapper->setAttribute('class', 'group');
 			$wrapper->appendChild($this->generateField(self::SETTING_AUTO_UNBAN, 'Users can unban their IP via email', 'checkbox'));
 
-			// append field before errors
 			$out_wrapper->appendChild($wrapper);
 
 			// wrapper into fieldset
@@ -386,6 +400,12 @@
 			return $wrap;
 		}
 
+		/**
+		 *
+		 * Utility method to know if there was any error
+		 * while saving preferences
+		 * @return boolean
+		 */
 		private function hasErrors() {
 			return count($this->errors) > 0;
 		}
@@ -412,7 +432,7 @@
 			$this->saveOne($context, self::SETTING_FAILED_COUNT, false);
 			$this->saveOne($context, self::SETTING_FAILED_COUNT, true, 'checkbox');
 
-			if (count($this->errors) == 0) {
+			if (!$this->hasErrors()) {
 				// clean old entry after save, since this may affects some banned IP
 				ABF::instance()->removeExpiredEntries(self::getConfigVal(self::SETTING_LENGTH));
 			}

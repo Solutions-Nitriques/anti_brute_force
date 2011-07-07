@@ -174,7 +174,7 @@
 			return $this->registerToList($this->TBL_ABF_WL, $ip);
 		}
 
-		public function registerToList($tbl, $ip='') {
+		private function registerToList($tbl, $ip='') {
 			$ip = $this->getIP($ip);
 			$results = $this->isListed($btl, $ip);
 			$isGrey = $tbl == $this->TBL_ABF_GL;
@@ -221,16 +221,35 @@
 			return $this->isListed($this->TBL_ABF_WL, $ip);
 		}
 
-		public function isListed($tbl, $ip='') {
+		private function isListed($tbl, $ip='') {
+			$ip = $this->getIP($ip);
 			return count($this->getListEntriesByIp($tbl, $ip)) > 0;
 		}
 
 
 
-		public function unregisterToList($tbl, $ip='') {
+		private function unregisterToList($tbl, $ip='') {
 			$filter = MySQL::cleanValue($this->getIP($ip));
 			return Symphony::Database()->delete($this->TBL_ABF, "IP = '$filter'");
 		}
+
+		/**
+		 *
+		 * Utility function that throw a properly formatted SymphonyErrorPage Exception
+		 * @param string $length - length of block in minutes
+		 * @param boolean
+		 * @throws SymphonyErrorPage
+		 */
+		public function throwBlackListedException() {
+			$msg =
+				__('Your IP address is currently <strong>black listed</strong>, due to too many bans.')
+				. '<br/><br/>' .
+				__('Ask your administrator to unlock your IP.');
+
+			// banned - throw exception
+			throw new SymphonyErrorPage($msg, __('Black listed IP address'));
+		}
+
 
 
 		/**

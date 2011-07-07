@@ -7,7 +7,7 @@
 			'email' => 'open-source (at) nitriques.com',
 			'website' => 'http://www.nitriques.com/'
 		),
-		'release-date' => '2011-07-01',
+		'release-date' => '2011-07-06',
 	);
 
 
@@ -86,7 +86,35 @@
 		false,
 
 		'Grey list duration <em>in days</em>' =>
+		false,
+
+		'Your IP address is currently <strong>black listed</strong>, due to too many bans.' =>
+		false,
+
+		'Ask your administrator to unlock your IP.' =>
+		false,
+
+		'Black listed IP address' =>
+		false,
+
+		'Colored Lists' =>
+		false,
+
+		'Date Created' =>
+		false,
+
+		'Entries remove successfuly' =>
+		false,
+
+		'Change' =>
+		false,
+
+		'Black list' =>
+		false,
+
+		'Grey list' =>
+		false,
+
+		'White list' =>
 		false
-
-
 	);

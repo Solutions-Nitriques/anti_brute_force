@@ -3,6 +3,8 @@
 	if(!defined("__IN_SYMPHONY__")) die("<h2>Error</h2><p>You cannot directly access this file</p>");
 
 	require_once(TOOLKIT . '/class.administrationpage.php');
+	require_once(EXTENSIONS . '/anti_brute_force/lib/class.ABF.php');
+	require_once(EXTENSIONS . '/anti_brute_force/lib/class.ViewFactory.php');
 
 	/*
 	Copyight: Solutions Nitriques 2011
@@ -15,6 +17,7 @@
 
 		private $_cols = null;
 		private $_hasData = false;
+		private $_data = null;
 
 		public function __construct(&$parent) {
 			parent::__construct($parent);
@@ -27,6 +30,10 @@
 				'Source' => __('Source'),
 				'UA' => __('User Agent (browser)')
 			);
+
+			$this->_data = ABF::instance()->getFailures('IP ASC');
+
+			$this->_hasData = is_array($this->_data) && count($this->_data) > 0;
 		}
 
 		/**
@@ -42,10 +49,10 @@
 			$this->appendSubheading(__($title));
 
 			// build header table
-			$aTableHead = $this->buildTableHeader();
+			$aTableHead = ViewFactory::buildTableHeader($this->_cols);
 
 			// build body table
-			$aTableBody = $this->buildTableBody();
+			$aTableBody = ViewFactory::buildTableBody($this->_cols, $this->_data);
 
 			// build data table
 			$table = Widget::Table(
@@ -59,113 +66,9 @@
 
 			$this->Form->appendChild($table);
 
-			$this->addActions();
-		}
-
-		/**
-		 *
-		 * Utility method that build the header of the table element
-		 */
-		private function buildTableHeader() {
-			$a = array();
-			foreach ($this->_cols as $key => $value) {
-				$label = Widget::Label($value);
-				$a[] = array($label, 'col');
-			}
-			return $a;
-		}
-
-		/**
-		 *
-		 * Utility method that build the body of the table element
-		 *
-		 * ** I wish templating Admin Page was simplier !!!
-		 */
-		private function buildTableBody() {
-			$a = array();
-			$data = ABF::instance()->getFailures('IP ASC');
-
-			// update flag
-			$this->_hasData = $data != null && count($data) > 0;
-
-			if (!$this->_hasData) {
-				// no data
-				// add a table row with only one cell
-				$a = array(
-					Widget::TableRow(
-						array(
-							Widget::TableData(
-								__('None found.'), // text
-								'inactive', // class
-								NULL, // id
-								count($this->_cols)  // span
-							)
-						),'odd'
-					)
-				);
-			} else {
-
-				$index = 0;
-
-				foreach ($data as $datarow) {
-
-					$cols = array();
-
-					$datarow = get_object_vars($datarow);
-
-					foreach ($this->_cols as $key => $value) {
-						$val = $datarow[$key];
-						$css = 'col';
-						$hasValue = strlen($val) > 0;
-
-						if (!$hasValue) {
-							$val = __('None');
-							$css = 'inactive';
-						}
-
-						$td = Widget::TableData($val, $css);
-
-						// add the hidden checkbox for selectacle row
-						if ($key == 'IP' && $hasValue) {
-							$chk = Widget::Input(
-								"ip[$val]", //name
-								NULL,
-								'checkbox'
-							);
-							$td->appendChild($chk);
-						}
-
-						array_push($cols, $td);
-					}
-
-					array_push($a, Widget::TableRow($cols, $index % 2 == 0 ? 'even' : 'odd'));
-
-					$index++;
-				}
-			}
-
-			return $a;
-		}
-
-		/**
-		 * Utility method that generates the 'action' panel
-		 */
-		private function addActions() {
-			$tableActions = new XMLElement('div');
-			$tableActions->setAttribute('class', 'actions');
-
-			if ($this->_hasData) {
-
-				$options = array(
-					array(NULL, false, __('With Selected...')),
-					array('delete', false, __('Delete'), 'confirm'),
-				);
-
-				$tableActions->appendChild(Widget::Select('with-selected', $options));
-				$tableActions->appendChild(Widget::Input('action[apply]', __('Apply'), 'submit'));
-			}
-
-			$this->Form->appendChild($tableActions);
+			$this->Form->appendChild(
+				ViewFactory::buildActions($this->_hasData)
+			);
 		}
 
 		/**
