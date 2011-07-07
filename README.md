@@ -11,7 +11,7 @@ Prevents ***people and softwares*** to brute force your authors accounts.
 - After **x** failed attempt, the IP address will be banned for **y** min;  
   **x** and **y** are settings in the preferences page 
 - Features colored list: ***Black list***, **Grey list**, *White list*.
-- Features a "unban via email" capabilities; Must be enabled in the preferences page
+- Features a **unban via email** capabilities; Must be enabled in the preferences page
 - Backend content page for managing blocked IPs and colored lists
 - A Facade/Singleton class -ABF- for developers to leverage anti_brute_force capabilities
   (ex.: email reports or use with the member extension)
@@ -34,7 +34,9 @@ Prevents ***people and softwares*** to brute force your authors accounts.
 	- Banned duration - number of minutes IP is banned
 	- Grey list threshold - maximum number of grey list entries before black list
 	- Grey list duration - in days - before expire
+	- Unban via email - Enables/disable this feature
 - (optional) See all the banned IPs via System menu -> Banned IPs
+- (optional) Manage colored lists entries via System menu -> Colored lists
 
 *Voila !*
 
