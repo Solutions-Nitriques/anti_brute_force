@@ -85,7 +85,7 @@
 		 * @param string $ip @optional - will take current user's ip
 		 */
 		public function registerFailure($username, $source, $ip='') {
-			$ip = strlen($ip) < 8 ? $this->getIP() : $ip;
+			$ip = $this->getIP($ip);
 			$username = MySQL::cleanValue($username);
 			$source = MySQL::cleanValue($source);
 			$ua = MySQL::cleanValue($this->getUA());
@@ -147,9 +147,7 @@
 		 * can be the IP address or the hash value
 		 */
 		public function unregisterFailure($filter='') {
-			// ip is at least 8 char
-			// hash is 36 char
-			$filter = strlen($filter) < 8 ? $this->getIP() : $filter;
+			$filter = MySQL::cleanValue($this->getIP($ip));
 			return Symphony::Database()->delete($this->TBL_ABF, "IP = '$filter' OR Hash = '$filter'");
 		}
 
@@ -163,6 +161,76 @@
 		}
 
 
+		/**
+		 * COLORED (B/G/W) Public methods
+		 */
+		public function registerToBlackList($ip='') {
+			return $this->registerToList($this->TBL_ABF_BL, $ip);
+		}
+		public function registerToGreyList($ip='') {
+			return $this->registerToList($this->TBL_ABF_GL, $ip);
+		}
+		public function registerToWhiteList($ip='') {
+			return $this->registerToList($this->TBL_ABF_WL, $ip);
+		}
+
+		public function registerToList($tbl, $ip='') {
+			$ip = $this->getIP($ip);
+			$results = $this->isListed($btl, $ip);
+			$isGrey = $tbl == $this->TBL_ABF_GL;
+			$ret = false;
+
+			// do not re-register existing entries
+			if ($results != null && count($results) > 0) {
+				if ($isGrey) {
+					$this->incrementGreyList($ip);
+				}
+
+			} else {
+				// INSERT -- grey list will get the default values for others columns
+				$ret = Symphony::Database()->query("
+					INSERT INTO $tbl
+						(`IP`, `DateCreated`, `Source`)
+						VALUES
+						('$ip', NOW(),        '$source')
+				");
+			}
+
+			return $ret;
+		}
+
+		private function incrementGreyList($ip) {
+			// UPDATE -- only Grey list
+			return Symphony::Database()->query("
+				UPDATE $tbl
+					SET `FailedCount` = `FailedCount` + 1,
+					WHERE IP = '$ip'
+					LIMIT 1
+			");
+		}
+
+		public function isBlackListed($ip='') {
+			return $this->isListed($this->TBL_ABF_BL, $ip);
+		}
+
+		public function isGreyListed($ip='') {
+			return $this->isListed($this->TBL_ABF_GL, $ip);
+		}
+
+		public function isWhiteListed($ip='') {
+			return $this->isListed($this->TBL_ABF_WL, $ip);
+		}
+
+		public function isListed($tbl, $ip='') {
+			return count($this->getListEntriesByIp($tbl, $ip)) > 0;
+		}
+
+
+
+		public function unregisterToList($tbl, $ip='') {
+			$filter = MySQL::cleanValue($this->getIP($ip));
+			return Symphony::Database()->delete($this->TBL_ABF, "IP = '$filter'");
+		}
 
 
 		/**
@@ -176,7 +244,7 @@
 		 * @param string $additionalWhere @optional additional SQL filters
 		 */
 		public function getFailureByIp($ip='', $additionalWhere='') {
-			$ip = strlen($ip) < 8 ? $this->getIP() : $ip;
+			$ip = $this->getIP($ip);
 			$where = "IP = '$ip'";
 			if (strlen($additionalWhere) > 0) {
 				$where .= $additionalWhere;
@@ -218,12 +286,33 @@
 		}
 
 
+		public function getListEntriesByIp($tbl, $ip='', $additionalWhere='') {
+			$ip = $this->getIP($ip);
+			$where = "IP = '$ip'";
+			if (strlen($additionalWhere) > 0) {
+				$where .= $additionalWhere;
+			}
+			$sql ="
+				SELECT * FROM $tbl WHERE $where LIMIT 1
+			" ;
+
+			$rets = array();
+
+			if (Symphony::Database()->query($sql)) {
+				$rets = Symphony::Database()->fetch();
+			}
+
+			return $rets;
+		}
+
 
 		/**
 		 * Utilities
 		 */
-		private function getIP() {
-			return $_SERVER["REMOTE_ADDR"];
+		private function getIP($ip='') {
+			// ip is at least 8 char
+			// hash is 36 char
+			return strlen($ip) < 8 ? $_SERVER["REMOTE_ADDR"]: $ip;
 		}
 
 		private function getUA() {
@@ -293,7 +382,7 @@
 				CREATE TABLE IF NOT EXISTS $this->TBL_ABF_WL (
 					`IP` VARCHAR( 16 ) NOT NULL ,
 					`DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-					`FailedCount` INT( 5 ) NOT NULL DEFAULT  '1',
+					`Source` VARCHAR( 100 ) NULL,
 					PRIMARY KEY (  `IP` )
 				) ENGINE = MYISAM
 			";
