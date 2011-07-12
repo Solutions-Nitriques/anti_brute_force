@@ -358,7 +358,7 @@
 				CREATE TABLE IF NOT EXISTS $this->TBL_ABF(
 					`IP` VARCHAR( 16 ) NOT NULL ,
 					`LastAttempt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-					`FailedCount` INT( 5 ) NOT NULL DEFAULT  '1',
+					`FailedCount` INT( 5 ) unsigned NOT NULL DEFAULT  '1',
 					`UA` VARCHAR( 1024 ) NULL,
 					`Username` VARCHAR( 100 ) NULL,
 					`Source` VARCHAR( 100 ) NULL,
@@ -376,7 +376,7 @@
 				CREATE TABLE IF NOT EXISTS $this->TBL_ABF_GL (
 					`IP` VARCHAR( 16 ) NOT NULL ,
 					`DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-					`FailedCount` INT( 5 ) NOT NULL DEFAULT  '1',
+					`FailedCount` INT( 5 ) unsigned NOT NULL DEFAULT  '1',
 					`Source` VARCHAR( 100 ) NULL,
 					PRIMARY KEY (  `IP` )
 				) ENGINE = MYISAM
