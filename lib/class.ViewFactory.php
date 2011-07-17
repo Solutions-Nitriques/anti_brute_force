@@ -94,7 +94,6 @@
 			return $a;
 		}
 
-
 		/**
 		 * Utility method that generates the 'action' panel
 		 */

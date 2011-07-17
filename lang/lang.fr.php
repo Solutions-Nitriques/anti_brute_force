@@ -116,5 +116,11 @@
 		false,
 
 		'White list' =>
+		false,
+
+		'Add' =>
+		'Ajouter',
+
+		'IP added successfuly' =>
 		false
 	);

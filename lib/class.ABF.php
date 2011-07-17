@@ -166,26 +166,30 @@
 		/**
 		 * COLORED (B/G/W) Public methods
 		 */
-		public function registerToBlackList($ip='') {
-			return $this->registerToList($this->TBL_ABF_BL, $ip);
+		public function registerToBlackList($source, $ip='') {
+			return $this->__registerToList($this->TBL_ABF_BL, $source, $ip);
 		}
-		public function registerToGreyList($ip='') {
-			return $this->registerToList($this->TBL_ABF_GL, $ip);
+		public function registerToGreyList($source, $ip='') {
+			return $this->__registerToList($this->TBL_ABF_GL, $source, $ip);
 		}
-		public function registerToWhiteList($ip='') {
-			return $this->registerToList($this->TBL_ABF_WL, $ip);
+		public function registerToWhiteList($source, $ip='') {
+			return $this->__registerToList($this->TBL_ABF_WL, $source, $ip);
 		}
 
-		private function registerToList($tbl, $ip='') {
+		public function registerToList($color, $source, $ip='') {
+			return $this->__registerToList($this->getTableName($color), $source, $ip);
+		}
+
+		private function __registerToList($tbl, $source, $ip='') {
 			$ip = $this->getIP($ip);
-			$results = $this->isListed($btl, $ip);
+			$results = $this->__isListed($tbl, $ip);
 			$isGrey = $tbl == $this->TBL_ABF_GL;
 			$ret = false;
 
 			// do not re-register existing entries
 			if ($results != null && count($results) > 0) {
 				if ($isGrey) {
-					$this->incrementGreyList($ip);
+					$ret = $this->incrementGreyList($ip);
 				}
 
 			} else {
@@ -206,7 +210,7 @@
 			// UPDATE -- only Grey list
 			return Symphony::Database()->query("
 				UPDATE $tbl
-					SET `FailedCount` = `FailedCount` + 1,
+					SET `FailedCount` = `FailedCount` + 1
 					WHERE IP = '$ip'
 					LIMIT 1
 			");
@@ -224,16 +228,23 @@
 			return $this->__isListed($this->TBL_ABF_WL, $ip);
 		}
 
+		public function isListed($color, $ip='') {
+			return $this->__isListed($this->getTableName($color), $ip);
+		}
+
 		private function __isListed($tbl, $ip='') {
 			$ip = $this->getIP($ip);
 			return count($this->getListEntriesByIp($tbl, $ip)) > 0;
 		}
 
 
+		public function unregisterToList($color, $ip='') {
+			return $this->__unregisterToList($this->getTableName($color), $ip);
+		}
 
 		private function __unregisterToList($tbl, $ip='') {
 			$filter = MySQL::cleanValue($this->getIP($ip));
-			return Symphony::Database()->delete($this->TBL_ABF, "IP = '$filter'");
+			return Symphony::Database()->delete($tbl, "IP = '$filter'");
 		}
 
 		/**
@@ -375,7 +386,7 @@
 					$tbl = $this->TBL_ABF_WL;
 					break;
 				default:
-					throw new Exception(vsprintf("'%s' is not a know color", $color));
+					throw new Exception(vsprintf("'%s' is not a know color", $color == null ? 'NULL' : $color));
 			}
 			return $tbl;
 		}
