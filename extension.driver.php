@@ -24,42 +24,6 @@
 		const EXT_NAME = 'Anti Brute Force';
 
 		/**
-		 * Key of the length setting
-		 * @var string
-		 */
-		const SETTING_LENGTH = 'length';
-
-		/**
-		 * Key of the failed count setting
-		 * @var string
-		 */
-		const SETTING_FAILED_COUNT = 'failed-count';
-
-		/**
-		 * Key of the auto unband via email setting
-		 * @var string
-		 */
-		const SETTING_AUTO_UNBAN = 'auto-unban';
-
-		/**
-		 * Key of the Grey list threshold setting
-		 * @var string
-		 */
-		const SETTING_GL_THRESHOLD = 'gl-threshold';
-
-		/**
-		 * Key of the Grey list duration setting
-		 * @var string
-		 */
-		const SETTING_GL_DURATION = 'gl-duration';
-
-		/**
-		 * Key of the group of setting
-		 * @var string
-		 */
-		const SETTING_GROUP = 'anti-brute-force';
-
-		/**
 		 * private variable for holding the errors encountered when saving
 		 * @var array
 		 */
@@ -177,14 +141,14 @@
 		 * @param array $context
 		 */
 		public function authorLoginSuccess($context) {
-			// unregister any result with current IP
-			ABF::instance()->unregisterFailure();
-
 			// Since user can still post data to the login page
 			// we don't want them to be able to know they guessed it right.
 			// So, if user is loggued in but still ban, we logout them
-			if (Administration::instance()->isLoggedIn && $this->isCurrentlyBanned) {
+			if ($this->isCurrentlyBanned) {
 				Administration::instance()->logout();
+			} else {
+				// unregister any result with current IP
+				ABF::instance()->unregisterFailure();
 			}
 		}
 
@@ -194,14 +158,12 @@
 		 * @param array $context
 		 */
 		public function adminPagePreGenerate($context) {
-			$length = self::getConfigVal(self::SETTING_LENGTH);
 			$oPage = $context['oPage'];
-			$unBanViaEmail = self::getConfigVal(self::SETTING_AUTO_UNBAN);
 
 			// clean on login page
 			if ($oPage instanceof contentLogin) {
 				// clean database before check
-				ABF::instance()->removeExpiredEntries($length);
+				ABF::instance()->removeExpiredEntries();
 			}
 
 			// N.B. We must still do it here
@@ -215,41 +177,14 @@
 		}
 
 		/**
-		 *
-		 * Utility function that returns <code>>true</code>
-		 * if the current IP address is banned.
-		 */
-		public function isCurrentlyBanned() {
-			$length = self::getConfigVal(self::SETTING_LENGTH);
-			return ABF::instance()->isCurrentlyBanned($length,self::getConfigVal(self::SETTING_FAILED_COUNT));
-		}
-
-		/**
 		 * Do the actual ban check: throw exception if banned/black listed
-		 * Can be called only once; wont do anything after that
+		 * N.B. This one will be called only once; wont do anything after that
 		 */
 		public function doBanCheck() {
 			// if no already done...
 			if (!$this->banCheckDone) {
 
-				// check if not white listed
-				if (!ABF::instance()->isWhiteListed()) {
-
-					// check if blacklisted
-					if (ABF::instance()->isBlackListed()) {
-						// block access
-						ABF::instance()->throwBlackListedException();
-					}
-
-					// check if banned
-					if ($this->isCurrentlyBanned()) {
-						$length = self::getConfigVal(self::SETTING_LENGTH);
-						$unbanViaEmail = self::getConfigVal(self::SETTING_AUTO_UNBAN);
-
-						// block access
-						ABF::instance()->throwBannedException($length, $unbanViaEmail);
-					}
-				}
+				ABF::instance()->doBanCheck();
 
 				$this->banCheckDone = true;
 			}
@@ -260,25 +195,7 @@
 		 * Delegate fired when the extension is install
 		 */
 		public function install() {
-			$intalled = ABF::instance()->install();
-
-			if ($intalled) {
-				// set default values
-				$pseudo_context = array(
-					'settings' => array (
-						self::SETTING_GROUP => array (
-							self::SETTING_LENGTH => 60,
-							self::SETTING_FAILED_COUNT => 5,
-							self::SETTING_AUTO_UNBAN => 'off',
-							self::SETTING_GL_THRESHOLD => 5,
-							self::SETTING_GL_DURATION => 30
-						)
-					)
-				);
-				$this->save($pseudo_context);
-			}
-
-			return $intalled;
+			return ABF::instance()->install($this);
 		}
 
 		/**
@@ -297,8 +214,6 @@
 		 * Cleans settings and Database
 		 */
 		public function uninstall() {
-			Symphony::Configuration()->remove(self::SETTING_GROUP, self::SETTING_GROUP);
-			Administration::instance()->saveConfig();
 			return ABF::instance()->uninstall();
 		}
 
@@ -327,23 +242,23 @@
 			$wrapper->setAttribute('class', 'group');
 
 			// append labels to field set
-			$wrapper->appendChild($this->generateField(self::SETTING_FAILED_COUNT, 'Fail count limit'));
-			$wrapper->appendChild($this->generateField(self::SETTING_LENGTH, 'Blocked length <em>in minutes</em>'));
+			$wrapper->appendChild($this->generateField(ABF::SETTING_FAILED_COUNT, 'Fail count limit'));
+			$wrapper->appendChild($this->generateField(ABF::SETTING_LENGTH, 'Blocked length <em>in minutes</em>'));
 
 			$out_wrapper->appendChild($wrapper);
 
 			// create a new wrapper
 			$wrapper = new XMLElement('div');
 			$wrapper->setAttribute('class', 'group');
-			$wrapper->appendChild($this->generateField(self::SETTING_GL_THRESHOLD, 'Grey list threshold'));
-			$wrapper->appendChild($this->generateField(self::SETTING_GL_DURATION, 'Grey list duration <em>in days</em>'));
+			$wrapper->appendChild($this->generateField(ABF::SETTING_GL_THRESHOLD, 'Grey list threshold'));
+			$wrapper->appendChild($this->generateField(ABF::SETTING_GL_DURATION, 'Grey list duration <em>in days</em>'));
 
 			$out_wrapper->appendChild($wrapper);
 
 			// create a new wrapper
 			$wrapper = new XMLElement('div');
 			$wrapper->setAttribute('class', 'group');
-			$wrapper->appendChild($this->generateField(self::SETTING_AUTO_UNBAN, 'Users can unban their IP via email', 'checkbox'));
+			$wrapper->appendChild($this->generateField(ABF::SETTING_AUTO_UNBAN, 'Users can unban their IP via email', 'checkbox'));
 
 			$out_wrapper->appendChild($wrapper);
 
@@ -360,7 +275,7 @@
 		 * @param string $textKey
 		 */
 		public function generateField($settingName, $textKey, $type = 'text') {
-			$inputText = self::getConfigVal($settingName);
+			$inputText = ABF::instance()->getConfigVal($settingName);
 			$inputAttr = array();
 
 			switch ($type) {
@@ -376,7 +291,7 @@
 			$wrap = new XMLElement('div');
 			$label = Widget::Label();
 			$input = Widget::Input(
-						'settings[' . self::SETTING_GROUP . '][' . $settingName .']',
+						'settings[' . ABF::SETTING_GROUP . '][' . $settingName .']',
 						$inputText,
 						$type,
 						$inputAttr
@@ -411,67 +326,21 @@
 		}
 
 		/**
-		 *
-		 * Utility function that returns settings from this extensions settings group
-		 * @param string $key
-		 */
-		public static function getConfigVal($key) {
-			return Symphony::Configuration()->get($key, self::SETTING_GROUP);
-		}
-
-		/**
 		 * Delegate handle that saves the preferences
 		 * Saves settings and cleans the database acconding to the new settings
 		 * @param array $context
 		 */
 		public function save(&$context){
-			$this->saveOne($context, self::SETTING_LENGTH, false);
-			$this->saveOne($context, self::SETTING_FAILED_COUNT, false);
-			$this->saveOne($context, self::SETTING_GL_DURATION, false);
-			$this->saveOne($context, self::SETTING_GL_THRESHOLD, false);
-			$this->saveOne($context, self::SETTING_FAILED_COUNT, false);
-			$this->saveOne($context, self::SETTING_FAILED_COUNT, true, 'checkbox');
+			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_LENGTH, false);
+			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_FAILED_COUNT, false);
+			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_GL_DURATION, false);
+			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_GL_THRESHOLD, false);
+			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_FAILED_COUNT, false);
+			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_FAILED_COUNT, true, 'checkbox');
 
 			if (!$this->hasErrors()) {
 				// clean old entry after save, since this may affects some banned IP
-				ABF::instance()->removeExpiredEntries(self::getConfigVal(self::SETTING_LENGTH));
-			}
-		}
-
-		/**
-		 *
-		 * Save one parameter
-		 * @param array $context
-		 * @param string $key
-		 * @param string $autoSave @optional
-		 */
-		public function saveOne(&$context, $key, $autoSave = true, $type = 'text'){
-			// get the input
-			$input = $context['settings'][self::SETTING_GROUP][$key];
-			$iVal = intval($input);
-
-			// verify it is a good domain
-			if (strlen($input) > 0 && is_int($iVal) && $iVal > 0) {
-
-				// set config                    (name, value, group)
-				Symphony::Configuration()->set($key, $iVal, self::SETTING_GROUP);
-
-				// save it
-				if ($autoSave) {
-					Administration::instance()->saveConfig();
-				}
-
-			} else {
-				// don't save
-
-				// set error message
-				$error = __('"%s" is not a valid positive integer',  array($input));
-
-				// append to local array
-				$this->errors[$key] = $error;
-
-				// add an error into the stack
-				$context['errors'][self::SETTING_GROUP][$key] = $error;
+				ABF::instance()->removeExpiredEntries();
 			}
 		}
 	}

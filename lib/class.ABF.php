@@ -18,6 +18,47 @@
 	class ABF implements Singleton {
 
 		/**
+		 * Key of the length setting
+		 * @var string
+		 */
+		const SETTING_LENGTH = 'length';
+
+		/**
+		 * Key of the failed count setting
+		 * @var string
+		 */
+		const SETTING_FAILED_COUNT = 'failed-count';
+
+		/**
+		 * Key of the auto unband via email setting
+		 * @var string
+		 */
+		const SETTING_AUTO_UNBAN = 'auto-unban';
+
+		/**
+		 * Key of the Grey list threshold setting
+		 * @var string
+		 */
+		const SETTING_GL_THRESHOLD = 'gl-threshold';
+
+		/**
+		 * Key of the Grey list duration setting
+		 * @var string
+		 */
+		const SETTING_GL_DURATION = 'gl-duration';
+
+		/**
+		 * Key of the group of setting
+		 * @var string
+		 */
+		const SETTING_GROUP = 'anti-brute-force';
+
+		/**
+		 * Variable that holds the settings values
+		 */
+		private $_setings = array();
+
+		/**
 		 * Short hand for the tables name
 		 * @var string
 		 */
@@ -26,6 +67,10 @@
 		private $TBL_ABF_GL = 'tbl_anti_brute_force_gl';
 		private $TBL_ABF_BL = 'tbl_anti_brute_force_bl';
 
+		/**
+		 * All the different colors of the colored lists
+		 * @var array
+		 */
 		public $COLORS = array('black', 'grey', 'white');
 
 		/**
@@ -48,13 +93,21 @@
 		 */
 		public static function instance() {
 			if (self::$I == null) {
-				self::$I = new self();
+				self::$I = new ABF();
 			}
 			return self::$I;
 		}
 
 		// do not allow external creation
-		private function __construct(){}
+		private function __construct(){
+			$s = Symphony::Configuration()->get();
+			$this->_setings = $s[ABF::SETTING_GROUP];
+			unset($s);
+
+			if (count($this->_setings) < 1) {
+				throw new Exception('Can not load settings. Can not continue.');
+			}
+		}
 
 
 		/**
@@ -62,17 +115,35 @@
 		 */
 
 		/**
+		 * Do the actual ban check: throw exception if banned/black listed
+		 */
+		public function doBanCheck() {
+			// check if not white listed
+			if (!$this->isWhiteListed()) {
+
+				// check if blacklisted
+				if ($this->isBlackListed()) {
+					// block access
+					$this->throwBlackListedException();
+				}
+
+				// check if banned
+				if ($this->isCurrentlyBanned()) {
+					// block access
+					$this->throwBannedException();
+				}
+			}
+		}
+
+		/**
 		 *
 		 * Check to see if the current user IP address is banned,
-		 * based on the parameters passed to the method
-		 * @param int/string $length
-		 * @param int/string $failedCount
+		 * based on the parameters set in Configuration
 		 */
-		public function isCurrentlyBanned($length, $failedCount) {
-			if (!isset($length) || !isset($failedCount)) {
-				return false; // no preference, how can we know...
-			}
-			$results = $this->getFailureByIp(null, "
+		public function isCurrentlyBanned($ip='') {
+			$length = $this->_setings[ABF::SETTING_LENGTH];
+			$failedCount = $this->_setings[ABF::SETTING_FAILED_COUNT];
+			$results = $this->getFailureByIp($ip, "
 				AND UNIX_TIMESTAMP(LastAttempt) + (60 * $length) > UNIX_TIMESTAMP()
 				AND FailedCount >= $failedCount");
 
@@ -124,11 +195,11 @@
 		/**
 		 *
 		 * Utility function that throw a properly formatted SymphonyErrorPage Exception
-		 * @param string $length - length of block in minutes
-		 * @param boolean
 		 * @throws SymphonyErrorPage
 		 */
-		public function throwBannedException($length, $useUnbanViaEmail = false) {
+		public function throwBannedException() {
+			$length = $this->_setings[ABF::SETTING_LENGTH];
+			$useUnbanViaEmail = $this->_setings[ABF::SETTING_AUTO_UNBAN];
 			$msg =
 				__('Your IP address is currently banned, due to typing too many wrong usernames/passwords')
 				. '<br/><br/>' .
@@ -156,9 +227,9 @@
 		/**
 		 *
 		 * Delete expired entries
-		 * @param string/int $length
 		 */
-		public function removeExpiredEntries($length) {
+		public function removeExpiredEntries() {
+			$length = $this->_setings[ABF::SETTING_LENGTH];
 			return Symphony::Database()->delete($this->TBL_ABF, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
 		}
 
@@ -392,6 +463,60 @@
 		}
 
 
+
+
+		/**
+		 * SETTINGS
+		 */
+
+		/**
+		 *
+		 * Utility function that returns settings from this extensions settings group
+		 * @param string $key
+		 */
+		public function getConfigVal($key) {
+			return $this->_setings[$key];
+		}
+
+		/**
+		 *
+		 * Save one parameter, passed in the $context array
+		 * @param array $context
+		 * @param array $errors
+		 * @param string $key
+		 * @param string $autoSave @optional
+		 */
+		public function setConfigVal(&$context, &$errors, $key, $autoSave = true, $type = 'text'){
+			// get the input
+			$input = $context['settings'][ABF::SETTING_GROUP][$key];
+			$iVal = intval($input);
+
+			// verify it is a good domain
+			if (strlen($input) > 0 && is_int($iVal) && $iVal > 0) {
+
+				// set config                    (name, value, group)
+				Symphony::Configuration()->set($key, $iVal, ABF::SETTING_GROUP);
+
+				// save it
+				if ($autoSave) {
+					Administration::instance()->saveConfig();
+				}
+
+			} else {
+				// don't save
+
+				// set error message
+				$error = __('"%s" is not a valid positive integer',  array($input));
+
+				// append to local array
+				$errors[$key] = $error;
+
+				// add an error into the stack
+				$context['errors'][ABF::SETTING_GROUP][$key] = $error;
+			}
+		}
+
+
 		/**
 		 * Database Data Definition Queries
 		 */
@@ -400,8 +525,24 @@
 		 *
 		 * This method will install the plugin
 		 */
-		public function install() {
-			return $this->install_v1_0() && $this->install_v1_1();
+		public function install(&$ext_driver) {
+			$ret = $this->install_v1_0() && $this->install_v1_1();
+			if ( $ret ) {
+				// set default values
+				$pseudo_context = array(
+					'settings' => array (
+						ABF::SETTING_GROUP => array (
+							ABF::SETTING_LENGTH => 60,
+							ABF::SETTING_FAILED_COUNT => 5,
+							ABF::SETTING_AUTO_UNBAN => 'off',
+							ABF::SETTING_GL_THRESHOLD => 5,
+							ABF::SETTING_GL_DURATION => 30
+						)
+					)
+				);
+				$ext_driver->save($pseudo_context);
+			}
+			return $ret;
 		}
 
 		private function install_v1_0() {
@@ -516,6 +657,9 @@
 			";
 
 			$retABF_WL = Symphony::Database()->query($sql);
+
+			Symphony::Configuration()->remove(ABF::SETTING_GROUP, ABF::SETTING_GROUP);
+			Administration::instance()->saveConfig();
 
 			return $retABF && $retABF_BL && $retABF_GL && $retABF_WL;
 		}
