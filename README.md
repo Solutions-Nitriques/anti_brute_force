@@ -44,16 +44,17 @@ http://www.nitriques.com/open-source/
 
 ### History ###
 
-- 1.1 - 2011-07-xx
-  Colored list feature
+- 1.1 - 2011-07-xx  
+  Colored list feature added  
+  Fix issues #3, #4, #5, #6 and #7  
 
-- 1.0.2 - 2011-07-02
-  New data base scheme
-  New setting group, which was a copy/paste error -- breaks downward compatibility --
-  Fix others errors (not bugs, errors)  
+- 1.0.2 - 2011-07-02  
+  New data base scheme  
+  New setting group, which was a copy/paste error -- breaks downward compatibility --  
+  Fix others errors (not bugs, errors)    
 
-- 1.0.1 - 2011-07-02  
-  Fix Issues #1 (typo) and #2 (no more ASDC)
+- 1.0.1 - 2011-07-02    
+  Fix Issues #1 (typo) and #2 (no more ASDC)  
 
-- 1.0 - 2011-07-01  
-  First release: Block login, Admin content page, ABF Facade/Singleton
+- 1.0 - 2011-07-01    
+  First release: Block login, Admin content page, ABF Facade/Singleton  
