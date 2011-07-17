@@ -56,7 +56,7 @@
 
 				foreach ($data as $datarow) {
 
-					$cols = array();
+					$tds = array();
 
 					$datarow = get_object_vars($datarow);
 
@@ -82,10 +82,10 @@
 							$td->appendChild($chk);
 						}
 
-						array_push($cols, $td);
+						array_push($tds, $td);
 					}
 
-					array_push($a, Widget::TableRow($cols, $index % 2 == 0 ? 'even' : 'odd'));
+					array_push($a, Widget::TableRow($tds, $index % 2 == 0 ? 'even' : 'odd'));
 
 					$index++;
 				}
@@ -128,7 +128,7 @@
 			$tableActions = new XMLElement('div');
 			$tableActions->setAttribute('class', 'actions');
 
-			$tableActions->appendChild(Widget::Select('with-selected', $options));
+			$tableActions->appendChild(Widget::Select('with-' . $actionkey, $options));
 			$tableActions->appendChild(Widget::Input("action[$actionkey]", __($actionTextKey), 'submit'));
 
 			return $tableActions;

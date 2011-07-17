@@ -26,6 +26,8 @@
 		private $TBL_ABF_GL = 'tbl_anti_brute_force_gl';
 		private $TBL_ABF_BL = 'tbl_anti_brute_force_bl';
 
+		public $COLORS = array('black', 'grey', 'white');
+
 		/**
 		 *
 		 * Holds the path to the "send me unband link" page
@@ -200,6 +202,7 @@
 		}
 
 		private function incrementGreyList($ip) {
+			$tbl = $this->TBL_ABF_GL;
 			// UPDATE -- only Grey list
 			return Symphony::Database()->query("
 				UPDATE $tbl
@@ -210,25 +213,25 @@
 		}
 
 		public function isBlackListed($ip='') {
-			return $this->isListed($this->TBL_ABF_BL, $ip);
+			return $this->__isListed($this->TBL_ABF_BL, $ip);
 		}
 
 		public function isGreyListed($ip='') {
-			return $this->isListed($this->TBL_ABF_GL, $ip);
+			return $this->__isListed($this->TBL_ABF_GL, $ip);
 		}
 
 		public function isWhiteListed($ip='') {
-			return $this->isListed($this->TBL_ABF_WL, $ip);
+			return $this->__isListed($this->TBL_ABF_WL, $ip);
 		}
 
-		private function isListed($tbl, $ip='') {
+		private function __isListed($tbl, $ip='') {
 			$ip = $this->getIP($ip);
 			return count($this->getListEntriesByIp($tbl, $ip)) > 0;
 		}
 
 
 
-		private function unregisterToList($tbl, $ip='') {
+		private function __unregisterToList($tbl, $ip='') {
 			$filter = MySQL::cleanValue($this->getIP($ip));
 			return Symphony::Database()->delete($this->TBL_ABF, "IP = '$filter'");
 		}
@@ -324,6 +327,27 @@
 			return $rets;
 		}
 
+		public function getListEntries($color) {
+			return $this->__getListEntries($this->getTableName($color));
+		}
+
+		private function __getListEntries($tbl, $where='', $order='IP ASC') {
+			if (strlen($where) > 0) {
+				$where = 'WHERE ' . $where;
+			}
+			$sql ="
+				SELECT * FROM $tbl $where ORDER BY $order
+			" ;
+
+			$rets = array();
+
+			if (Symphony::Database()->query($sql)) {
+				$rets = Symphony::Database()->fetch();
+			}
+
+			return $rets;
+		}
+
 
 		/**
 		 * Utilities
@@ -338,7 +362,23 @@
 			return $_ENV["HTTP_USER_AGENT"];
 		}
 
-
+		private function getTableName($color) {
+			$tbl = '';
+			switch ($color) {
+				case $this->COLORS[0]:
+					$tbl = $this->TBL_ABF_BL;
+					break;
+				case $this->COLORS[1]:
+					$tbl = $this->TBL_ABF_GL;
+					break;
+				case $this->COLORS[2]:
+					$tbl = $this->TBL_ABF_WL;
+					break;
+				default:
+					throw new Exception(vsprintf("'%s' is not a know color", $color));
+			}
+			return $tbl;
+		}
 
 
 		/**

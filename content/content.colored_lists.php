@@ -52,6 +52,17 @@
 		}
 
 		/**
+		 * Quiclk accessor and lazy load of the data
+		 */
+		private function getData() {
+			if (count($this->_data) == 0) {
+				$this->_data = ABF::instance()->getListEntries($this->_curColor);
+				$this->_hasData = count($this->_data) > 0;
+			}
+			return $this->_data;
+		}
+
+		/**
 		 * Builds the content view
 		 */
 		public function __viewIndex() {
@@ -69,7 +80,7 @@
 			$aTableHead = ViewFactory::buildTableHeader($cols);
 
 			// build body table
-			$aTableBody = ViewFactory::buildTableBody($cols, $this->_data);
+			$aTableBody = ViewFactory::buildTableBody($cols, $this->getData());
 
 			// build data table
 			$table = Widget::Table(
@@ -133,8 +144,8 @@
 		 * Switch action
 		 */
 		public function __actionSwitch() {
-			if (isset($_POST['with-selected'])) {
-				$this->_curColor = $_POST['with-selected'];
+			if (isset($_POST['with-switch'])) {
+				$this->_curColor = $_POST['with-switch'];
 
 				$this->setSelected();
 			}
