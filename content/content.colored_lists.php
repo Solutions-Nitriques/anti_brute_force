@@ -19,6 +19,7 @@
 		private $_hasData = false;
 		private $_data = null;
 		private $_tables = array();
+		private $_curColor = 'black';
 
 		public function __construct(&$parent) {
 			parent::__construct($parent);
@@ -31,12 +32,23 @@
 			);
 
 			$this->_tables = array(
+					// value, selected, label
 				array('black', false, __('Black list')),
 				array('grey', false, __('Grey list')),
 				array('white', false, __('White list'))
 			);
 
+			$this->setSelected();
+
 			$this->_data = array();
+		}
+
+		private function setSelected() {
+			$x = 0;
+			foreach ($this->_tables as $t) {
+				$this->_tables[$x][1] = ($this->_curColor == $t[0]);
+				$x++;
+			}
 		}
 
 		/**
@@ -51,11 +63,13 @@
 
 			$this->appendSubheading(__($title));
 
+			$cols = $this->getCurrentCols();
+
 			// build header table
-			$aTableHead = ViewFactory::buildTableHeader($this->_cols);
+			$aTableHead = ViewFactory::buildTableHeader($cols);
 
 			// build body table
-			$aTableBody = ViewFactory::buildTableBody($this->_cols, $this->_data);
+			$aTableBody = ViewFactory::buildTableBody($cols, $this->_data);
 
 			// build data table
 			$table = Widget::Table(
@@ -91,7 +105,11 @@
 				foreach ($_POST['action'] as $key => $action) {
 					switch ($key) {
 						case 'apply':
-							$this->__actionApply($action);
+							$this->__actionApply();
+							break;
+
+						case 'switch':
+							$this->__actionSwitch();
 							break;
 					}
 				}
@@ -100,15 +118,25 @@
 
 		/**
 		 * Apply action
-		 * @param $action
 		 */
-		public function __actionApply($action) {
+		public function __actionApply() {
 			if (isset($_POST['with-selected'])) {
 				switch ($_POST['with-selected']) {
 					case 'delete':
 						$this->__delete();
 						break;
 				}
+			}
+		}
+
+		/**
+		 * Switch action
+		 */
+		public function __actionSwitch() {
+			if (isset($_POST['with-selected'])) {
+				$this->_curColor = $_POST['with-selected'];
+
+				$this->setSelected();
 			}
 		}
 
@@ -132,6 +160,18 @@
 
 				}
 			}
+		}
+
+		private function getCurrentCols() {
+			$cols = array();
+			$cols = array_merge($cols, $this->_cols);
+
+			// only grey list a failed count col
+			if ($this->_curColor != 'grey') {
+				array_splice($cols, 1, 1);
+			}
+
+			return $cols;
 		}
 
 	}
