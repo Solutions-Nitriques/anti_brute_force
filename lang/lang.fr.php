@@ -7,7 +7,7 @@
 			'email' => 'open-source (at) nitriques.com',
 			'website' => 'http://www.nitriques.com/'
 		),
-		'release-date' => '2011-07-06',
+		'release-date' => '2011-07-17',
 	);
 
 
@@ -65,62 +65,62 @@
 		'Source',
 
 		'Enter your email address to be sent a remote unban link with further instructions.' =>
-		false,
+		'Veuillez entrer votre adresse courriel pour recevoir un lien et des instruction pour vous ré-autoriser.',
 
 		'Email Address' =>
-		false,
+		'Courriel',
 
 		'Users can unban their IP via email' =>
-		false,
+		'Les utilisateurs peuvent se débannir via courriel',
 
 		'Alternatively, you can <a href="%s">un-ban your IP by email</a>.' =>
-		false,
+		'De plus, vous pouvez vous <a href="%s">débannir par courriel</a>.',
 
 		'Please follow this link to unban your IP: ' =>
-		false,
+		'Veuillez suivre ce lien pour vous débannir: ',
 
 		'If you do not remember your password, follow the "forgot password" link on the login page.' =>
-		false,
+		'Si vous ne vous souvenez plus de votre mot de passe, veuillez suivre le lien "mot de passe oublié" sur la page d\'identification.',
 
 		'Grey list threshold' =>
-		false,
+		'Limit de la liste grise',
 
 		'Grey list duration <em>in days</em>' =>
-		false,
+		'Durée de validité de la liste grise <em>en jour</em>',
 
 		'Your IP address is currently <strong>black listed</strong>, due to too many bans.' =>
-		false,
+		'Votre adresse IP est présentement <strong>sur la liste noire</strong>, dû à trop d\'erreurs.',
 
 		'Ask your administrator to unlock your IP.' =>
-		false,
+		'Demandez à votre administrateur de débloquer votre adresse IP.',
 
 		'Black listed IP address' =>
-		false,
+		'Adresse IP sur la liste noire',
 
 		'IP Colored Lists' =>
-		false,
+		'Listes colorées d\'IPs',
 
 		'Date Created' =>
-		false,
+		'Date d\'ajout',
 
 		'Entries remove successfuly' =>
-		false,
+		'Entrées supprimées avec succès',
 
 		'Change' =>
-		false,
+		'Changer',
 
 		'Black list' =>
-		false,
+		'Liste noire',
 
 		'Grey list' =>
-		false,
+		'Liste grise',
 
 		'White list' =>
-		false,
+		'Liste blanche',
 
 		'Add' =>
 		'Ajouter',
 
 		'IP added successfuly' =>
-		false
+		'Adresse IP ajoutée avec succès'
 	);
