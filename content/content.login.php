@@ -64,7 +64,7 @@
 		private function __buildFormContent() {
 			$fieldset = new XMLElement('fieldset');
 
-			if (!isset($this->_email_sent) && $this->_email_sent == false) {
+			if ($this->_email_sent !== true) {
 
 				$fieldset->appendChild(new XMLElement('p', __('Enter your email address to be sent a remote unban link with further instructions.')));
 
@@ -95,7 +95,7 @@
 
 			$this->Form->appendChild($fieldset);
 
-			if (!isset($this->_email_sent) && $this->_email_sent == false) {
+			if ($this->_email_sent !== true) {
 				$div = new XMLElement('div', NULL, array('class' => 'actions'));
 				$div->appendChild(new XMLElement('button', __('Send Email'), array('name' => 'action[send-email]', 'type' => 'submit')));
 				$this->Form->appendChild($div);

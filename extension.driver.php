@@ -109,19 +109,20 @@
 				),
 				array(
 					'location'	=> __('System'),
-					'name'	=> __('Colored Lists'),
+					'name'	=> __('IP Colored Lists'),
 					'link'	=> '/colored_lists/'
 				)
 			);
 		}
 
 		/**
-		 * Delegate fired when the HEAD section must be build
+		 * Delegate fired when the HEAD section will be built
 		 * @param array $context
 		 */
 		public function initaliseAdminPageHead($context) {
 			// do it here since it is called before
 			// processing $_POST['action']
+			// BUT NOT CALLED ON THE LOGIN PAGE... DAMN...
 			$this->doBanCheck();
 		}
 
@@ -133,6 +134,14 @@
 		public function authorLoginFailure($context) {
 			// register failure in DB
 			ABF::instance()->registerFailure($context['username'], self::EXT_NAME);
+
+			// if user is now banned
+			if (ABF::instance()->isCurrentlyBanned()) {
+				// register into grey list
+				ABF::instance()->registerToGreyList(self::EXT_NAME);
+				// move to black list if necessary
+				ABF::instance()->moveGreyToBlack(self::EXT_NAME);
+			}
 		}
 
 		/**
@@ -144,7 +153,7 @@
 			// Since user can still post data to the login page
 			// we don't want them to be able to know they guessed it right.
 			// So, if user is loggued in but still ban, we logout them
-			if ($this->isCurrentlyBanned) {
+			if (ABF::instance()->isCurrentlyBanned()) {
 				Administration::instance()->logout();
 			} else {
 				// unregister any result with current IP
@@ -164,16 +173,23 @@
 			if ($oPage instanceof contentLogin) {
 				// clean database before check
 				ABF::instance()->removeExpiredEntries();
+				ABF::instance()->removeExpiredListEntries();
 			}
 
 			// N.B. We must still do it here
 			// since initaliseAdminPageHead is not fired on some requests
-			if (! 	($oPage instanceof contentExtensionAnti_brute_forceLogin) ||
-					($oPage instanceof contentExtensionAnti_brute_forceLogin &&
-					$unBanViaEmail != 'Yes' &&
-					$unBanViaEmail != true) ) {
+			if ($this->mustCheck($oPage)) {
 				$this->doBanCheck();
 			}
+		}
+
+		private function mustCheck($oPage) {
+			return (
+				   !($oPage instanceof contentExtensionAnti_brute_forceLogin)) ||
+					($oPage instanceof contentExtensionAnti_brute_forceLogin &&
+					$unBanViaEmail != 'No' &&
+					$unBanViaEmail != false &&
+					$unBanViaEmail != 'off');
 		}
 
 		/**

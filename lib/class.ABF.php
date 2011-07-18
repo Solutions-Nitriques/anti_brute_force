@@ -229,14 +229,18 @@
 		 * Delete expired entries
 		 */
 		public function removeExpiredEntries() {
+			// in minutes
 			$length = $this->_setings[ABF::SETTING_LENGTH];
 			return Symphony::Database()->delete($this->TBL_ABF, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
 		}
 
 
+
+
 		/**
-		 * COLORED (B/G/W) Public methods
+		 * Database Data queries - COLORED (B/G/W) Public methods
 		 */
+
 		public function registerToBlackList($source, $ip='') {
 			return $this->__registerToList($this->TBL_ABF_BL, $source, $ip);
 		}
@@ -276,6 +280,15 @@
 			return $ret;
 		}
 
+		public function moveGreyToBlack($source, $ip='') {
+			$grey = $this->getGreyListEntriesByIP($ip);
+			if (is_array($grey) && !empty($grey)) {
+				if ($grey[0]->FailedCount >= $this->_setings[ABF::SETTING_GL_THRESHOLD]) {
+					$this->registerToBlackList($source, $ip);
+				}
+			}
+		}
+
 		private function incrementGreyList($ip) {
 			$tbl = $this->TBL_ABF_GL;
 			// UPDATE -- only Grey list
@@ -305,9 +318,8 @@
 
 		private function __isListed($tbl, $ip='') {
 			$ip = $this->getIP($ip);
-			return count($this->getListEntriesByIp($tbl, $ip)) > 0;
+			return count($this->__getListEntriesByIp($tbl, $ip)) > 0;
 		}
-
 
 		public function unregisterToList($color, $ip='') {
 			return $this->__unregisterToList($this->getTableName($color), $ip);
@@ -316,6 +328,12 @@
 		private function __unregisterToList($tbl, $ip='') {
 			$filter = MySQL::cleanValue($this->getIP($ip));
 			return Symphony::Database()->delete($tbl, "IP = '$filter'");
+		}
+
+		public function removeExpiredListEntries() {
+			// in days
+			$length = $this->_setings[ABF::SETTING_GL_DURATION];
+			return Symphony::Database()->delete($this->TBL_ABF_GL, "UNIX_TIMESTAMP(DateCreated) + (60 * 60 * 24 * $length) < UNIX_TIMESTAMP()");
 		}
 
 		/**
@@ -338,7 +356,7 @@
 
 
 		/**
-		 * Database Data queries
+		 * Database Data queries - FAILURES
 		 */
 
 		/**
@@ -389,8 +407,23 @@
 			return $rets;
 		}
 
+		public function getBlackListEntriesByIP($ip='', $additionalWhere='') {
+			return $this->__getListEntriesByIp($this->TBL_ABF_BL, $ip, $additionalWhere);
+		}
 
-		public function getListEntriesByIp($tbl, $ip='', $additionalWhere='') {
+		public function getGreyListEntriesByIP($ip='', $additionalWhere='') {
+			return $this->__getListEntriesByIp($this->TBL_ABF_GL, $ip, $additionalWhere);
+		}
+
+		public function getWhiteListEntriesByIP($ip='', $additionalWhere='') {
+			return $this->__getListEntriesByIp($this->TBL_ABF_WL, $ip, $additionalWhere);
+		}
+
+		public function getListEntriesByIP($color, $ip='', $additionalWhere='') {
+			return $this->__getListEntriesByIp($this->getTableName($color), $ip, $additionalWhere);
+		}
+
+		private function __getListEntriesByIp($tbl, $ip='', $additionalWhere='') {
 			$ip = $this->getIP($ip);
 			$where = "IP = '$ip'";
 			if (strlen($additionalWhere) > 0) {

@@ -97,7 +97,7 @@
 		'Black listed IP address' =>
 		false,
 
-		'Colored Lists' =>
+		'IP Colored Lists' =>
 		false,
 
 		'Date Created' =>

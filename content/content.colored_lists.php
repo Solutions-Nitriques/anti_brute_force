@@ -72,7 +72,7 @@
 		 * Builds the content view
 		 */
 		public function __viewIndex() {
-			$title = __('Colored Lists');
+			$title = __('IP Colored Lists');
 
 			$this->setPageType('table');
 
