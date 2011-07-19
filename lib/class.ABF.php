@@ -76,7 +76,6 @@
 		/**
 		 *
 		 * Holds the path to the "send me unband link" page
-		 * @todo use a dynamic way to get the /symphony/extensionx/ part
 		 * @var string
 		 */
 		const UNBAND_LINK =  '/extension/anti_brute_force/login/';
@@ -104,8 +103,16 @@
 			$this->_setings = $s[ABF::SETTING_GROUP];
 			unset($s);
 
-			if (count($this->_setings) < 1) {
-				throw new Exception('Can not load settings. Can not continue.');
+			$status = Symphony::ExtensionManager()->fetchStatus(extension_anti_brute_force::EXT_NAME);
+			$isInstalled = ($status == EXTENSION_ENABLED || $status == EXTENSION_REQUIRES_UPDATE);
+
+			// only if already installed
+			if ($isInstalled) {
+				// assure access to settings
+				// fail is not settings, since this is a security software
+				if (count($this->_setings) < 1) {
+					throw new Exception('Can not load settings. Can not continue.');
+				}
 			}
 		}
 
