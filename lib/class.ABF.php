@@ -54,9 +54,29 @@
 		const SETTING_GROUP = 'anti-brute-force';
 
 		/**
+		 * Defaults settings values
+		 * @var array->array
+		 */
+		private $DEFAULTS = array (
+						ABF::SETTING_GROUP => array (
+							ABF::SETTING_LENGTH => 60,
+							ABF::SETTING_FAILED_COUNT => 5,
+							ABF::SETTING_AUTO_UNBAN => 'off',
+							ABF::SETTING_GL_THRESHOLD => 5,
+							ABF::SETTING_GL_DURATION => 30
+						)
+					);
+
+		/**
 		 * Variable that holds the settings values
 		 */
 		private $_setings = array();
+
+		/**
+		 * Variable that hold true if the extension is installed
+		 * @var boolean
+		 */
+		private $_isInstalled = false;
 
 		/**
 		 * Short hand for the tables name
@@ -70,6 +90,7 @@
 		/**
 		 * All the different colors of the colored lists
 		 * @var array
+		 * @property
 		 */
 		public $COLORS = array('black', 'grey', 'white');
 
@@ -104,10 +125,13 @@
 			unset($s);
 
 			$status = Symphony::ExtensionManager()->fetchStatus(extension_anti_brute_force::EXT_NAME);
-			$isInstalled = ($status == EXTENSION_ENABLED || $status == EXTENSION_REQUIRES_UPDATE);
+			$this->_isInstalled = ($status == EXTENSION_ENABLED || $status == EXTENSION_REQUIRES_UPDATE);
+
+			var_dump($this->_isInstalled);
+			var_dump($status);
 
 			// only if already installed
-			if ($isInstalled) {
+			if ($this->_isInstalled) {
 				// assure access to settings
 				// fail is not settings, since this is a security software
 				if (count($this->_setings) < 1) {
@@ -126,7 +150,7 @@
 		 */
 		public function doBanCheck() {
 			// check if not white listed
-			if (!$this->isWhiteListed()) {
+			if ($this->_isInstalled && !$this->isWhiteListed()) {
 
 				// check if blacklisted
 				if ($this->isBlackListed()) {
@@ -227,7 +251,7 @@
 		 * can be the IP address or the hash value
 		 */
 		public function unregisterFailure($filter='') {
-			$filter = MySQL::cleanValue($this->getIP($ip));
+			$filter = MySQL::cleanValue($this->getIP($filter));
 			return Symphony::Database()->delete($this->TBL_ABF, "IP = '$filter' OR Hash = '$filter'");
 		}
 
@@ -237,8 +261,10 @@
 		 */
 		public function removeExpiredEntries() {
 			// in minutes
-			$length = $this->_setings[ABF::SETTING_LENGTH];
-			return Symphony::Database()->delete($this->TBL_ABF, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
+			if ($this->_isInstalled) {
+				$length = $this->_setings[ABF::SETTING_LENGTH];
+				return Symphony::Database()->delete($this->TBL_ABF, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
+			}
 		}
 
 
@@ -570,16 +596,14 @@
 			if ( $ret ) {
 				// set default values
 				$pseudo_context = array(
-					'settings' => array (
-						ABF::SETTING_GROUP => array (
-							ABF::SETTING_LENGTH => 60,
-							ABF::SETTING_FAILED_COUNT => 5,
-							ABF::SETTING_AUTO_UNBAN => 'off',
-							ABF::SETTING_GL_THRESHOLD => 5,
-							ABF::SETTING_GL_DURATION => 30
-						)
-					)
+					'settings' => $this->DEFAULTS
 				);
+
+				// *** load settings in memory
+				// Even if we just installed the ext, a ban check will be done,
+				// so we need settings: use defaults
+				$this->_setings = empty($this->_setings) ? $this->DEFAULTS : $this->_setings;
+
 				$ext_driver->save($pseudo_context);
 			}
 			return $ret;
@@ -700,6 +724,8 @@
 
 			Symphony::Configuration()->remove(ABF::SETTING_GROUP, ABF::SETTING_GROUP);
 			Administration::instance()->saveConfig();
+
+			$this->_isInstalled = false;
 
 			return $retABF && $retABF_BL && $retABF_GL && $retABF_WL;
 		}

@@ -147,6 +147,7 @@
 		/**
 		 *
 		 * Delegate fired when a author is logged in correctly
+		 * N.B. Fired on each and every page in the admin *except* login
 		 * @param array $context
 		 */
 		public function authorLoginSuccess($context) {
