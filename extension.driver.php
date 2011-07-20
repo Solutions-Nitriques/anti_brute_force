@@ -42,7 +42,7 @@
 			return array(
 				'name'			=> self::EXT_NAME,
 				'version'		=> '1.1',
-				'release-date'	=> '2011-07-17',
+				'release-date'	=> '2011-07-xx',
 				'author'		=> array(
 					'name'			=> 'Solutions Nitriques',
 					'website'		=> 'http://www.nitriques.com/open-source/',

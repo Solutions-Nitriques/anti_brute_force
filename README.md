@@ -44,7 +44,7 @@ http://www.nitriques.com/open-source/
 
 ### History ###
 
-- 1.1 - 2011-07-17  
+- 1.1 - 2011-07-xx  
   Colored list feature added  
   Fix issues #5, and #7  
 
