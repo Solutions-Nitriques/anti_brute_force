@@ -16,6 +16,12 @@
 	 *
 	 */
 	class extension_anti_brute_force extends Extension {
+		
+		/**
+		 * Name of the extension
+		 * @var string
+		 */
+		const EXT_NAME = 'Anti Brute Force';
 
 		/**
 		 * private variable for holding the errors encountered when saving
@@ -34,7 +40,7 @@
 		 */
 		public function about() {
 			return array(
-				'name'			=> ABF::EXT_NAME,
+				'name'			=> self::EXT_NAME,
 				'version'		=> '1.1',
 				'release-date'	=> '2011-07-20',
 				'author'		=> array(
@@ -127,14 +133,14 @@
 		 */
 		public function authorLoginFailure($context) {
 			// register failure in DB
-			ABF::instance()->registerFailure($context['username'], ABF::EXT_NAME);
+			ABF::instance()->registerFailure($context['username'], self::EXT_NAME);
 
 			// if user is now banned
 			if (ABF::instance()->isCurrentlyBanned()) {
 				// register into grey list
-				ABF::instance()->registerToGreyList(ABF::EXT_NAME);
+				ABF::instance()->registerToGreyList(self::EXT_NAME);
 				// move to black list if necessary
-				ABF::instance()->moveGreyToBlack(ABF::EXT_NAME);
+				ABF::instance()->moveGreyToBlack(self::EXT_NAME);
 			}
 		}
 
@@ -237,7 +243,7 @@
 			// creates the field set
 			$fieldset = new XMLElement('fieldset');
 			$fieldset->setAttribute('class', 'settings');
-			$fieldset->appendChild(new XMLElement('legend', ABF::EXT_NAME));
+			$fieldset->appendChild(new XMLElement('legend', self::EXT_NAME));
 
 			// create a paragraph for short intructions
 			$p = new XMLElement('p', __('Define here when and how IP are blocked'), array('class' => 'help'));

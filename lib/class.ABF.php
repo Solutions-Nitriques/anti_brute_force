@@ -20,12 +20,6 @@
 	class ABF implements Singleton {
 		
 		/**
-		 * Name of the extension
-		 * @var string
-		 */
-		const EXT_NAME = 'Anti Brute Force';
-
-		/**
 		 * Key of the length setting
 		 * @var string
 		 */
@@ -132,9 +126,9 @@
 			$this->_setings = $s[ABF::SETTING_GROUP];
 			unset($s);
 
-			$status = Symphony::ExtensionManager()->fetchStatus(ABF::EXT_NAME);
+			$status = Symphony::ExtensionManager()->fetchStatus('anti_brute_force');
 			$this->_isInstalled = ($status == EXTENSION_ENABLED || $status == EXTENSION_REQUIRES_UPDATE);
-
+			
 			// only if already installed
 			if ($this->_isInstalled) {
 				// assure access to settings
@@ -177,13 +171,16 @@
 		 * based on the parameters set in Configuration
 		 */
 		public function isCurrentlyBanned($ip='') {
-			$length = $this->_setings[ABF::SETTING_LENGTH];
-			$failedCount = $this->_setings[ABF::SETTING_FAILED_COUNT];
-			$results = $this->getFailureByIp($ip, "
-				AND UNIX_TIMESTAMP(LastAttempt) + (60 * $length) > UNIX_TIMESTAMP()
-				AND FailedCount >= $failedCount");
-
-			return count($results) > 0;
+			if ($this->_isInstalled) {
+				$length = $this->_setings[ABF::SETTING_LENGTH];
+				$failedCount = $this->_setings[ABF::SETTING_FAILED_COUNT];
+				$results = $this->getFailureByIp($ip, "
+					AND UNIX_TIMESTAMP(LastAttempt) + (60 * $length) > UNIX_TIMESTAMP()
+					AND FailedCount >= $failedCount");
+	
+				return count($results) > 0;
+			}
+			return false;
 		}
 
 		/**
