@@ -43,16 +43,9 @@ Prevents ***people and softwares*** to brute force your authors accounts.
 http://www.nitriques.com/open-source/
 
 ### History ###
-<<<<<<< HEAD
 
-- 1.1 - 2011-07-17  
-=======
 
-- 1.1 - 2011-07-17  
-<<<<<<< HEAD
->>>>>>> parent of c2316ea... typo
-=======
->>>>>>> parent of 0c7ac7f... Revert "Release dates and FR translation"
+- 1.1 - 2011-07-20  
   Colored list feature added  
   Fix issues #5, and #7  
 

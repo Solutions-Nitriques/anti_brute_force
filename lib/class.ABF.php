@@ -6,6 +6,8 @@
 	Copyight: Solutions Nitriques 2011
 	License: MIT
 	*/
+	
+	require_once (TOOLKIT . '/class.extensionmanager.php');
 
 	/**
 	 *
@@ -126,9 +128,6 @@
 
 			$status = Symphony::ExtensionManager()->fetchStatus(extension_anti_brute_force::EXT_NAME);
 			$this->_isInstalled = ($status == EXTENSION_ENABLED || $status == EXTENSION_REQUIRES_UPDATE);
-
-			var_dump($this->_isInstalled);
-			var_dump($status);
 
 			// only if already installed
 			if ($this->_isInstalled) {
