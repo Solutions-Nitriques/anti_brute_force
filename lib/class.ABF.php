@@ -7,8 +7,6 @@
 	License: MIT
 	*/
 
-	require_once (TOOLKIT . '/class.extensionmanager.php');
-
 	/**
 	 *
 	 * Symphony CMS leaverages the Decorator pattern with their <code>Extension</code> class.
@@ -128,7 +126,10 @@
 
 			$status = Symphony::ExtensionManager()->fetchStatus(extension_anti_brute_force::EXT_NAME);
 			$this->_isInstalled = ($status == EXTENSION_ENABLED || $status == EXTENSION_REQUIRES_UPDATE);
-			
+
+			var_dump($this->_isInstalled);
+			var_dump($status);
+
 			// only if already installed
 			if ($this->_isInstalled) {
 				// assure access to settings
