@@ -44,12 +44,7 @@ http://www.nitriques.com/open-source/
 
 ### History ###
 
-<<<<<<< HEAD
-
-- 1.1 - 2011-07-17   
-=======
 - 1.1 - 2011-07-17  
->>>>>>> parent of c2316ea... typo
   Colored list feature added  
   Fix issues #5, and #7  
 
