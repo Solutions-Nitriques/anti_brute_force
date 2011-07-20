@@ -49,7 +49,10 @@ http://www.nitriques.com/open-source/
 =======
 
 - 1.1 - 2011-07-17  
+<<<<<<< HEAD
 >>>>>>> parent of c2316ea... typo
+=======
+>>>>>>> parent of 0c7ac7f... Revert "Release dates and FR translation"
   Colored list feature added  
   Fix issues #5, and #7  
 
