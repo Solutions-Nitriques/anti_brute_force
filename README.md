@@ -44,11 +44,11 @@ http://www.nitriques.com/open-source/
 
 ### History ###
 
-- 1.1 - 2011-07-17  
+- 1.1 - 2011-07-17   
   Colored list feature added  
-  Fix issues #5, and #7  
+  Fix issues #5 and #7  
 
-- 1.0.2 - 2011-07-02  
+- 1.0.2 - 2011-07-02    
   New data base scheme  
   New setting group, which was a copy/paste error -- breaks downward compatibility --  
   Fix others errors (not bugs, errors): issue  #3, #4, #6
