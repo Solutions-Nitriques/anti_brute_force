@@ -1,4 +1,4 @@
-All source code included in the "Configuration Settings" Symphony Extension
+All source code included in this Symphony Extension
 archive is, unless otherwise specified, released under the MIT licence as
 follows:
 
