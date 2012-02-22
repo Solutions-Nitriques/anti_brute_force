@@ -2,9 +2,9 @@
 
 Version: 1.1
 
-## Secure your Symphony backend login page against brute force attacks ##
+## Secure your Symphony backend against brute force and dictionary attacks ##
 
-Prevents ***people and softwares*** to brute force your authors accounts.  
+Prevents ***people and softwares*** to brute force your authors/developers accounts.  
 
 ### SPECS ###
 
@@ -41,21 +41,4 @@ Prevents ***people and softwares*** to brute force your authors accounts.
 *Voila !*
 
 http://www.nitriques.com/open-source/
-
-### History ###
-
-
-- 1.1 - 2011-07-20  
-  Colored list feature added  
-  Fix issues #5, and #7  
-
-- 1.0.2 - 2011-07-02  
-  New data base scheme  
-  New setting group, which was a copy/paste error -- breaks downward compatibility --  
-  Fix others errors (not bugs, errors): issue  #3, #4, #6
-
-- 1.0.1 - 2011-07-02    
-  Fix Issues #1 (typo) and #2 (no more ASDC)  
-
-- 1.0 - 2011-07-01    
-  First release: Block login, Admin content page, ABF Facade/Singleton  
+ 
