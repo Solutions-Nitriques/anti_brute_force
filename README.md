@@ -1,6 +1,6 @@
 # Anti Brute Force #
 
-Version: 1.1
+Version: 1.2
 
 ## Secure your Symphony backend against brute force and dictionary attacks ##
 
@@ -18,7 +18,7 @@ Prevents ***people and softwares*** to brute force your authors/developers accou
 
 ### REQUIREMENTS ###
 
-- Symphony CMS version 2.2 and up (as of the day of the last release of this extension)
+- Symphony CMS version 2.3 and up (as of the day of the last release of this extension)
 
 ### INSTALLATION ###
 
