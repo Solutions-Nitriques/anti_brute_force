@@ -21,8 +21,8 @@
 		private $_tables = array();
 		private $_curColor = null;
 
-		public function __construct(&$parent) {
-			parent::__construct($parent);
+		public function __construct() {
+			parent::__construct();
 
 			$this->_curColor = (isset($_SESSION['with-switch']) && !empty($_SESSION['with-switch']) ? $_SESSION['with-switch'] : 'black');
 

@@ -21,21 +21,24 @@
 	<dependencies>
 		<!-- None -->
 	</dependencies>
-	<releases>  
-		<release version="1.1" date="2011-07-20" min="2.2">  
-	- Colored list feature added  
- 	- Fix issues #5, and #7  
+	<releases>
+		<release version="1.2" date="2012-10-05" min="2.3">  
+			- Updated for Symphony 2.3 
+		</release>  
+		<release version="1.1" date="2011-07-20" min="2.2" max="2.2.5">  
+			- Colored list feature added  
+ 			- Fix issues #5, and #7  
 		</release>
-		<release version="1.0.2" date="2011-07-03 " min="2.2">  
-	- New data base scheme  
-  	- New setting group, which was a copy/paste error -- breaks downward compatibility --  
-  	- Fix others errors (not bugs, errors): issue  #3, #4, #6
+		<release version="1.0.2" date="2011-07-03 " min="2.2" max="2.2.5">  
+			- New data base scheme  
+  			- New setting group, which was a copy/paste error -- breaks downward compatibility --  
+  			- Fix others errors (not bugs, errors): issue  #3, #4, #6
 		</release>
-		<release version="1.0.1" date="2011-07-02" min="2.2">  
-	- Fix Issues #1 (typo) and #2 (no more ASDC) 
+		<release version="1.0.1" date="2011-07-02" min="2.2" max="2.2.5">  
+			- Fix Issues #1 (typo) and #2 (no more ASDC) 
 		</release>
-		<release version="1.0" date="2011-07-01" min="2.2">  
-	- First release: Block login, Admin content page, ABF Facade/Singleton 
+		<release version="1.0" date="2011-07-01" min="2.2" max="2.2.5">  
+			- First release: Block login, Admin content page, ABF Facade/Singleton 
 		</release>
 	</releases>
 </extension>

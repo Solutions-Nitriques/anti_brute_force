@@ -36,25 +36,8 @@
 		protected $banCheckDone = false;
 
 		/**
-		 * Credits for the extension
+		 * Credits for the extension - this is found in extension.meta.xml
 		 */
-		public function about() {
-			return array(
-				'name'			=> self::EXT_NAME,
-				'version'		=> '1.1',
-				'release-date'	=> '2011-07-20',
-				'author'		=> array(
-					'name'			=> 'Solutions Nitriques',
-					'website'		=> 'http://www.nitriques.com/open-source/',
-					'email'			=> 'open-source (at) nitriques.com'
-				),
-				'description'	=> __('Secure your backend login page against brute force attacks'),
-				'compatibility' => array(
-					'2.2.1' => true,
-					'2.2' => true
-				)
-	 		);
-		}
 
 		/**
 		 *

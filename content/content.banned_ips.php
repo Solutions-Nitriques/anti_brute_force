@@ -19,8 +19,8 @@
 		private $_hasData = false;
 		private $_data = null;
 
-		public function __construct(&$parent) {
-			parent::__construct($parent);
+		public function __construct() {
+			parent::__construct();
 
 			$this->_cols = array(
 				'IP' => __('IP Address'),
