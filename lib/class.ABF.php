@@ -126,15 +126,20 @@
 			$this->_setings = $s[ABF::SETTING_GROUP];
 			unset($s);
 
-			$status = Symphony::ExtensionManager()->fetchStatus('anti_brute_force');
-			$this->_isInstalled = ($status == EXTENSION_ENABLED || $status == EXTENSION_REQUIRES_UPDATE);
-			
-			// only if already installed
-			if ($this->_isInstalled) {
-				// assure access to settings
-				// fail is not settings, since this is a security software
-				if (count($this->_setings) < 1) {
-					throw new Exception('Can not load settings. Can not continue.');
+			$em = Symphony::ExtensionManager();
+
+			// Extension Manager will be null on install
+			if ($em != NULL) {
+				$status = Symphony::ExtensionManager()->fetchStatus('anti_brute_force');
+				$this->_isInstalled = ($status == EXTENSION_ENABLED || $status == EXTENSION_REQUIRES_UPDATE);
+				
+				// only if already installed
+				if ($this->_isInstalled) {
+					// assure access to settings
+					// fail is not settings, since this is a security software
+					if (count($this->_setings) < 1) {
+						throw new Exception('Can not load settings. Can not continue.');
+					}
 				}
 			}
 		}
