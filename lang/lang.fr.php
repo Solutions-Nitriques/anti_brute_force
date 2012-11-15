@@ -3,11 +3,11 @@
 	$about = array(
 		'name' => 'Français',
 		'author' => array(
-			'name' => 'Solutions Nitriques',
-			'email' => 'open-source (at) nitriques.com',
-			'website' => 'http://www.nitriques.com/'
+			'name' => 'Deux Huit Huit',
+			'email' => 'open-source (at) deuxhuithuit.com',
+			'website' => 'http://www.deuxhuithuit.com/'
 		),
-		'release-date' => '2011-07-17',
+		'release-date' => '2012-11-15',
 	);
 
 
@@ -97,9 +97,6 @@
 		'Black listed IP address' =>
 		'Adresse IP sur la liste noire',
 
-		'IP Colored Lists' =>
-		'Listes colorées d\'IPs',
-
 		'Date Created' =>
 		'Date d\'ajout',
 
@@ -122,5 +119,20 @@
 		'Ajouter',
 
 		'IP added successfuly' =>
-		'Adresse IP ajoutée avec succès'
+		'Adresse IP ajoutée avec succès',
+
+		'Black Listed IPs' =>
+		'Liste noire d\'IP',
+
+		'Grey Listed IPs' =>
+		'Liste grise d\'IP',
+
+		'White Listed IPs' =>
+		'Liste blanche d\'IP',
+
+		"%s is not installed properly and does not protect Symphony until this is fixed. Ensure latest version is intalled." =>
+		"%s n'est pas installé correctement et ne protège Symphony si ceci n'est pas réglé. Assurez-vous d'avoir la dernière version d'installer.",
+
+		'Unban via email' =>
+		'Déblocage par courriel',
 	);

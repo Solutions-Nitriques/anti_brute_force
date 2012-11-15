@@ -3,10 +3,9 @@
 	if(!defined("__IN_SYMPHONY__")) die("<h2>Error</h2><p>You cannot directly access this file</p>");
 
 	/*
-	Copyight: Solutions Nitriques 2011
 	License: MIT
 	*/
-	
+
 	require_once (TOOLKIT . '/class.extensionmanager.php');
 
 	/**
@@ -18,7 +17,7 @@
 	 *
 	 */
 	class ABF implements Singleton {
-		
+
 		/**
 		 * Key of the length setting
 		 * @var string
@@ -126,20 +125,18 @@
 			$this->_setings = $s[ABF::SETTING_GROUP];
 			unset($s);
 
-			$em = Symphony::ExtensionManager();
+			// now an array
+			$validStatuses = EXTENSION_ENABLED;//array();
+			$about = ExtensionManager::about('anti_brute_force');
+			$status = ExtensionManager::fetchStatus($about);
+			$this->_isInstalled = in_array($validStatuses, $status);
 
-			// Extension Manager will be null on install
-			if ($em != NULL) {
-				$status = Symphony::ExtensionManager()->fetchStatus('anti_brute_force');
-				$this->_isInstalled = ($status == EXTENSION_ENABLED || $status == EXTENSION_REQUIRES_UPDATE);
-				
-				// only if already installed
-				if ($this->_isInstalled) {
-					// assure access to settings
-					// fail is not settings, since this is a security software
-					if (count($this->_setings) < 1) {
-						throw new Exception('Can not load settings. Can not continue.');
-					}
+			// only if already installed
+			if ($this->_isInstalled) {
+				// assure access to settings
+				// fail is not settings, since this is a security software
+				if (count($this->_setings) < 1) {
+					throw new Exception('Can not load settings. Can not continue.');
 				}
 			}
 		}
@@ -151,21 +148,34 @@
 
 		/**
 		 * Do the actual ban check: throw exception if banned/black listed
+		 *
+		 * @param $source the name of the caller
 		 */
 		public function doBanCheck() {
 			// check if not white listed
-			if ($this->_isInstalled && !$this->isWhiteListed()) {
+			if ($this->_isInstalled) {
 
-				// check if blacklisted
-				if ($this->isBlackListed()) {
-					// block access
-					$this->throwBlackListedException();
+				if(!$this->isWhiteListed()) {
+
+					// check if blacklisted
+					if ($this->isBlackListed()) {
+						// block access
+						$this->throwBlackListedException();
+					}
+
+					// check if banned
+					if ($this->isCurrentlyBanned()) {
+						// block access
+						$this->throwBannedException();
+					}
 				}
-
-				// check if banned
-				if ($this->isCurrentlyBanned()) {
-					// block access
-					$this->throwBannedException();
+			} else {
+				// display alert about not beging able to work
+				if (Administration::instance()->Page instanceof AdministrationPage) {
+					Administration::instance()->Page->pageAlert(
+						__("%s is not installed properly and won't work until this is fixed. Ensure latest version is intalled.", array(extension_anti_brute_force::EXT_NAME)),
+						Alert::ERROR
+					);
 				}
 			}
 		}
@@ -182,7 +192,7 @@
 				$results = $this->getFailureByIp($ip, "
 					AND UNIX_TIMESTAMP(LastAttempt) + (60 * $length) > UNIX_TIMESTAMP()
 					AND FailedCount >= $failedCount");
-	
+
 				return count($results) > 0;
 			}
 			return false;
@@ -682,18 +692,14 @@
 		 * @param string $currentVersion
 		 */
 		public function update($previousVersion, $currentVersion) {
-			switch ($previousVersion) {
-				case $currentVersion:
-					break;
-				case '1.1':
-					break;
-				case '1.0':
-					$this->install_v1_1();
-					break;
-				default:
-					return $this->install();
+			$ret = true;
+
+			// less than 1.1
+			if ($ret && version_compare($previousVersion,'1.1') == -1) {
+				$ret = $this->install_v1_1();
 			}
-			return false;
+
+			return $ret;
 		}
 
 		/**

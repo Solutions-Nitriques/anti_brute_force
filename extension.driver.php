@@ -1,6 +1,5 @@
 <?php
 	/*
-	Copyight: Solutions Nitriques 2011
 	License: MIT, see the LICENCE file
 	*/
 
@@ -16,7 +15,7 @@
 	 *
 	 */
 	class extension_anti_brute_force extends Extension {
-		
+
 		/**
 		 * Name of the extension
 		 * @var string
@@ -87,13 +86,23 @@
 			return array(
 				array(
 					'location'	=> __('System'),
-					'name'	=> __('Banned IPs'),
+					'name'	=> sprintf("ABF: %s", __('Banned IPs')),
 					'link'	=> '/banned_ips/'
 				),
 				array(
 					'location'	=> __('System'),
-					'name'	=> __('IP Colored Lists'),
-					'link'	=> '/colored_lists/'
+					'name'	=> sprintf("ABF: %s", __('Black Listed IPs')),
+					'link'	=> '/colored_lists/?list=black'
+				),
+				array(
+					'location'	=> __('System'),
+					'name'	=> sprintf("ABF: %s", __('Grey Listed IPs')),
+					'link'	=> '/colored_lists/?list=grey'
+				),
+				array(
+					'location'	=> __('System'),
+					'name'	=> sprintf("ABF: %s", __('White Listed IPs')),
+					'link'	=> '/colored_lists/?list=white'
 				)
 			);
 		}
@@ -204,7 +213,7 @@
 		 * @param string $previousVersion
 		 */
 		public function update($previousVersion) {
-			$about = $this->about();
+			$about = ExtensionManager::about('anti_brute_force');
 			return ABF::instance()->update($previousVersion,$about['version']);
 		}
 
