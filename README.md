@@ -1,5 +1,6 @@
 # Anti Brute Force #
 
+# DO NOT INSTALL THIS VERSION, AS IT IS NOT WORKING
 Version: 1.2
 
 ## Secure your Symphony backend against brute force and dictionary attacks ##
