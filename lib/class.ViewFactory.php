@@ -3,9 +3,7 @@
 	if(!defined("__IN_SYMPHONY__")) die("<h2>Error</h2><p>You cannot directly access this file</p>");
 
 	/*
-	Copyight: Solutions Nitriques 2011
 	License: MIT
-
 	*/
 
 	class ViewFactory {
@@ -112,8 +110,7 @@
 					array_push($options, $additionalActions);
 				}
 
-				$tableActions->appendChild(Widget::Select('with-selected', $options));
-				$tableActions->appendChild(Widget::Input('action[apply]', __('Apply'), 'submit'));
+				$tableActions->appendChild(Widget::Apply($options));
 			}
 
 			return $tableActions;
@@ -121,14 +118,27 @@
 
 
 		/**
-		 * Utility method that generates a 'select' menu
+		 * Utility method that generates the 'sub' menu
 		 */
-		public static function buildSelectMenu(Array $options, $actionkey, $actionTextKey) {
+		public static function buildSubMenu(Array $options, $current, $actionkey) {
 			$tableActions = new XMLElement('div');
-			$tableActions->setAttribute('class', 'actions');
+			$tableActions->setAttribute('class', 'actions no-pad');
 
-			$tableActions->appendChild(Widget::Select('with-' . $actionkey, $options));
-			$tableActions->appendChild(Widget::Input("action[$actionkey]", __($actionTextKey), 'submit'));
+			$fieldset = new XMLElement('fieldset');
+
+			foreach ($options as $key => $o) {
+				$button = new XMLElement('button', __($o));
+				$button->setAttribute('name', "action[$actionkey]");
+				$button->setAttribute('onclick', "document.location='?list=$key'");
+
+				if ($key == $current) {
+					$button->setAttribute('class', 'active');
+				}
+
+				$fieldset->appendChild($button);
+			}
+
+			$tableActions->appendChild($fieldset);
 
 			return $tableActions;
 		}

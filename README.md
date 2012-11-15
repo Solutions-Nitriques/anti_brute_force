@@ -1,7 +1,6 @@
 # Anti Brute Force #
 
-# DO NOT INSTALL THIS VERSION, AS IT IS NOT WORKING
-Version: 1.2
+Version: 1.3
 
 ## Secure your Symphony backend against brute force and dictionary attacks ##
 
@@ -41,5 +40,5 @@ Prevents ***people and softwares*** to brute force your authors/developers accou
 
 *Voila !*
 
-http://www.nitriques.com/open-source/
+http://www.deuxhuithuit.com
  

@@ -7,7 +7,6 @@
 	require_once(EXTENSIONS . '/anti_brute_force/lib/class.ViewFactory.php');
 
 	/*
-	Copyight: Solutions Nitriques 2011
 	License: MIT
 
 	Based on content pages on https://github.com/eKoeS/edui/
@@ -24,8 +23,6 @@
 		public function __construct() {
 			parent::__construct();
 
-			$this->_curColor = (isset($_SESSION['with-switch']) && !empty($_SESSION['with-switch']) ? $_SESSION['with-switch'] : 'black');
-
 			$this->_cols = array(
 				'IP' => __('IP Address'),
 				'FailedCount' => __('Failed Count'),
@@ -34,27 +31,15 @@
 			);
 
 			$this->_tables = array(
-					// value, selected, label
-				array('black', false, __('Black list')),
-				array('grey', false, __('Grey list')),
-				array('white', false, __('White list'))
+				// value, selected, label
+				'black' => __('Black list'),
+				'grey'  => __('Grey list'),
+				'white' => __('White list')
 			);
 
-			$this->setSelected();
+			$this->_curColor = (isset($_REQUEST['list']) && array_key_exists($_REQUEST['list'], $this->_tables)) ? $_REQUEST['list'] : 'black';
 
 			$this->_data = array();
-		}
-
-		/**
-		 *
-		 * Selects the right options in the select box
-		 */
-		private function setSelected() {
-			$x = 0;
-			foreach ($this->_tables as $t) {
-				$this->_tables[$x][1] = ($this->_curColor == $t[0]);
-				$x++;
-			}
 		}
 
 		/**
@@ -72,15 +57,15 @@
 		 * Builds the content view
 		 */
 		public function __viewIndex() {
-			$title = __('IP Colored Lists');
+			$title = $this->_tables[$this->_curColor];
 
 			$this->setPageType('table');
 
-			$this->setTitle(__('%1$s &ndash; %2$s', array(__('Symphony'), $title)));
-
-			$this->appendSubheading(__($title));
+			$this->setTitle(sprintf('%1$s: %2$s &ndash; %3$s', extension_anti_brute_force::EXT_NAME, $title, __('Symphony')));
 
 			$this->addStylesheetToHead(URL . '/extensions/anti_brute_force/assets/content.abf.css', 'screen', time() + 10);
+
+			$this->appendSubheading(__($title));
 
 			$cols = $this->getCurrentCols();
 
@@ -101,27 +86,30 @@
 			);
 
 			// build the color select box
-			$this->Form->appendChild(
-				ViewFactory::buildSelectMenu($this->_tables, 'switch', 'Change')
+			$this->Context->appendChild(
+				ViewFactory::buildSubMenu($this->_tables, $this->_curColor, 'switch')
 			);
 
 			// append table
 			$this->Form->appendChild($table);
 
-			// append the insert line
-			$this->Form->appendChild(self::buildInsertForm());
+			// insert form
+			$insertLine = $this->buildInsertForm();
 
 			// append actions
-			$this->Form->appendChild(
+			$insertLine->appendChild(
 				ViewFactory::buildActions($this->_hasData)
 			);
+
+			// append the insert line
+			$this->Form->appendChild($insertLine);
 		}
 
 		/**
 		 *
 		 * Utility function that build the Insert Form UI
 		 */
-		private static function buildInsertForm() {
+		private function buildInsertForm() {
 			$wrap = new XMLElement('fieldset');
 			$wrap->setAttribute('class', 'insert');
 
@@ -129,8 +117,9 @@
 
 			$iInput = Widget::Input(
 						'insert[ip]',
-						$_SERVER["REMOTE_ADDR"],
-						'text'
+						$this->_curColor == 'white' ? $_SERVER["REMOTE_ADDR"] : '',
+						'text',
+						array('placeholder'=> '0.0.0.0')
 					);
 
 			$iBut = Widget::Input(
@@ -144,9 +133,10 @@
 
 			$wrap->appendChild($label);
 
+			$wrap->appendChild(Widget::Input('list',$this->_curColor, 'hidden'));
+
 			return $wrap;
 		}
-
 
 		/**
 		 * Method that handles user actions on the page
@@ -161,10 +151,6 @@
 							$this->__actionApply();
 							break;
 
-						case 'switch':
-							$this->__actionSwitch();
-							break;
-
 						case 'insert':
 							$this->__actionInsert();
 							break;
@@ -172,7 +158,6 @@
 				}
 			}
 		}
-
 
 		/**
 		 * Apply action
@@ -187,16 +172,6 @@
 			}
 		}
 
-		/**
-		 * Switch action
-		 */
-		public function __actionSwitch() {
-			if (isset($_POST['with-switch'])) {
-				$this->_curColor = $_POST['with-switch'];
-				$_SESSION['with-switch'] = $this->_curColor;
-				$this->setSelected();
-			}
-		}
 
 		/**
 		 * Insert action
@@ -205,7 +180,7 @@
 			if (is_array($_POST['insert']) && isset($_POST['insert']['ip'])) {
 				$ip = $_POST['insert']['ip'];
 
-				if (strlen($ip) > 8) { // protection for not entering the users ip
+				if (strlen($ip) > 6) { // protection for not entering the users ip
 									   // since ip='' will become his ip
 
 					try {
@@ -234,9 +209,7 @@
 			if (isset($_POST['ip']) && is_array($_POST['ip'])) {
 				try {
 					foreach ($_POST['ip'] as $ip => $value) {
-
 						ABF::instance()->unregisterToList($this->_curColor, $ip);
-
 					}
 
 					$this->pageAlert(__('Entries remove successfuly'), Alert::SUCCESS);
@@ -249,11 +222,15 @@
 			}
 		}
 
+		/**
+		 * Utility method that filters the columns names
+		 * based on the current color
+		 */
 		private function getCurrentCols() {
 			$cols = array();
 			$cols = array_merge($cols, $this->_cols);
 
-			// only grey list a failed count col
+			// only grey list has failed count col
 			if ($this->_curColor != 'grey') {
 				array_splice($cols, 1, 1);
 			}

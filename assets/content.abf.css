@@ -1,19 +1,30 @@
-fieldset.insert {	
+
+.actions.no-pad {
+	padding-top: 0px;
+}
+
+.actions button.active {
+	font-weight: bold;
+}
+
+table + fieldset.insert {	
 	display: block;
-	margin: 1em 0;
+	margin: 1em 0 !important;
 	border: 1px solid #E4E4DE;
 	padding: 1em 0 0 19px;
 	background-color: #F5F5F3;
 }
 
 fieldset.insert label {
-	width: 50%;
+	width: auto;
+	display: inline-block;
 }
 
 fieldset.insert label input[type=text] {
 	width: 150px;
 }
 
-fieldset.insert label input[type=submit] {
-	width: auto;
+fieldset.insert  .actions{
+	float: right;
+	padding-top: 0px;
 }
