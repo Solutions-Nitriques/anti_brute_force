@@ -422,7 +422,7 @@
 				$where .= $additionalWhere;
 			}
 			$sql ="
-				SELECT * FROM $this->TBL_ABF WHERE $where LIMIT 1
+				SELECT SQL_CACHE * FROM $this->TBL_ABF WHERE $where LIMIT 1
 			" ;
 
 			$rets = array();
@@ -445,7 +445,7 @@
 				$order .= (' ORDER BY ' . $orderedBy);
 			}
 			$sql ="
-				SELECT * FROM $this->TBL_ABF $order
+				SELECT SQL_CACHE * FROM $this->TBL_ABF $order
 			" ;
 
 			$rets = array();
@@ -480,7 +480,7 @@
 				$where .= $additionalWhere;
 			}
 			$sql ="
-				SELECT * FROM $tbl WHERE $where LIMIT 1
+				SELECT SQL_CACHE * FROM $tbl WHERE $where LIMIT 1
 			" ;
 
 			$rets = array();
@@ -501,7 +501,7 @@
 				$where = 'WHERE ' . $where;
 			}
 			$sql ="
-				SELECT * FROM $tbl $where ORDER BY $order
+				SELECT SQL_CACHE * FROM $tbl $where ORDER BY $order
 			" ;
 
 			$rets = array();
