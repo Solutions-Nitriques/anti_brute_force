@@ -142,4 +142,51 @@
 
 			return $tableActions;
 		}
+
+
+		/**
+		 * Quick utility function to make a input field+label
+		 * @param string $settingName
+		 * @param string $textKey
+		 */
+		public static function generateField($settingName, $textKey, $hasErrors, $errors, $type = 'text') {
+			$inputText = ABF::instance()->getConfigVal($settingName);
+			$inputAttr = array();
+
+			switch ($type) {
+				case 'checkbox':
+					if ($inputText == 'on') {
+						$inputAttr['checked'] = 'checked';
+					}
+					$inputText = '';
+					break;
+			}
+
+			// create the label and the input field
+			$wrap = new XMLElement('div');
+			$label = Widget::Label();
+			$input = Widget::Input(
+						'settings[' . ABF::SETTING_GROUP . '][' . $settingName .']',
+						$inputText,
+						$type,
+						$inputAttr
+					);
+
+			// set the input into the label
+			$label->setValue(__($textKey). ' ' . $input->generate() . $err);
+
+			$wrap->appendChild($label);
+
+			// error management
+			if ($hasErrors && isset($errors[$settingName])) {
+				// style
+				$wrap->setAttribute('class', 'invalid');
+				$wrap->setAttribute('id', 'error');
+				// error message
+				$err = new XMLElement('p', $errors[$settingName]);
+				$wrap->appendChild($err);
+			}
+
+			return $wrap;
+		}
 	}

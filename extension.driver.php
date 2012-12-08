@@ -7,6 +7,8 @@
 
 	// facade
 	require_once(EXTENSIONS . '/anti_brute_force/lib/class.ABF.php');
+	// UI
+	require_once(EXTENSIONS . '/anti_brute_force/lib/class.ViewFactory.php');
 
 	/**
 	 *
@@ -253,23 +255,23 @@
 			$wrapper->setAttribute('class', 'group');
 
 			// append labels to field set
-			$wrapper->appendChild($this->generateField(ABF::SETTING_FAILED_COUNT, 'Fail count limit'));
-			$wrapper->appendChild($this->generateField(ABF::SETTING_LENGTH, 'Blocked length <em>in minutes</em>'));
+			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_FAILED_COUNT, 'Fail count limit', $this->hasErrors(), $this->errors));
+			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_LENGTH, 'Blocked length <em>in minutes</em>', $this->hasErrors(), $this->errors));
 
 			$out_wrapper->appendChild($wrapper);
 
 			// create a new wrapper
 			$wrapper = new XMLElement('div');
 			$wrapper->setAttribute('class', 'group');
-			$wrapper->appendChild($this->generateField(ABF::SETTING_GL_THRESHOLD, 'Grey list threshold'));
-			$wrapper->appendChild($this->generateField(ABF::SETTING_GL_DURATION, 'Grey list duration <em>in days</em>'));
+			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_GL_THRESHOLD, 'Grey list threshold', $this->hasErrors(), $this->errors));
+			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_GL_DURATION, 'Grey list duration <em>in days</em>', $this->hasErrors(), $this->errors));
 
 			$out_wrapper->appendChild($wrapper);
 
 			// create a new wrapper
 			$wrapper = new XMLElement('div');
 			$wrapper->setAttribute('class', 'group');
-			$wrapper->appendChild($this->generateField(ABF::SETTING_AUTO_UNBAN, 'Users can unban their IP via email', 'checkbox'));
+			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_AUTO_UNBAN, 'Users can unban their IP via email', $this->hasErrors(), $this->errors, 'checkbox'));
 
 			$out_wrapper->appendChild($wrapper);
 
@@ -280,51 +282,7 @@
 			$context['wrapper']->appendChild($fieldset);
 		}
 
-		/**
-		 * Quick utility function to make a input field+label
-		 * @param string $settingName
-		 * @param string $textKey
-		 */
-		public function generateField($settingName, $textKey, $type = 'text') {
-			$inputText = ABF::instance()->getConfigVal($settingName);
-			$inputAttr = array();
 
-			switch ($type) {
-				case 'checkbox':
-					if ($inputText == 'on') {
-						$inputAttr['checked'] = 'checked';
-					}
-					$inputText = '';
-					break;
-			}
-
-			// create the label and the input field
-			$wrap = new XMLElement('div');
-			$label = Widget::Label();
-			$input = Widget::Input(
-						'settings[' . ABF::SETTING_GROUP . '][' . $settingName .']',
-						$inputText,
-						$type,
-						$inputAttr
-					);
-
-			// set the input into the label
-			$label->setValue(__($textKey). ' ' . $input->generate() . $err);
-
-			$wrap->appendChild($label);
-
-			// error management
-			if ($this->hasErrors() && isset($this->errors[$settingName])) {
-				// style
-				$wrap->setAttribute('class', 'invalid');
-				$wrap->setAttribute('id', 'error');
-				// error message
-				$err = new XMLElement('p', $this->errors[$settingName]);
-				$wrap->appendChild($err);
-			}
-
-			return $wrap;
-		}
 
 		/**
 		 *
