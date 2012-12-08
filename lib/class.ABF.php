@@ -368,7 +368,7 @@
 
 		private function __isListed($tbl, $ip='') {
 			$ip = $this->getIP($ip);
-			return count($this->__getListEntriesByIp($tbl, $ip)) > 0;
+			return count($this->__getListEntriesByIp($tbl, $ip, NULL, false)) > 0;
 		}
 
 		public function unregisterToList($color, $ip='') {
@@ -473,14 +473,18 @@
 			return $this->__getListEntriesByIp($this->getTableName($color), $ip, $additionalWhere);
 		}
 
-		private function __getListEntriesByIp($tbl, $ip='', $additionalWhere='') {
+		private function __getListEntriesByIp($tbl, $ip='', $additionalWhere='', $cache = true) {
 			$ip = $this->getIP($ip);
+
+			$sqlcache = $cache ? 'SQL_CACHE' : '';
+
 			$where = "IP = '$ip'";
 			if (strlen($additionalWhere) > 0) {
 				$where .= $additionalWhere;
 			}
+
 			$sql ="
-				SELECT SQL_CACHE * FROM $tbl WHERE $where LIMIT 1
+				SELECT $sqlcache * FROM $tbl WHERE $where LIMIT 1
 			" ;
 
 			$rets = array();
