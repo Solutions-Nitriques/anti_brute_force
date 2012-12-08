@@ -84,27 +84,29 @@
 		 */
 		public function fetchNavigation() {
 			return array(
-				array(
-					'location'	=> __('System'),
-					'name'	=> sprintf("ABF: %s", __('Banned IPs')),
-					'link'	=> '/banned_ips/'
-				),
-				array(
-					'location'	=> __('System'),
-					'name'	=> sprintf("ABF: %s", __('Black Listed IPs')),
-					'link'	=> '/colored_lists/?list=black'
-				),
-				array(
-					'location'	=> __('System'),
-					'name'	=> sprintf("ABF: %s", __('Grey Listed IPs')),
-					'link'	=> '/colored_lists/?list=grey'
-				),
-				array(
-					'location'	=> __('System'),
-					'name'	=> sprintf("ABF: %s", __('White Listed IPs')),
-					'link'	=> '/colored_lists/?list=white'
-				)
-			);
+					array (
+						'location' => __(self::EXT_NAME),
+						'name' => __(self::EXT_NAME),
+						'children' => array(
+							array(
+								'name'	=> __('Banned IPs'),
+								'link'	=> '/banned_ips/'
+							),
+							array(
+								'name'	=> __('Black Listed IPs'),
+								'link'	=> '/colored_lists/?list=black'
+							),
+							array(
+								'name'	=> __('Grey Listed IPs'),
+								'link'	=> '/colored_lists/?list=grey'
+							),
+							array(
+								'name'	=> __('White Listed IPs'),
+								'link'	=> '/colored_lists/?list=white'
+							)
+						) // children
+					) // nav group
+				); // nav
 		}
 
 		/**
