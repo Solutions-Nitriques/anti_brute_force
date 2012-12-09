@@ -35,6 +35,7 @@ Prevents ***people and softwares*** to brute force your authors/developers accou
 	- Grey list threshold - maximum number of grey list entries before black list
 	- Grey list duration - in days - before expire
 	- Unban via email - Enables/disable this feature
+	- Restrict access from authors - Hide/Show ABF content page to Authors
 - (optional) See all the banned IPs via System menu -> Banned IPs
 - (optional) Manage colored lists entries via System menu -> Colored lists
 
