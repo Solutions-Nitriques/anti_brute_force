@@ -25,10 +25,10 @@ Prevents ***people and softwares*** to brute force your authors/developers accou
 #### Beware, you will loose settings after upgrading from < 1.0.2 ####
 ***You must uninstall all previous version and install the new one***
 
-- Unzip the anti_brute_force.zip file
+- `git clone` / download and unpack the tarball file
 - (re)Name the folder ***anti_brute_force***
 - Put into the extension directory
-- Enable/install just like any other extension
+- Enable/install just like any other extension (@see <http://getsymphony.com/learn/tasks/view/install-an-extension/>)
 - (optional) Go to the *Preferences* page to customize settings
 	- Maximum failed count before user gets banned
 	- Banned duration - number of minutes IP is banned
@@ -36,8 +36,8 @@ Prevents ***people and softwares*** to brute force your authors/developers accou
 	- Grey list duration - in days - before expire
 	- Unban via email - Enables/disable this feature
 	- Restrict access from authors - Hide/Show ABF content page to Authors
-- (optional) See all the banned IPs via System menu -> Banned IPs
-- (optional) Manage colored lists entries via System menu -> Colored lists
+- (optional) See all the banned IPs via Anti Brute Force -> Banned IPs
+- (optional) Manage colored lists entries via Anti Brute Force -> Black/Grey/White list
 
 *Voila !*
 
