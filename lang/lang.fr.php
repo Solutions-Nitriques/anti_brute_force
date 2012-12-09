@@ -31,10 +31,10 @@
 		'"%s" is not a valid positive integer' =>
 		'"%s" n\'est pas un entier positif',
 
-		'Your IP address is currently banned, due to typing too many wrong usernames/passwords' =>
+		'Your IP address is currently banned, due to typing too many wrong usernames/passwords.' =>
 		'Votre adresse IP est bannie pour avoir essayer trop de mauvais noms d\'usager et/ou mot de passes',
 
-		'You can ask your administrator to unlock your account or wait %s minutes' =>
+		'You can ask your administrator to unlock your account or wait %s minutes.' =>
 		'Demandez à votre administrateur de débloquer votre compte ou attendez %s minutes',
 
 		'Banned IP address' =>
@@ -135,4 +135,10 @@
 
 		'Unban via email' =>
 		'Déblocage par courriel',
+
+		'There are currently' =>
+		'Il y a présentement',
+
+		'%d blocked IPs.' =>
+		'%d adresses IP bloquées'
 	);

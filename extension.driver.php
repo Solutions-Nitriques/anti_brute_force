@@ -77,6 +77,11 @@
 					'page'      => '/backend/',
 					'delegate'  => 'InitaliseAdminPageHead',
 					'callback'  => 'initaliseAdminPageHead'
+				),
+				array(
+					'page'     => '/backend/',
+					'delegate' => 'AppendPageAlert',
+					'callback' => 'appendPageAlert'
 				)
 			);
 		}
@@ -180,6 +185,24 @@
 			}
 		}
 
+		public function appendPageAlert() {
+			$blocked = ABF::instance()->getFailures();
+			$blockedCount = count($blocked);
+			if ($blockedCount > 0) {
+				Administration::instance()->Page->pageAlert(
+					__('There are currently') .
+					'<a href="' . SYMPHONY_URL . '/extension/anti_brute_force/banned_ips/">' .
+					__('%d blocked IPs.', array($blockedCount)) .
+					'</a>'
+				);
+			}
+		}
+
+
+		/**
+		 * Check if this type $oPage needs ban check
+		 * @param HTMLPage $oPage
+		 */
 		private function mustCheck($oPage) {
 			return (
 				   !($oPage instanceof contentExtensionAnti_brute_forceLogin)) ||

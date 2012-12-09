@@ -24,7 +24,12 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
-		<release version="1.3" date="2012-11-15" min="2.3">  
+		<release version="1.3.1" date="TBA" min="2.3">
+			- Officially added Russian translation (thanks @bzerangue)
+			- Grouped naviguation
+			- Added alert when there are banned IPs.
+		</release>
+		<release version="1.3" date="2012-11-15" min="2.3">
 			- **Major Security Update:** Make sure the extension warns the user if misconfigured: 
 			**Do not fail silently.**
 			- UI Update for Symphony 2.3.

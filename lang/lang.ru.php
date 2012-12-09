@@ -14,92 +14,92 @@
 	 * Anti Brute Force
 	 */
 	$dictionary = array(
-	
-		'Banned IPs' => 
+
+		'Banned IPs' =>
 		'Блокированные IP',
 
-		'IP Colored Lists' => 
+		'IP Colored Lists' =>
 		'Группы IP адресов',
 
-		'Define here when and how IP are blocked' => 
+		'Define here when and how IP are blocked' =>
 		'Определите когда и как блокировать IP адреса',
 
-		'IP Address' => 
+		'IP Address' =>
 		'IP адрес',
 
-		'Failed Count' => 
+		'Failed Count' =>
 		'Количество попыток',
 
-		'Last Attempt' => 
+		'Last Attempt' =>
 		'Последняя попытка',
 
-		'User Agent (browser)' => 
+		'User Agent (browser)' =>
 		'User Agent (браузер)',
 
-		'Failures remove successfuly' => 
+		'Failures remove successfuly' =>
 		'Список ошибок входа удалён',
 
-		'Error' => 
+		'Error' =>
 		'Ошибка',
 
-		'Date Created' => 
+		'Date Created' =>
 		'Дата создания',
 
-		'Black list' => 
+		'Black list' =>
 		'Чёрный список',
 
-		'Grey list' => 
+		'Grey list' =>
 		'Серый список',
 
-		'White list' => 
+		'White list' =>
 		'Белый лист',
 
-		'Add' => 
+		'Add' =>
 		'Добавить',
 
-		'IP added successfuly' => 
+		'IP added successfuly' =>
 		'IP адрес добавлен',
 
-		'Entries remove successfuly' => 
+		'Entries remove successfuly' =>
 		'Запись удалена',
 
-		'Enter your email address to be sent a remote unban link with further instructions.' => 
+		'Enter your email address to be sent a remote unban link with further instructions.' =>
 		'Укажите ваш email для отправки сообщения с ссылкой и инструкцией для дальнейшей разблокировки.',
 
-		'Email sent. Follow the instruction in it.' => 
+		'Email sent. Follow the instruction in it.' =>
 		'Письмо отправлено. Следуйте дальнейшим инструкциям.',
 
-		'Unban IP link' => 
+		'Unban IP link' =>
 		'Разбанать IP',
 
-		'Please follow this link to unban your IP: ' => 
+		'Please follow this link to unban your IP: ' =>
 		'Пройдите по ссылке для разблокировки вашего IP:',
 
-		'If you do not remember your password, follow the "forgot password" link on the login page.' => 
+		'If you do not remember your password, follow the "forgot password" link on the login page.' =>
 		'Если вы забыли свой пароль, нажмите на ссылку "забыли пароль" на странице входа в систему.',
 
-		'Your IP address is currently banned, due to typing too many wrong usernames/passwords' => 
+		'Your IP address is currently banned, due to typing too many wrong usernames/passwords.' =>
 		'Ваш текущий IP адрес находится в списке забаненных из-за большого числа попыток входа с неверным логином/паролем.',
 
-		'You can ask your administrator to unlock your account or wait %s minutes' => 
+		'You can ask your administrator to unlock your account or wait %s minutes.' =>
 		'Вы можете обратиться к администратору для разблокировки вашей учётной записи или подождать %s минут',
 
-		'Alternatively, you can <a href="%s">un-ban your IP by email</a>.' => 
+		'Alternatively, you can <a href="%s">un-ban your IP by email</a>.' =>
 		'Так же вы можете <a href="%s">разблокировать ваш IP по email</a>.',
 
-		'Banned IP address' => 
+		'Banned IP address' =>
 		'Забаненные IP адреса',
 
-		'Your IP address is currently <strong>black listed</strong>, due to too many bans.' => 
+		'Your IP address is currently <strong>black listed</strong>, due to too many bans.' =>
 		'Ваш IP адрес находится в <strong>чёрном списке</strong> из-за большого числа банов.',
 
-		'Ask your administrator to unlock your IP.' => 
+		'Ask your administrator to unlock your IP.' =>
 		'Обратитесь к администратору для разблокировки вашего IP адреса.',
 
-		'Black listed IP address' => 
+		'Black listed IP address' =>
 		'Чёрный список IP адресов',
 
-		'"%s" is not a valid positive integer' => 
+		'"%s" is not a valid positive integer' =>
 		'"%s" не является положительным числом',
 
 	);

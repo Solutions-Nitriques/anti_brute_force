@@ -149,7 +149,6 @@
 		/**
 		 * Do the actual ban check: throw exception if banned/black listed
 		 *
-		 * @param $source the name of the caller
 		 */
 		public function doBanCheck() {
 			// check if not white listed
@@ -249,9 +248,9 @@
 			$length = $this->_setings[ABF::SETTING_LENGTH];
 			$useUnbanViaEmail = $this->_setings[ABF::SETTING_AUTO_UNBAN];
 			$msg =
-				__('Your IP address is currently banned, due to typing too many wrong usernames/passwords')
+				__('Your IP address is currently banned, due to typing too many wrong usernames/passwords.')
 				. '<br/><br/>' .
-				__('You can ask your administrator to unlock your account or wait %s minutes', array($length));
+				__('You can ask your administrator to unlock your account or wait %s minutes.', array($length));
 
 			if ($useUnbanViaEmail == true || $useUnbanViaEmail == 'Yes') {
 				$msg .= ('<br/><br/>' . __('Alternatively, you can <a href="%s">un-ban your IP by email</a>.', array(SYMPHONY_URL . self::UNBAND_LINK)));
