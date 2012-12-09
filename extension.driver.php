@@ -94,6 +94,7 @@
 					array (
 						'location' => __(self::EXT_NAME),
 						'name' => __(self::EXT_NAME),
+						'limit' =>  ABF::instance()->getNaviguationGroup(),
 						'children' => array(
 							array(
 								'name'	=> __('Banned IPs'),
@@ -295,6 +296,7 @@
 			$wrapper = new XMLElement('div');
 			$wrapper->setAttribute('class', 'group');
 			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_AUTO_UNBAN, 'Users can unban their IP via email', $this->hasErrors(), $this->errors, 'checkbox'));
+			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_RESTRICT_ACCESS, 'Restrict access from authors', $this->hasErrors(), $this->errors, 'checkbox'));
 
 			$out_wrapper->appendChild($wrapper);
 
@@ -326,9 +328,10 @@
 			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_LENGTH, false);
 			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_FAILED_COUNT, false);
 			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_GL_DURATION, false);
-			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_GL_THRESHOLD, false);
-			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_FAILED_COUNT, false);
-			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_FAILED_COUNT, true, 'checkbox');
+			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_GL_THRESHOLD, true);
+
+			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_AUTO_UNBAN, false, 'checkbox');
+			ABF::instance()->setConfigVal($context, $this->errors, ABF::SETTING_RESTRICT_ACCESS, true, 'checkbox');
 
 			if (!$this->hasErrors()) {
 				// clean old entry after save, since this may affects some banned IP

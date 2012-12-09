@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension id="anti_brute_force" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
 	<name>Anti Brute Force</name>
-	<description>Secure your Symphony backend against brute force and dictionary attacks </description>
+	<description>Secure your Symphony backend against brute force and dictionary attacks</description>
 	<repo type="github">https://github.com/Solutions-Nitriques/anti_brute_force</repo>
 	<url type="discuss">http://symphony-cms.com/discuss/thread/72904/</url>
 	<types>
@@ -27,6 +27,7 @@
 		<release version="1.3.1" date="TBA" min="2.3">
 			- Officially added Russian translation (thanks @bzerangue)
 			- Grouped naviguation
+			- Added a parameter for hidding Anti Brute Force menu to authors
 			- Added alert when there are banned IPs
 		</release>
 		<release version="1.3" date="2012-11-15" min="2.3">
@@ -41,19 +42,19 @@
 			- DEPRECATED - Use 1.3
 			- Compatibility update for Symphony 2.3 
 		</release>  
-		<release version="1.1" date="2011-07-20" min="2.2" max="2.2.5">  
+		<release version="1.1" date="2011-07-20" min="2.2" max="2.2.5">
 			- Colored list feature added  
  			- Fix issues #5, and #7  
 		</release>
-		<release version="1.0.2" date="2011-07-03 " min="2.2" max="2.2.5">  
+		<release version="1.0.2" date="2011-07-03 " min="2.2" max="2.2.5">
 			- New data base scheme  
   			- New setting group, which was a copy/paste error -- breaks downward compatibility --  
   			- Fix others errors (not bugs, errors): issue  #3, #4, #6
 		</release>
-		<release version="1.0.1" date="2011-07-02" min="2.2" max="2.2.5">  
+		<release version="1.0.1" date="2011-07-02" min="2.2" max="2.2.5">
 			- Fix Issues #1 (typo) and #2 (no more ASDC) 
 		</release>
-		<release version="1.0" date="2011-07-01" min="2.2" max="2.2.5">  
+		<release version="1.0" date="2011-07-01" min="2.2" max="2.2.5">
 			- First release: Block login, Admin content page, ABF Facade/Singleton 
 		</release>
 	</releases>

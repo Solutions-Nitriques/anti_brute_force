@@ -167,7 +167,7 @@
 			$label = Widget::Label();
 			$input = Widget::Input(
 						'settings[' . ABF::SETTING_GROUP . '][' . $settingName .']',
-						$inputText,
+						(string)$inputText,
 						$type,
 						$inputAttr
 					);

@@ -16,6 +16,9 @@
 	 */
 	$dictionary = array(
 
+		'Anti Brute Force' =>
+		'Protection "Brute Force"',
+
 		'Secure your backend login page against brute force attacks' =>
 		'Sécurisez la page de connection contre les attaques "brute force"',
 
@@ -140,5 +143,8 @@
 		'Il y a présentement',
 
 		'%d blocked IPs.' =>
-		'%d adresses IP bloquées'
+		'%d adresses IP bloquées',
+
+		'Restrict access from authors' =>
+		'Restreindre l\'acces des auteurs',
 	);

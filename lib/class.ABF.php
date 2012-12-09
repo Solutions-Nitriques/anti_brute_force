@@ -49,6 +49,12 @@
 		const SETTING_GL_DURATION = 'gl-duration';
 
 		/**
+		 * Key of the restrict access setting
+		 * @var string
+		 */
+		const SETTING_RESTRICT_ACCESS = 'restrict-access';
+
+		/**
 		 * Key of the group of setting
 		 * @var string
 		 */
@@ -64,7 +70,8 @@
 							ABF::SETTING_FAILED_COUNT => 5,
 							ABF::SETTING_AUTO_UNBAN => 'off',
 							ABF::SETTING_GL_THRESHOLD => 5,
-							ABF::SETTING_GL_DURATION => 30
+							ABF::SETTING_GL_DURATION => 30,
+							ABF::SETTING_RESTRICT_ACCESS => 'off'
 						)
 					);
 
@@ -186,8 +193,8 @@
 		 */
 		public function isCurrentlyBanned($ip='') {
 			if ($this->_isInstalled) {
-				$length = $this->_setings[ABF::SETTING_LENGTH];
-				$failedCount = $this->_setings[ABF::SETTING_FAILED_COUNT];
+				$length = $this->getConfigVal(ABF::SETTING_LENGTH);
+				$failedCount = $this->getConfigVal(ABF::SETTING_FAILED_COUNT);
 				$results = $this->getFailureByIp($ip, "
 					AND UNIX_TIMESTAMP(LastAttempt) + (60 * $length) > UNIX_TIMESTAMP()
 					AND FailedCount >= $failedCount");
@@ -245,8 +252,8 @@
 		 * @throws SymphonyErrorPage
 		 */
 		public function throwBannedException() {
-			$length = $this->_setings[ABF::SETTING_LENGTH];
-			$useUnbanViaEmail = $this->_setings[ABF::SETTING_AUTO_UNBAN];
+			$length = $this->getConfigVal(ABF::SETTING_LENGTH);
+			$useUnbanViaEmail = $this->getConfigVal(ABF::SETTING_AUTO_UNBAN);
 			$msg =
 				__('Your IP address is currently banned, due to typing too many wrong usernames/passwords.')
 				. '<br/><br/>' .
@@ -278,7 +285,7 @@
 		public function removeExpiredEntries() {
 			// in minutes
 			if ($this->_isInstalled) {
-				$length = $this->_setings[ABF::SETTING_LENGTH];
+				$length = $this->getConfigVal(ABF::SETTING_LENGTH);
 				return Symphony::Database()->delete($this->TBL_ABF, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
 			}
 		}
@@ -332,7 +339,7 @@
 		public function moveGreyToBlack($source, $ip='') {
 			$grey = $this->getGreyListEntriesByIP($ip);
 			if (is_array($grey) && !empty($grey)) {
-				if ($grey[0]->FailedCount >= $this->_setings[ABF::SETTING_GL_THRESHOLD]) {
+				if ($grey[0]->FailedCount >= $this->getConfigVal(ABF::SETTING_GL_THRESHOLD)) {
 					$this->registerToBlackList($source, $ip);
 				}
 			}
@@ -381,7 +388,7 @@
 
 		public function removeExpiredListEntries() {
 			// in days
-			$length = $this->_setings[ABF::SETTING_GL_DURATION];
+			$length = $this->getConfigVal(ABF::SETTING_GL_DURATION);
 			return Symphony::Database()->delete($this->TBL_ABF_GL, "UNIX_TIMESTAMP(DateCreated) + (60 * 60 * 24 * $length) < UNIX_TIMESTAMP()");
 		}
 
@@ -555,6 +562,11 @@
 		 * SETTINGS
 		 */
 
+		public function getNaviguationGroup() {
+			return $this->getConfigVal(ABF::SETTING_RESTRICT_ACCESS) == 'on' ?
+				'developer' : NULL;
+		}
+
 		/**
 		 *
 		 * Utility function that returns settings from this extensions settings group
@@ -572,16 +584,31 @@
 		 * @param string $key
 		 * @param string $autoSave @optional
 		 */
-		public function setConfigVal(&$context, &$errors, $key, $autoSave = true, $type = 'text'){
+		public function setConfigVal(&$context, &$errors, $key, $autoSave = true, $type = 'numeric'){
 			// get the input
 			$input = $context['settings'][ABF::SETTING_GROUP][$key];
 			$iVal = intval($input);
 
-			// verify it is a good domain
-			if (strlen($input) > 0 && is_int($iVal) && $iVal > 0) {
+			$valid = false;
+			$error = __('An error occured');
 
+			switch ($type) {
+				case 'checkbox':
+					$valid = true;
+					$input = $input == 'on' ? 'on' : 'off';
+					break;
+				case 'numeric':
+					$error = __('"%s" is not a valid positive integer',  array($input));
+					$valid = strlen($input) > 0 && is_int($iVal) && $iVal > 0;
+					$input = $iVal;
+					break;
+			}
+
+			// verify it is a good domain
+			if ($valid) {
 				// set config                    (name, value, group)
-				Symphony::Configuration()->set($key, $iVal, ABF::SETTING_GROUP);
+				Symphony::Configuration()->set($key, $input, ABF::SETTING_GROUP);
+				$this->_setings[$key] = $input;
 
 				// save it
 				if ($autoSave) {
@@ -590,9 +617,6 @@
 
 			} else {
 				// don't save
-
-				// set error message
-				$error = __('"%s" is not a valid positive integer',  array($input));
 
 				// append to local array
 				$errors[$key] = $error;
@@ -687,6 +711,12 @@
 			return $retGL && $retBL && $retWL;
 		}
 
+		private function install_v1_3_1() {
+			Symphony::Configuration()->set(ABF::SETTING_RESTRICT_ACCESS, 'off', ABF::SETTING_GROUP);
+			Administration::instance()->saveConfig();
+			return true;
+		}
+
 		/**
 		 *
 		 * This methode will update the extension according to the
@@ -700,6 +730,11 @@
 			// less than 1.1
 			if ($ret && version_compare($previousVersion,'1.1') == -1) {
 				$ret = $this->install_v1_1();
+			}
+
+			// less than 1.3.1
+			if ($ret && version_compare($previousVersion,'1.3.1') == -1) {
+				$ret = $this->install_v1_3_1();
 			}
 
 			return $ret;
