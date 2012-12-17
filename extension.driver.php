@@ -134,15 +134,19 @@
 		 * @param array $context
 		 */
 		public function authorLoginFailure($context) {
-			// register failure in DB
-			ABF::instance()->registerFailure($context['username'], self::EXT_NAME);
-
-			// if user is now banned
-			if (ABF::instance()->isCurrentlyBanned()) {
-				// register into grey list
-				ABF::instance()->registerToGreyList(self::EXT_NAME);
-				// move to black list if necessary
-				ABF::instance()->moveGreyToBlack(self::EXT_NAME);
+			// do not do anything is ip is white listed
+			if (!ABF::instance()->isWhiteListed()) {
+				
+				// register failure in DB
+				ABF::instance()->registerFailure($context['username'], self::EXT_NAME);
+	
+				// if user is now banned
+				if (ABF::instance()->isCurrentlyBanned()) {
+					// register into grey list
+					ABF::instance()->registerToGreyList(self::EXT_NAME);
+					// move to black list if necessary
+					ABF::instance()->moveGreyToBlack(self::EXT_NAME);
+				}
 			}
 		}
 
