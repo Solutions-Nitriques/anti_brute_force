@@ -7,7 +7,7 @@
 			'email' => 'info@alexbirukov.ru',
 			'website' => 'http://alexbirukov.ru'
 		),
-		'release-date' => '2013-01-12'
+		'release-date' => '2013-02-19'
 	);
 
 	/**
@@ -88,7 +88,7 @@
 		'User Agent (браузер)',
 
 		'White list' => 
-		'Белый список',
+		'Белый лист',
 
 		'You can ask your administrator to unlock your account or wait %s minutes.' => 
 		'Вы можете обратиться к администратору для разблокировки вашей учётной записи или подождать %s минут',
@@ -98,7 +98,8 @@
 
 		'Your IP address is currently banned, due to typing too many wrong usernames/passwords.' => 
 		'Ваш текущий IP адрес находится в списке забаненных из-за большого числа попыток входа с неверным логином/паролем.',
-		
+
+
 		'Black Listed IPs' => 
 		'Чёрный список IP',
 
@@ -112,13 +113,13 @@
 		'В настоящее время',
 
 		'%d blocked IPs.' => 
-		'%d заблокированных IP.',
+		'%d заблокированных IP',
 
 		'Unban via email' => 
-		'Разблокировать по электронной почте',
+		'Разблокировать через email',
 
 		'%s is not installed properly and won\'t work until this is fixed. Ensure latest version is intalled.' => 
-		'%s не установлен должным образом и не может работать корректно. Убедитесь, что установлена последняя версия.',
+		'%s не установлен должным образом и не может корректно работать. Убедитесь, что установлена последняя версия.',
 
 		'An error occured' => 
 		'Произошла ошибка',
