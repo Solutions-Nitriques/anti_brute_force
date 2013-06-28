@@ -134,6 +134,9 @@
 
 			$author = Symphony::Database()->fetchRow(0, "SELECT `id`, `email`, `first_name` FROM `tbl_authors` WHERE `email` = '".MySQL::cleanValue($_POST['email'])."'");
 			$failure = ABF::instance()->getFailureByIp();
+			
+			$emailGateway = Symphony::Configuration()->get('default_gateway', 'email');
+			$emailSettings = Symphony::Configuration()->get('email_'.$emailGateway);
 
 			if (is_array($author) && isset($author['email']) &&
 				is_array($failure) && isset($failure[0]) && isset($failure[0]->Hash)) {
@@ -141,7 +144,12 @@
 				try {
 					// use default values
 					$email = Email::create();
-
+					
+					// if no default values are set
+					if (!is_array($emailSettings) || !isset($emailSettings['from_address'])) {
+						$email->setFrom($author['email'], Symphony::Configuration()->get('sitename','general'));
+					}
+					
 					$email->recipients = $author['email'];
 					$email->subject = __('Unban IP link');
 					$email->text_plain =
@@ -154,6 +162,8 @@
 					$this->_email_sent = $email->validate() && $email->send();
 
 				} catch (Exception $e) {
+					var_dump($e);
+				
 					// do nothing
 					$this->_email_sent = false;
 				}
