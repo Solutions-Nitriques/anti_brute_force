@@ -162,8 +162,8 @@
 					$this->_email_sent = $email->validate() && $email->send();
 
 				} catch (Exception $e) {
-					var_dump($e);
-				
+					//var_dump($e);
+					
 					// do nothing
 					$this->_email_sent = false;
 				}
