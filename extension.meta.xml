@@ -24,6 +24,10 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="1.3.3" date="2013-11-29" min="2.3">
+			- Added a default sender email address, so email can be send even if nothing is set in the preferences.
+			- Remove a left over var_dump
+		</release>
 		<release version="1.3.2" date="2013-06-28" min="2.3">
 			- Officially added Italian translation (thanks @DaveRev)
 			- Fixed a bug when no email settings are set in config.php
