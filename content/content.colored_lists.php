@@ -117,7 +117,7 @@
 
 			$iInput = Widget::Input(
 						'insert[ip]',
-						$this->_curColor == 'white' ? $_SERVER["REMOTE_ADDR"] : '',
+						$this->_curColor == 'white' ? ABF::instance()->getIP() : '',
 						'text',
 						array('placeholder'=> '0.0.0.0')
 					);

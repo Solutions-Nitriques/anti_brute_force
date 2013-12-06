@@ -533,10 +533,18 @@
 		/**
 		 * Utilities
 		 */
-		private function getIP($ip='') {
+		
+		/**
+		 * @return the $ip param if valid. If not, it returns the $_SERVER field specified 
+		 *   by the ABF::SETTING_REMOTE_ADDR setting or the REMOTE_ADDR
+		 */
+		public function getIP($ip='') {
+			// client ip
+			$ipField = $this->_settings[ABF::SETTING_REMOTE_ADDR];
+			$clientip = isset($_SERVER[$ipField]) ? $_SERVER[$ipField] : $_SERVER["REMOTE_ADDR"];
 			// ip is at least 8 char
 			// hash is 36 char
-			return strlen($ip) < 8 ? $_SERVER["REMOTE_ADDR"] : $ip;
+			return strlen($ip) < 8 ? $clientip : $ip;
 		}
 
 		private function getUA() {
