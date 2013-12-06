@@ -105,7 +105,7 @@
 								'link'	=> '/colored_lists/?list=black'
 							),
 							array(
-								'name'	=> __('Grey Listed IPs'),
+								'name'	=> __('Gray Listed IPs'),
 								'link'	=> '/colored_lists/?list=grey'
 							),
 							array(
@@ -143,9 +143,9 @@
 				// if user is now banned
 				if (ABF::instance()->isCurrentlyBanned()) {
 					// register into grey list
-					ABF::instance()->registerToGreyList(self::EXT_NAME);
+					ABF::instance()->registerToGrayList(self::EXT_NAME);
 					// move to black list if necessary
-					ABF::instance()->moveGreyToBlack(self::EXT_NAME);
+					ABF::instance()->moveGrayToBlack(self::EXT_NAME);
 				}
 			}
 		}
@@ -291,8 +291,8 @@
 			// create a new wrapper
 			$wrapper = new XMLElement('div');
 			$wrapper->setAttribute('class', 'group');
-			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_GL_THRESHOLD, 'Grey list threshold', $this->hasErrors(), $this->errors));
-			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_GL_DURATION, 'Grey list duration <em>in days</em>', $this->hasErrors(), $this->errors));
+			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_GL_THRESHOLD, 'Gray list threshold', $this->hasErrors(), $this->errors));
+			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_GL_DURATION, 'Gray list duration <em>in days</em>', $this->hasErrors(), $this->errors));
 
 			$out_wrapper->appendChild($wrapper);
 

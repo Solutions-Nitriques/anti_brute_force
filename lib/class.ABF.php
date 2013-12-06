@@ -37,13 +37,13 @@
 		const SETTING_AUTO_UNBAN = 'auto-unban';
 
 		/**
-		 * Key of the Grey list threshold setting
+		 * Key of the Gray list threshold setting
 		 * @var string
 		 */
 		const SETTING_GL_THRESHOLD = 'gl-threshold';
 
 		/**
-		 * Key of the Grey list duration setting
+		 * Key of the Gray list duration setting
 		 * @var string
 		 */
 		const SETTING_GL_DURATION = 'gl-duration';
@@ -53,6 +53,12 @@
 		 * @var string
 		 */
 		const SETTING_RESTRICT_ACCESS = 'restrict-access';
+		
+		/**
+		 * Key of the IP (REMOTE_ADDR) server field
+		 * @var string
+		 */
+		const SETTING_REMOTE_ADDR = 'remote-addr-key';
 
 		/**
 		 * Key of the group of setting
@@ -71,7 +77,8 @@
 							ABF::SETTING_AUTO_UNBAN => 'off',
 							ABF::SETTING_GL_THRESHOLD => 5,
 							ABF::SETTING_GL_DURATION => 30,
-							ABF::SETTING_RESTRICT_ACCESS => 'off'
+							ABF::SETTING_RESTRICT_ACCESS => 'off',
+							ABF::SETTING_REMOTE_ADDR => 'REMOTE_ADDR'
 						)
 					);
 
@@ -100,7 +107,7 @@
 		 * @var array
 		 * @property
 		 */
-		public $COLORS = array('black', 'grey', 'white');
+		public $COLORS = array('black', 'gray', 'white');
 
 		/**
 		 *
@@ -289,10 +296,9 @@
 				return Symphony::Database()->delete($this->TBL_ABF, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
 			}
 		}
-
-
-
-
+		
+		
+		
 		/**
 		 * Database Data queries - COLORED (B/G/W) Public methods
 		 */
@@ -300,7 +306,7 @@
 		public function registerToBlackList($source, $ip='') {
 			return $this->__registerToList($this->TBL_ABF_BL, $source, $ip);
 		}
-		public function registerToGreyList($source, $ip='') {
+		public function registerToGrayList($source, $ip='') {
 			return $this->__registerToList($this->TBL_ABF_GL, $source, $ip);
 		}
 		public function registerToWhiteList($source, $ip='') {
@@ -314,17 +320,17 @@
 		private function __registerToList($tbl, $source, $ip='') {
 			$ip = $this->getIP($ip);
 			$results = $this->__isListed($tbl, $ip);
-			$isGrey = $tbl == $this->TBL_ABF_GL;
+			$isGray = $tbl == $this->TBL_ABF_GL;
 			$ret = false;
 
 			// do not re-register existing entries
 			if ($results != null && count($results) > 0) {
-				if ($isGrey) {
-					$ret = $this->incrementGreyList($ip);
+				if ($isGray) {
+					$ret = $this->incrementGrayList($ip);
 				}
 
 			} else {
-				// INSERT -- grey list will get the default values for others columns
+				// INSERT -- gray list will get the default values for others columns
 				$ret = Symphony::Database()->query("
 					INSERT INTO $tbl
 						(`IP`, `DateCreated`, `Source`)
@@ -336,18 +342,18 @@
 			return $ret;
 		}
 
-		public function moveGreyToBlack($source, $ip='') {
-			$grey = $this->getGreyListEntriesByIP($ip);
-			if (is_array($grey) && !empty($grey)) {
-				if ($grey[0]->FailedCount >= $this->getConfigVal(ABF::SETTING_GL_THRESHOLD)) {
+		public function moveGrayToBlack($source, $ip='') {
+			$gray = $this->getGrayListEntriesByIP($ip);
+			if (is_array($gray) && !empty($gray)) {
+				if ($gray[0]->FailedCount >= $this->getConfigVal(ABF::SETTING_GL_THRESHOLD)) {
 					$this->registerToBlackList($source, $ip);
 				}
 			}
 		}
 
-		private function incrementGreyList($ip) {
+		private function incrementGrayList($ip) {
 			$tbl = $this->TBL_ABF_GL;
-			// UPDATE -- only Grey list
+			// UPDATE -- only Gray list
 			return Symphony::Database()->query("
 				UPDATE $tbl
 					SET `FailedCount` = `FailedCount` + 1
@@ -360,7 +366,7 @@
 			return $this->__isListed($this->TBL_ABF_BL, $ip);
 		}
 
-		public function isGreyListed($ip='') {
+		public function isGrayListed($ip='') {
 			return $this->__isListed($this->TBL_ABF_GL, $ip);
 		}
 
@@ -467,7 +473,7 @@
 			return $this->__getListEntriesByIp($this->TBL_ABF_BL, $ip, $additionalWhere);
 		}
 
-		public function getGreyListEntriesByIP($ip='', $additionalWhere='') {
+		public function getGrayListEntriesByIP($ip='', $additionalWhere='') {
 			return $this->__getListEntriesByIp($this->TBL_ABF_GL, $ip, $additionalWhere);
 		}
 
@@ -530,7 +536,7 @@
 		private function getIP($ip='') {
 			// ip is at least 8 char
 			// hash is 36 char
-			return strlen($ip) < 8 ? $_SERVER["REMOTE_ADDR"]: $ip;
+			return strlen($ip) < 8 ? $_SERVER["REMOTE_ADDR"] : $ip;
 		}
 
 		private function getUA() {
@@ -716,6 +722,12 @@
 			Administration::instance()->saveConfig();
 			return true;
 		}
+		
+		private function install_v1_3_4() {
+			Symphony::Configuration()->set(ABF::SETTING_REMOTE_ADDR, 'REMOTE_ADDR', ABF::SETTING_GROUP);
+			Administration::instance()->saveConfig();
+			return true;
+		}
 
 		/**
 		 *
@@ -726,17 +738,22 @@
 		 */
 		public function update($previousVersion, $currentVersion) {
 			$ret = true;
-
+			
 			// less than 1.1
-			if ($ret && version_compare($previousVersion,'1.1') == -1) {
+			if ($ret && version_compare($previousVersion, '1.1') == -1) {
 				$ret = $this->install_v1_1();
 			}
-
+			
 			// less than 1.3.1
-			if ($ret && version_compare($previousVersion,'1.3.1') == -1) {
+			if ($ret && version_compare($previousVersion, '1.3.1') == -1) {
 				$ret = $this->install_v1_3_1();
 			}
-
+			
+			// less than 1.3.4
+			if ($ret && version_compare($previousVersion, '1.3.4') == -1) {
+				$ret = $this->install_v1_3_4();
+			}
+			
 			return $ret;
 		}
 
@@ -759,7 +776,7 @@
 
 			$retABF_BL = Symphony::Database()->query($sql);
 
-			// Grey
+			// Gray
 			$sql = "
 				DROP TABLE IF EXISTS $this->TBL_ABF_GL
 			";
