@@ -1,6 +1,6 @@
 # Anti Brute Force #
 
-Version: 1.3.3
+Version: 1.3.4
 
 ## Secure your Symphony backend against brute force and dictionary attacks ##
 

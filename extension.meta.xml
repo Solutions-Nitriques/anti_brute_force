@@ -24,6 +24,12 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="1.3.4" date="2013-12-06" min="2.3">
+			- Fixed a bunch of typos.
+			- Added a setting for the name of the $_SERVER tag that contains the IP address. This is usefull
+			when running being a proxy, so you can get the real user IP.
+			- Fixing issue #17 - IP were not added to colored lists properly via the UI (thanks @michael-e).
+		</release>
 		<release version="1.3.3" date="2013-11-29" min="2.3">
 			- Added a default sender email address, so email can be send even if nothing is set in the preferences.
 			- Remove a left over var_dump
