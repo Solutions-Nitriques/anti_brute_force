@@ -85,10 +85,10 @@
 		'If you do not remember your password, follow the "forgot password" link on the login page.' =>
 		'Si vous ne vous souvenez plus de votre mot de passe, veuillez suivre le lien "mot de passe oublié" sur la page d\'identification.',
 
-		'Grey list threshold' =>
+		'Gray list threshold' =>
 		'Limit de la liste grise',
 
-		'Grey list duration <em>in days</em>' =>
+		'Gray list duration <em>in days</em>' =>
 		'Durée de validité de la liste grise <em>en jour</em>',
 
 		'Your IP address is currently <strong>black listed</strong>, due to too many bans.' =>
@@ -112,7 +112,7 @@
 		'Black list' =>
 		'Liste noire',
 
-		'Grey list' =>
+		'Gray list' =>
 		'Liste grise',
 
 		'White list' =>
@@ -127,7 +127,7 @@
 		'Black Listed IPs' =>
 		'Liste noire d\'IP',
 
-		'Grey Listed IPs' =>
+		'Gray Listed IPs' =>
 		'Liste grise d\'IP',
 
 		'White Listed IPs' =>

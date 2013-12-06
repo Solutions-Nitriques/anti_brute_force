@@ -33,7 +33,7 @@
 			$this->_tables = array(
 				// value, selected, label
 				'black' => __('Black list'),
-				'grey'  => __('Grey list'),
+				'gray'  => __('Gray list'),
 				'white' => __('White list')
 			);
 
@@ -230,8 +230,8 @@
 			$cols = array();
 			$cols = array_merge($cols, $this->_cols);
 
-			// only grey list has failed count col
-			if ($this->_curColor != 'grey') {
+			// only gray list has failed count col
+			if ($this->_curColor != 'gray') {
 				array_splice($cols, 1, 1);
 			}
 

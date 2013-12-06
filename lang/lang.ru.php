@@ -63,7 +63,7 @@
 		'Failures remove successfuly' => 
 		'Список ошибок входа удалён',
 
-		'Grey list' => 
+		'Gray list' => 
 		'Серый список',
 
 		'IP Address' => 
@@ -103,7 +103,7 @@
 		'Black Listed IPs' => 
 		'Чёрный список IP',
 
-		'Grey Listed IPs' => 
+		'Gray Listed IPs' => 
 		'Серый список IP',
 
 		'White Listed IPs' => 
