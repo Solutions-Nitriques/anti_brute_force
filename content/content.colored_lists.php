@@ -179,25 +179,26 @@
 		public function __actionInsert() {
 			if (is_array($_POST['insert']) && isset($_POST['insert']['ip'])) {
 				$ip = $_POST['insert']['ip'];
-
-				if (strlen($ip) > 6) { // protection for not entering the users ip
+				
+				if (ABF::instance()->isIPValid($ip)) { // protection for not entering the users ip
 									   // since ip='' will become his ip
-
 					try {
 						$ret = ABF::instance()->registerToList(
 											$this->_curColor,
 											extension_anti_brute_force::EXT_NAME,
 											$ip
-										);
+										); //die;
 
 						if ($ret) {
 							$this->pageAlert(__('IP added successfuly'), Alert::SUCCESS);
+						} else {
+							
 						}
 					} catch (Exception $e) {
-
 						$this->pageAlert(__('Error') . ': ' . $e->getMessage(), Alert::ERROR);
-
 					}
+				} else if (strlen($ip) > 0) {
+					$this->pageAlert(__('Error: The given IP address, `%s`, is not valid', array($ip)), Alert::ERROR);
 				}
 			}
 		}

@@ -147,4 +147,7 @@
 
 		'Restrict access from authors' =>
 		'Restreindre l\'acces des auteurs',
+		
+		'Error: The given IP address, `%s`, is not valid' =>
+		"Erreur: L'adresse IP fournie, `%s`, n'est pas valide",
 	);

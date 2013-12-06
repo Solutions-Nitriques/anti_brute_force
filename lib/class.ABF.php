@@ -328,7 +328,6 @@
 				if ($isGray) {
 					$ret = $this->incrementGrayList($ip);
 				}
-
 			} else {
 				// INSERT -- gray list will get the default values for others columns
 				$ret = Symphony::Database()->query("
@@ -535,16 +534,28 @@
 		 */
 		
 		/**
+		 * @return boolean - Really simple validation for IP Addresses
+		 */
+		public function isIPValid($ip) {
+			// ip v4 is at least 7 char max 15
+			// hash is 36 char
+			return strlen($ip) > 6 && strlen($ip) < 16;
+		}
+		
+		/**
 		 * @return the $ip param if valid. If not, it returns the $_SERVER field specified 
 		 *   by the ABF::SETTING_REMOTE_ADDR setting or the REMOTE_ADDR
 		 */
 		public function getIP($ip='') {
+			if ($this->isIPValid($ip)) {
+				return $ip;
+			}
+			
 			// client ip
 			$ipField = $this->_settings[ABF::SETTING_REMOTE_ADDR];
 			$clientip = isset($_SERVER[$ipField]) ? $_SERVER[$ipField] : $_SERVER["REMOTE_ADDR"];
-			// ip is at least 8 char
-			// hash is 36 char
-			return strlen($ip) < 8 ? $clientip : $ip;
+			
+			return $clientip;
 		}
 
 		private function getUA() {
