@@ -85,7 +85,7 @@
 		/**
 		 * Variable that holds the settings values
 		 */
-		private $_setings = array();
+		private $_settings = array();
 
 		/**
 		 * Variable that hold true if the extension is installed
@@ -136,11 +136,11 @@
 		// do not allow external creation
 		private function __construct(){
 			$s = Symphony::Configuration()->get();
-			$this->_setings = $s[ABF::SETTING_GROUP];
+			$this->_settings = $s[ABF::SETTING_GROUP];
 			unset($s);
 
 			// now an array
-			$validStatuses = EXTENSION_ENABLED;//array();
+			$validStatuses = EXTENSION_ENABLED;
 			$about = ExtensionManager::about('anti_brute_force');
 			$status = ExtensionManager::fetchStatus($about);
 			$this->_isInstalled = in_array($validStatuses, $status);
@@ -149,7 +149,7 @@
 			if ($this->_isInstalled) {
 				// assure access to settings
 				// fail is not settings, since this is a security software
-				if (count($this->_setings) < 1) {
+				if (count($this->_settings) < 1) {
 					throw new Exception('Can not load settings. Can not continue.');
 				}
 			}
@@ -579,7 +579,7 @@
 		 * @param string $key
 		 */
 		public function getConfigVal($key) {
-			return $this->_setings[$key];
+			return $this->_settings[$key];
 		}
 
 		/**
@@ -614,7 +614,7 @@
 			if ($valid) {
 				// set config                    (name, value, group)
 				Symphony::Configuration()->set($key, $input, ABF::SETTING_GROUP);
-				$this->_setings[$key] = $input;
+				$this->_settings[$key] = $input;
 
 				// save it
 				if ($autoSave) {
@@ -652,7 +652,7 @@
 				// *** load settings in memory
 				// Even if we just installed the ext, a ban check will be done,
 				// so we need settings: use defaults
-				$this->_setings = empty($this->_setings) ? $this->DEFAULTS : $this->_setings;
+				$this->_settings = empty($this->_settings) ? $this->DEFAULTS : $this->_settings;
 
 				$ext_driver->save($pseudo_context);
 			}
