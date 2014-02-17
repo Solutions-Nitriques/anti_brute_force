@@ -689,7 +689,7 @@
 					`Source` VARCHAR( 100 ) NULL,
 					`Hash` CHAR( 36 ) NOT NULL,
 					PRIMARY KEY (  `IP` )
-				) ENGINE = MYISAM
+				) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 			";
 
 			return Symphony::Database()->query($sql);
@@ -704,7 +704,7 @@
 					`FailedCount` INT( 5 ) unsigned NOT NULL DEFAULT  '1',
 					`Source` VARCHAR( 100 ) NULL,
 					PRIMARY KEY (  `IP` )
-				) ENGINE = MYISAM
+				) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 			";
 
 			$retGL = Symphony::Database()->query($sql);
@@ -716,7 +716,7 @@
 					`DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 					`Source` VARCHAR( 100 ) NULL,
 					PRIMARY KEY (  `IP` )
-				) ENGINE = MYISAM
+				) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 			";
 
 			$retBL = Symphony::Database()->query($sql);
@@ -728,7 +728,7 @@
 					`DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 					`Source` VARCHAR( 100 ) NULL,
 					PRIMARY KEY (  `IP` )
-				) ENGINE = MYISAM
+				) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 			";
 
 			$retWL = Symphony::Database()->query($sql);
