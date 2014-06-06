@@ -1,6 +1,6 @@
 # Anti Brute Force #
 
-Version: 1.3.5
+Version: 1.4
 
 ## Secure your Symphony backend against brute force and dictionary attacks ##
 
@@ -18,7 +18,7 @@ Prevents ***people and softwares*** to brute force your authors/developers accou
 
 ### REQUIREMENTS ###
 
-- Symphony CMS version 2.3 and up (as of the day of the last release of this extension)
+- Symphony CMS version 2.4 and up (as of the day of the last release of this extension)
 
 ### INSTALLATION ###
 
@@ -32,7 +32,7 @@ Prevents ***people and softwares*** to brute force your authors/developers accou
 - (optional) Go to the *Preferences* page to customize settings
 	- Maximum failed count before user gets banned
 	- Banned duration - number of minutes IP is banned
-	- Grey list threshold - maximum number of grey list entries before black list
+	- Grey list threshold - maximum number of gray list entries before black list
 	- Grey list duration - in days - before expire
 	- Unban via email - Enables/disable this feature
 	- Restrict access from authors - Hide/Show ABF content page to Authors
@@ -41,5 +41,4 @@ Prevents ***people and softwares*** to brute force your authors/developers accou
 
 *Voila !*
 
-http://www.deuxhuithuit.com
- 
+<http://www.deuxhuithuit.com/>
