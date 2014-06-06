@@ -24,6 +24,9 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="1.3.5" date="2014-06-06" min="2.3" max="2.3.6">
+			- Added default collate values on tables.
+		</release>
 		<release version="1.3.4" date="2013-12-06" min="2.3">
 			- Fixed a bunch of typos.
 			- Added a setting for the name of the $_SERVER tag that contains the IP address. This is usefull
