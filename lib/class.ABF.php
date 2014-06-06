@@ -637,7 +637,7 @@
 
 				// save it
 				if ($autoSave) {
-					Administration::instance()->saveConfig();
+					Symphony::Configuration()->write();
 				}
 
 			} else {
@@ -738,13 +738,13 @@
 
 		private function install_v1_3_1() {
 			Symphony::Configuration()->set(ABF::SETTING_RESTRICT_ACCESS, 'off', ABF::SETTING_GROUP);
-			Administration::instance()->saveConfig();
+			Symphony::Configuration()->write();
 			return true;
 		}
 		
 		private function install_v1_3_4() {
 			Symphony::Configuration()->set(ABF::SETTING_REMOTE_ADDR, 'REMOTE_ADDR', ABF::SETTING_GROUP);
-			Administration::instance()->saveConfig();
+			Symphony::Configuration()->write();
 			return true;
 		}
 
@@ -810,7 +810,7 @@
 			$retABF_WL = Symphony::Database()->query($sql);
 
 			Symphony::Configuration()->remove(ABF::SETTING_GROUP, ABF::SETTING_GROUP);
-			Administration::instance()->saveConfig();
+			Symphony::Configuration()->write();
 
 			$this->_isInstalled = false;
 
