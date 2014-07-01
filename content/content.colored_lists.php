@@ -77,12 +77,12 @@
 
 			// build data table
 			$table = Widget::Table(
-				Widget::TableHead($aTableHead), // header
-				NULL, // footer
-				Widget::TableBody($aTableBody), // body
-				'selectable' // class
-				// id
-				// attributes
+				Widget::TableHead($aTableHead),
+				NULL,
+				Widget::TableBody($aTableBody),
+				'selectable',
+				null,
+				array('role' => 'directory', 'aria-labelledby' => 'symphony-subheading', 'data-interactive' => 'data-interactive')
 			);
 
 			// build the color select box
