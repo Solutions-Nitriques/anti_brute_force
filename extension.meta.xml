@@ -24,6 +24,9 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="1.4.1" date="2014-07-01" min="2.4">
+			- Selectable table for Symphony 2.4 (thanks @nathanhornby)
+		</release>
 		<release version="1.4" date="2013-12-06" min="2.4">
 			- Fixes for Symphony 2.4
 		</release>
