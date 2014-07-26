@@ -1,6 +1,6 @@
 # Anti Brute Force #
 
-Version: 1.4.1
+Version: 1.4.2
 
 ## Secure your Symphony backend against brute force and dictionary attacks ##
 
@@ -15,6 +15,17 @@ Prevents ***people and softwares*** to brute force your authors/developers accou
 - Backend content page for managing blocked IPs and colored lists
 - A Facade/Singleton class -ABF- for developers to leverage anti_brute_force capabilities
   (ex.: email reports or use with the member extension)
+
+### NOTES ABOUT PROXIES
+
+If you are using Symphony on a server that sits behind a proxy, it will always
+track 127.0.0.1 as remote address, simply because PHP doesn't see anything else
+in `$_SERVER['REMOTE_ADDR']`. In order to fix this, please set the 'remote-addr-key'
+setting to the field set by your proxy in order to let ABF access the real user IP.
+
+Most proxies will set the 'HTTP_X_FORWARDED_FOR' field with the respective user's IP
+but some other provider (such as CloudFlare) will create a custom field. Your best bet
+would be to do some actual penetration testing to be sure ABF works properly.
 
 ### REQUIREMENTS ###
 

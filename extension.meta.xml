@@ -24,6 +24,9 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="1.4.2" date="2014-07-26" min="2.4">
+			- Added a note about proxies (thanks @michael-e)
+		</release>
 		<release version="1.4.1" date="2014-07-01" min="2.4">
 			- Selectable table for Symphony 2.4 (thanks @nathanhornby)
 		</release>
