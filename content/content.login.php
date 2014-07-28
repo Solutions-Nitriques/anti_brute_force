@@ -40,7 +40,7 @@
 				// redirect not matter what
 				// evil users won't be able to detect anything from the response
 				// they *should* still be blocked since guessing a hash is
-				// practicly unfesable
+				// practically infeasible
 				redirect(SYMPHONY_URL);
 				die();
 
@@ -131,6 +131,12 @@
 		}
 
 		private function __sendEmail() {
+			$emailUnban = ABF::instance()->getConfigVal(ABF::SETTING_AUTO_UNBAN);
+			if ($emailUnban != 'on') {
+				// do nothing
+				$this->_email_sent = null;
+				return;
+			}
 
 			$author = Symphony::Database()->fetchRow(0, "SELECT `id`, `email`, `first_name` FROM `tbl_authors` WHERE `email` = '".MySQL::cleanValue($_POST['email'])."'");
 			$failure = ABF::instance()->getFailureByIp();

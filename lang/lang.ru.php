@@ -118,7 +118,7 @@
 		'Unban via email' => 
 		'Разблокировать через email',
 
-		'%s is not installed properly and won\'t work until this is fixed. Ensure latest version is intalled.' => 
+		'%s is not installed properly and won\'t work until this is fixed. Ensure latest version is installed.' => 
 		'%s не установлен должным образом и не может корректно работать. Убедитесь, что установлена последняя версия.',
 
 		'An error occured' => 

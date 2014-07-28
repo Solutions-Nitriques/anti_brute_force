@@ -183,10 +183,10 @@
 					}
 				}
 			} else {
-				// display alert about not beging able to work
+				// display alert about not being able to work
 				if (Administration::instance()->Page instanceof AdministrationPage) {
 					Administration::instance()->Page->pageAlert(
-						__("%s is not installed properly and won't work until this is fixed. Ensure latest version is intalled.", array(extension_anti_brute_force::EXT_NAME)),
+						__("%s is not installed properly and won't work until this is fixed. Ensure latest version is installed.", array(extension_anti_brute_force::EXT_NAME)),
 						Alert::ERROR
 					);
 				}
@@ -266,7 +266,7 @@
 				. '<br/><br/>' .
 				__('You can ask your administrator to unlock your account or wait %s minutes.', array($length));
 
-			if ($useUnbanViaEmail == true || $useUnbanViaEmail == 'Yes') {
+			if ($useUnbanViaEmail == 'on') {
 				$msg .= ('<br/><br/>' . __('Alternatively, you can <a href="%s">un-ban your IP by email</a>.', array(SYMPHONY_URL . self::UNBAND_LINK)));
 			}
 

@@ -133,7 +133,7 @@
 		'White Listed IPs' =>
 		'Liste blanche d\'IP',
 
-		"%s is not installed properly and does not protect Symphony until this is fixed. Ensure latest version is intalled." =>
+		"%s is not installed properly and does not protect Symphony until this is fixed. Ensure latest version is installed." =>
 		"%s n'est pas installé correctement et ne protège Symphony si ceci n'est pas réglé. Assurez-vous d'avoir la dernière version d'installer.",
 
 		'Unban via email' =>
