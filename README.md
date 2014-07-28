@@ -22,6 +22,7 @@ If you are using Symphony on a server that sits behind a proxy, it will always
 track 127.0.0.1 (or your proxy's IP) as remote address, simply because PHP doesn't see anything else
 in `$_SERVER['REMOTE_ADDR']`. In order to fix this, please set the 'remote-addr-key'
 setting to the field set by your proxy in order to let ABF access the real user IP.
+You can also set this value in Symphony's settings backend page.
 
 Most proxies will set the 'HTTP_X_FORWARDED_FOR' field with the respective user's IP
 but some other provider (such as CloudFlare) will create a custom field. Your best bet
@@ -47,6 +48,7 @@ would be to do some actual penetration testing to be sure ABF works properly.
 	- Grey list duration - in days - before expire
 	- Unban via email - Enables/disable this feature
 	- Restrict access from authors - Hide/Show ABF content page to Authors
+	- Remote IP address field name - The $_SERVER field to look for the client's IP.
 - (optional) See all the banned IPs via Anti Brute Force -> Banned IPs
 - (optional) Manage colored lists entries via Anti Brute Force -> Black/Grey/White list
 
