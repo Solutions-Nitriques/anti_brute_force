@@ -1,10 +1,10 @@
 # Anti Brute Force #
 
-Version: 1.4.2
+Version: 1.4.3
 
-## Secure your Symphony backend against brute force and dictionary attacks ##
+> Secure your Symphony backend against brute force and dictionary attacks
 
-Prevents ***people and softwares*** to brute force your authors/developers accounts.  
+Prevents ***people and softwares*** to brute force your authors/developers accounts.
 
 ### SPECS ###
 
@@ -19,7 +19,7 @@ Prevents ***people and softwares*** to brute force your authors/developers accou
 ### NOTES ABOUT PROXIES
 
 If you are using Symphony on a server that sits behind a proxy, it will always
-track 127.0.0.1 as remote address, simply because PHP doesn't see anything else
+track 127.0.0.1 (or your proxy's IP) as remote address, simply because PHP doesn't see anything else
 in `$_SERVER['REMOTE_ADDR']`. In order to fix this, please set the 'remote-addr-key'
 setting to the field set by your proxy in order to let ABF access the real user IP.
 
