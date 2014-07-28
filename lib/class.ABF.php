@@ -580,6 +580,15 @@
 			return $tbl;
 		}
 
+		/**
+		 * @return The email settings for the default Email Gateway
+		 */
+		public function getEmailSettings() {
+			$emailGateway = Symphony::Configuration()->get('default_gateway', 'email');
+			$emailSettings = Symphony::Configuration()->get('email_'.$emailGateway);
+			return is_array($emailSettings) ? $emailSettings : null;
+		}
+
 
 
 

@@ -135,8 +135,7 @@
 			$author = Symphony::Database()->fetchRow(0, "SELECT `id`, `email`, `first_name` FROM `tbl_authors` WHERE `email` = '".MySQL::cleanValue($_POST['email'])."'");
 			$failure = ABF::instance()->getFailureByIp();
 			
-			$emailGateway = Symphony::Configuration()->get('default_gateway', 'email');
-			$emailSettings = Symphony::Configuration()->get('email_'.$emailGateway);
+			$emailSettings = ABF::instance()->getEmailSettings();
 
 			if (is_array($author) && isset($author['email']) &&
 				is_array($failure) && isset($failure[0]) && isset($failure[0]->Hash)) {
