@@ -145,7 +145,7 @@
 					$email = Email::create();
 					
 					// if no default values are set
-					if (!is_array($emailSettings) || !isset($emailSettings['from_address'])) {
+					if (!is_array($emailSettings) || empty($emailSettings['from_address'])) {
 						$email->setFrom($author['email'], Symphony::Configuration()->get('sitename','general'));
 					}
 					// use default settings, as this should help with SPF and DKIM

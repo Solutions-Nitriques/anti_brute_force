@@ -201,6 +201,19 @@
 					'</a>'
 				);
 			}
+
+			$emailUnban = ABF::instance()->getConfigVal(ABF::SETTING_AUTO_UNBAN);
+			if ($emailUnban == 'on') {
+				$emailSettings = ABF::instance()->getEmailSettings();
+				if (!is_array($emailSettings) || empty($emailSettings['from_address'])) {
+					Administration::instance()->Page->pageAlert(
+						__('Default Email Gateway is not configured. Unban via email may not work.') .
+						'<a href="' . SYMPHONY_URL . '/system/preferences/">' .
+						__('Go to the Preferences page to fix this.') .
+						'</a>'
+					);
+				}
+			}
 		}
 
 

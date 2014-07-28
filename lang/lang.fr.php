@@ -150,4 +150,10 @@
 		
 		'Error: The given IP address, `%s`, is not valid' =>
 		"Erreur: L'adresse IP fournie, `%s`, n'est pas valide",
+		
+		'Default Email Gateway is not configured. Unban via email may not work.' =>
+		"La passerelle de courriel par défaut n'est pas configurée. Les utilisateurs ne pourront pas de débannir par courriel.",
+		
+		'Go to the Preferences page to fix this.' =>
+		"Aller a la page des Préférences pour régler ceci"
 	);
