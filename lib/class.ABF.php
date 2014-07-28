@@ -662,7 +662,10 @@
 		 */
 		public function install(&$ext_driver) {
 			$ret = $this->install_v1_0() && $this->install_v1_1();
-			if ( $ret ) {
+			if ($ret) {
+				$ret = $this->install_v1_3_1() && $this->install_v1_3_4();
+			}
+			if ($ret) {
 				// set default values
 				$pseudo_context = array(
 					'settings' => $this->DEFAULTS
@@ -750,7 +753,7 @@
 
 		/**
 		 *
-		 * This methode will update the extension according to the
+		 * This method will update the extension according to the
 		 * previous and current version parameters.
 		 * @param string $previousVersion
 		 * @param string $currentVersion
