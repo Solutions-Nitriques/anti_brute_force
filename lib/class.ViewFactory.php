@@ -164,6 +164,7 @@
 
 			// create the label and the input field
 			$wrap = new XMLElement('div');
+			$wrap->setAttribute('class', 'column');
 			$label = Widget::Label();
 			$input = Widget::Input(
 						'settings[' . ABF::SETTING_GROUP . '][' . $settingName .']',

@@ -280,7 +280,7 @@
 
 			// create a wrapper
 			$wrapper = new XMLElement('div');
-			$wrapper->setAttribute('class', 'group');
+			$wrapper->setAttribute('class', 'two columns');
 
 			// append labels to field set
 			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_FAILED_COUNT, 'Fail count limit', $this->hasErrors(), $this->errors));
@@ -290,15 +290,22 @@
 
 			// create a new wrapper
 			$wrapper = new XMLElement('div');
-			$wrapper->setAttribute('class', 'group');
+			$wrapper->setAttribute('class', 'two columns');
 			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_GL_THRESHOLD, 'Gray list threshold', $this->hasErrors(), $this->errors));
 			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_GL_DURATION, 'Gray list duration <em>in days</em>', $this->hasErrors(), $this->errors));
+
+			$out_wrapper->appendChild($wrapper);
+			
+			// create a new wrapper
+			$wrapper = new XMLElement('div');
+			$wrapper->setAttribute('class', 'two columns');
+			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_REMOTE_ADDR, 'Remote IP address field name', $this->hasErrors(), $this->errors));
 
 			$out_wrapper->appendChild($wrapper);
 
 			// create a new wrapper
 			$wrapper = new XMLElement('div');
-			$wrapper->setAttribute('class', 'group');
+			$wrapper->setAttribute('class', 'two columns');
 			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_AUTO_UNBAN, 'Users can unban their IP via email', $this->hasErrors(), $this->errors, 'checkbox'));
 			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_RESTRICT_ACCESS, 'Restrict access from authors', $this->hasErrors(), $this->errors, 'checkbox'));
 
