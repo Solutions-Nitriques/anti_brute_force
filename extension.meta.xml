@@ -25,7 +25,8 @@
 	</dependencies>
 	<releases>
 		<release version="1.4.3" date="2014-07-28" min="2.4">
-			
+			- Fixing issue #20 and #19 completely.
+			- Update the settings UI for 2.4
 		</release>
 		<release version="1.4.2" date="2014-07-26" min="2.4">
 			- Added a note about proxies (thanks @michael-e)
