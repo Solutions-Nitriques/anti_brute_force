@@ -10,7 +10,7 @@ Prevents ***people and softwares*** to brute force your authors/developers accou
 
 - After **x** failed attempt, the IP address will be banned for **y** min;  
   **x** and **y** are settings in the preferences page 
-- Features colored list: ***Black list***, **Grey list**, *White list*.
+- Features colored list: ***Black list***, **Gray list**, *White list*.
 - Features a **unban via email** capabilities; Must be enabled in the preferences page
 - Backend content page for managing blocked IPs and colored lists
 - A Facade/Singleton class -ABF- for developers to leverage anti_brute_force capabilities
@@ -44,13 +44,13 @@ would be to do some actual penetration testing to be sure ABF works properly.
 - (optional) Go to the *Preferences* page to customize settings
 	- Maximum failed count before user gets banned
 	- Banned duration - number of minutes IP is banned
-	- Grey list threshold - maximum number of gray list entries before black list
-	- Grey list duration - in days - before expire
+	- Gray list threshold - maximum number of gray list entries before black list
+	- Gray list duration - in days - before expire
 	- Unban via email - Enables/disable this feature
 	- Restrict access from authors - Hide/Show ABF content page to Authors
 	- Remote IP address field name - The $_SERVER field to look for the client's IP.
 - (optional) See all the banned IPs via Anti Brute Force -> Banned IPs
-- (optional) Manage colored lists entries via Anti Brute Force -> Black/Grey/White list
+- (optional) Manage colored lists entries via Anti Brute Force -> Black/Gray/White list
 
 *Voila !*
 

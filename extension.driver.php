@@ -106,7 +106,7 @@
 							),
 							array(
 								'name'	=> __('Gray Listed IPs'),
-								'link'	=> '/colored_lists/?list=grey'
+								'link'	=> '/colored_lists/?list=gray'
 							),
 							array(
 								'name'	=> __('White Listed IPs'),
@@ -142,7 +142,7 @@
 	
 				// if user is now banned
 				if (ABF::instance()->isCurrentlyBanned()) {
-					// register into grey list
+					// register into gray list
 					ABF::instance()->registerToGrayList(self::EXT_NAME);
 					// move to black list if necessary
 					ABF::instance()->moveGrayToBlack(self::EXT_NAME);

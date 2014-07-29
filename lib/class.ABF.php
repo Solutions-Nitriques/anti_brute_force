@@ -714,7 +714,7 @@
 		}
 
 		private function install_v1_1() {
-			// GREY
+			// GRAY
 			$sql = "
 				CREATE TABLE IF NOT EXISTS $this->TBL_ABF_GL (
 					`IP` VARCHAR( 16 ) NOT NULL ,
