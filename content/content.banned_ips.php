@@ -30,16 +30,17 @@
 				'Source' => __('Source'),
 				'UA' => __('User Agent (browser)')
 			);
-
-			$this->_data = ABF::instance()->getFailures('IP ASC');
-
-			$this->_hasData = is_array($this->_data) && count($this->_data) > 0;
 		}
 
 		/**
 		 * Builds the content view
 		 */
 		public function __viewIndex() {
+			// Get data
+			$this->_data = ABF::instance()->getFailures('IP ASC');
+			$this->_hasData = is_array($this->_data) && count($this->_data) > 0;
+			
+			// Build the page
 			$title = __('Banned IPs');
 
 			$this->setPageType('table');
