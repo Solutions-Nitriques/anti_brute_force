@@ -543,7 +543,7 @@
 		}
 		
 		/**
-		 * @return the $ip param if valid. If not, it returns the $_SERVER field specified 
+		 * @return the $ip param if valid. If not, it returns the getenv(field) specified 
 		 *   by the ABF::SETTING_REMOTE_ADDR setting or the REMOTE_ADDR
 		 */
 		public function getIP($ip='') {
@@ -553,13 +553,19 @@
 			
 			// client ip
 			$ipField = $this->_settings[ABF::SETTING_REMOTE_ADDR];
-			$clientip = isset($_SERVER[$ipField]) ? $_SERVER[$ipField] : $_SERVER["REMOTE_ADDR"];
+			$ipEnvValue = null;
+			if (!empty($ipField)) {
+				$ipEnvValue = getenv($ipField);
+			}
+			// use user defined and fallback on Symphony's defined value
+			$clientip = !empty($ipEnvValue) ? $ipEnvValue : REMOTE_ADDR;
 			
 			return $clientip;
 		}
 
 		private function getUA() {
-			return $_ENV["HTTP_USER_AGENT"];
+			// Symphony's defined constant
+			return HTTP_USER_AGENT;
 		}
 
 		private function getTableName($color) {
