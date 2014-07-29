@@ -24,8 +24,9 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
-		<release version="1.4.4" date="2014-07-28" min="2.4" max="2.5">
-			
+		<release version="1.4.4" date="2014-07-29" min="2.4" max="2.5">
+			- Fixing issues #21, #22, #23, #24, #25 and #26 (thanks @michael-e)
+			- Minor UI updates
 		</release>
 		<release version="1.4.3" date="2014-07-28" min="2.4">
 			- Fixing issue #20 and #19 completely.
