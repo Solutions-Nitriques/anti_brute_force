@@ -24,7 +24,7 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
-		<release version="1.4.4" date="2014-07-28" min="2.4">
+		<release version="1.4.4" date="2014-07-28" min="2.4" max="2.5">
 			
 		</release>
 		<release version="1.4.3" date="2014-07-28" min="2.4">
