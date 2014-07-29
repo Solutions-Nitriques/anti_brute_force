@@ -7,12 +7,15 @@
 	font-weight: bold;
 }
 
-table + fieldset.insert {	
+table + fieldset.insert {
 	display: block;
 	margin: 1em 0 !important;
 	border: 1px solid #E4E4DE;
-	padding: 1em 0 0 19px;
-	background-color: #F5F5F3;
+	padding-bottom: 0;
+}
+
+fieldset.insert legend {
+	margin-left: 1rem;
 }
 
 fieldset.insert label {
@@ -20,7 +23,7 @@ fieldset.insert label {
 	display: inline-block;
 }
 
-fieldset.insert label input[type=text] {
+fieldset.insert label .input-ip {
 	width: 150px;
 }
 

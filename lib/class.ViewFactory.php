@@ -132,7 +132,7 @@
 				$button->setAttribute('onclick', "document.location='?list=$key'");
 
 				if ($key == $current) {
-					$button->setAttribute('class', 'active');
+					$button->setAttribute('class', 'active selected');
 				}
 
 				$fieldset->appendChild($button);

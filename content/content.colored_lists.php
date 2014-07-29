@@ -111,7 +111,8 @@
 		 */
 		private function buildInsertForm() {
 			$wrap = new XMLElement('fieldset');
-			$wrap->setAttribute('class', 'insert');
+			$wrap->setAttribute('class', 'insert settings');
+			$wrap->appendChild(new XMLElement('legend', __('Use this form to manually add an IP.')));
 
 			$label = Widget::Label();
 
@@ -119,7 +120,10 @@
 						'insert[ip]',
 						$this->_curColor == 'white' ? ABF::instance()->getIP() : '',
 						'text',
-						array('placeholder'=> '0.0.0.0')
+						array(
+							'placeholder'=> '0.0.0.0',
+							'class' => 'input-ip'
+						)
 					);
 
 			$iBut = Widget::Input(
