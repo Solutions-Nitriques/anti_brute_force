@@ -4,6 +4,7 @@
 	<description>Secure your Symphony backend against brute force and dictionary attacks</description>
 	<repo type="github">https://github.com/Solutions-Nitriques/anti_brute_force</repo>
 	<url type="discuss">http://symphony-cms.com/discuss/thread/72904/</url>
+	<url type="issues">https://github.com/Solutions-Nitriques/anti_brute_force/issues</url>
 	<types>
 		<type>Workflow</type>
 		<type>Security</type>
