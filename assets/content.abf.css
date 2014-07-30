@@ -1,6 +1,13 @@
+/**
+ * Anti Brute Force
+ */
 
 .actions.no-pad {
-	padding-top: 0px;
+	padding-top: 0;
+}
+
+.actions.no-pad button:last-child {
+	margin-right: 0;
 }
 
 .actions button.active {
@@ -9,8 +16,8 @@
 
 table + fieldset.insert {
 	display: block;
-	margin: 1em 0 !important;
-	border: 1px solid #E4E4DE;
+	margin: 1em 0 1em 1.9rem !important;
+	border-bottom: 1px solid #E4E4DE;
 	padding-bottom: 0;
 }
 
@@ -25,6 +32,13 @@ fieldset.insert label {
 
 fieldset.insert label .input-ip {
 	width: 150px;
+	margin-top: 0;
+	vertical-align: top;
+}
+
+fieldset.insert label .input-submit {
+	margin-top: 0;
+	vertical-align: top;
 }
 
 fieldset.insert  .actions{

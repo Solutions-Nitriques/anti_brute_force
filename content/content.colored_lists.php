@@ -95,7 +95,7 @@
 
 			// insert form
 			$insertLine = $this->buildInsertForm();
-
+			
 			// append actions
 			$insertLine->appendChild(
 				ViewFactory::buildActions($this->_hasData)
@@ -111,8 +111,7 @@
 		 */
 		private function buildInsertForm() {
 			$wrap = new XMLElement('fieldset');
-			$wrap->setAttribute('class', 'insert settings');
-			$wrap->appendChild(new XMLElement('legend', __('Use this form to manually add an IP.')));
+			$wrap->setAttribute('class', 'insert');
 
 			$label = Widget::Label();
 
@@ -129,7 +128,10 @@
 			$iBut = Widget::Input(
 						'action[insert]',
 						__('Add'),
-						'submit'
+						'submit',
+						array(
+							'class' => 'input-submit'
+						)
 					);
 
 			$label->appendChild($iInput);
@@ -191,18 +193,20 @@
 											$this->_curColor,
 											extension_anti_brute_force::EXT_NAME,
 											$ip
-										); //die;
+										);
 
 						if ($ret) {
-							$this->pageAlert(__('IP added successfuly'), Alert::SUCCESS);
+							$this->pageAlert(__('IP added successfuly.'), Alert::SUCCESS);
 						} else {
-							
+							throw new Exception(__('Could not save IP address.'));
 						}
 					} catch (Exception $e) {
 						$this->pageAlert(__('Error') . ': ' . $e->getMessage(), Alert::ERROR);
 					}
 				} else if (strlen($ip) > 0) {
 					$this->pageAlert(__('Error: The given IP address, `%s`, is not valid', array($ip)), Alert::ERROR);
+				} else {
+					$this->pageAlert(__('Error: No IP address submitted'), Alert::ERROR);
 				}
 			}
 		}
@@ -220,9 +224,7 @@
 					$this->pageAlert(__('Entries remove successfuly'), Alert::SUCCESS);
 
 				} catch (Exception $e) {
-
 					$this->pageAlert(__('Error') . ': ' . $e->getMessage(), Alert::ERROR);
-
 				}
 			}
 		}
