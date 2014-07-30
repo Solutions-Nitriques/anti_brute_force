@@ -173,7 +173,12 @@
 					);
 
 			// set the input into the label
-			$label->setValue(__($textKey). ' ' . $input->generate() . $err);
+			if ($type == 'checkbox') {
+				// put input first
+				$label->setValue($input->generate() . ' ' . __($textKey));
+			} else {
+				$label->setValue(__($textKey). ' ' . $input->generate());
+			}
 
 			// error management
 			if ($hasErrors && isset($errors[$settingName])) {
