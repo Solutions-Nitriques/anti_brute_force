@@ -24,6 +24,7 @@
 
 			$this->_cols = array(
 				'IP' => __('IP Address'),
+				'RawIP' => __('Raw IP value'),
 				'Username' => __('Username'),
 				'FailedCount' => __('Failed Count'),
 				'LastAttempt' => __('Last Attempt'),
