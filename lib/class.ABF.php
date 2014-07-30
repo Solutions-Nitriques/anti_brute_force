@@ -696,6 +696,9 @@
 				$ret = $this->install_v1_3_1() && $this->install_v1_3_4();
 			}
 			if ($ret) {
+				$ret = $this->install_v1_4_5();
+			}
+			if ($ret) {
 				// set default values
 				$pseudo_context = array(
 					'settings' => $this->DEFAULTS
@@ -721,7 +724,7 @@
 					`Username` VARCHAR( 100 ) NULL,
 					`Source` VARCHAR( 100 ) NULL,
 					`Hash` CHAR( 36 ) NOT NULL,
-					PRIMARY KEY (  `IP` )
+					PRIMARY KEY ( `IP` )
 				) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 			";
 
@@ -780,6 +783,16 @@
 			Symphony::Configuration()->write();
 			return true;
 		}
+		
+		private function install_v1_4_5() {
+			$sql = "
+				ALTER TABLE $this->TBL_ABF
+					ADD COLUMN `RawIP` VARCHAR( 1024 ) NOT NULL
+					AFTER `IP`
+			";
+
+			return Symphony::Database()->query($sql);
+		}
 
 		/**
 		 *
@@ -804,6 +817,11 @@
 			// less than 1.3.4
 			if ($ret && version_compare($previousVersion, '1.3.4') == -1) {
 				$ret = $this->install_v1_3_4();
+			}
+			
+			// less than 1.4.5
+			if ($ret && version_compare($previousVersion, '1.4.5') == -1) {
+				$ret = $this->install_v1_4_5();
 			}
 			
 			return $ret;
