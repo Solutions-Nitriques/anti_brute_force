@@ -219,10 +219,11 @@
 		 * @param string $ip @optional - will take current user's ip
 		 */
 		public function registerFailure($username, $source, $ip='') {
-			$ip = $this->getIP($ip);
+			$ip = MySQL::cleanValue($this->getIP($ip));
 			$username = MySQL::cleanValue($username);
 			$source = MySQL::cleanValue($source);
 			$ua = MySQL::cleanValue($this->getUA());
+			$rawip = MySQL::cleanValue($this->getRawClientIP());
 			$results = $this->getFailureByIp($ip);
 			$ret = false;
 
@@ -230,12 +231,13 @@
 				// UPDATE
 				$ret = Symphony::Database()->query("
 					UPDATE $this->TBL_ABF
-						SET `LastAttempt` = NOW(),
-						    `FailedCount` = `FailedCount` + 1,
-						    `Username` = '$username',
-						    `UA` = '$ua',
-						    `Source` = '$source',
-						    `Hash` = UUID()
+						SET `RawIP` = '$rawip',
+							`LastAttempt` = NOW(),
+							`FailedCount` = `FailedCount` + 1,
+							`Username` = '$username',
+							`UA` = '$ua',
+							`Source` = '$source',
+							`Hash` = UUID()
 						WHERE IP = '$ip'
 						LIMIT 1
 				");
@@ -243,10 +245,25 @@
 			} else {
 				// INSERT
 				$ret = Symphony::Database()->query("
-					INSERT INTO $this->TBL_ABF
-						(`IP`, `LastAttempt`, `Username`, `FailedCount`, `UA`, `Source`, `Hash`)
-						VALUES
-						('$ip', NOW(),        '$username', 1,            '$ua','$source', UUID())
+					INSERT INTO $this->TBL_ABF (
+						`IP`,
+						`RawIP`,
+						`LastAttempt`,
+						`Username`,
+						`FailedCount`,
+						`UA`,
+						`Source`,
+						`Hash`
+					) VALUES (
+						'$ip',
+						'$rawip',
+						NOW(),
+						'$username',
+						1,
+						'$ua',
+						'$source',
+						UUID()
+					)
 				");
 			}
 
