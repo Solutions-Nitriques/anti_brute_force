@@ -68,6 +68,9 @@
 
 		'IP Address' => 
 		'IP адрес',
+		
+		'Raw IP value' =>
+		null,
 
 		'IP added successfuly' => 
 		'IP адрес добавлен',

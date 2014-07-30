@@ -48,6 +48,9 @@
 
 		'IP Address' =>
 		'Adresse IP',
+		
+		'Raw IP value' =>
+		'Valeur IP lue',
 
 		'Last Attempt' =>
 		'Dernière tentative',

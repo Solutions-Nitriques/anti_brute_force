@@ -48,6 +48,9 @@
 
 		'IP Address' =>
 		'Indirizzo IP',
+		
+		'Raw IP value' =>
+		null,
 
 		'Last Attempt' =>
 		'Ultimo tentativo',
