@@ -34,9 +34,6 @@ would be to do some actual penetration testing to be sure ABF works properly.
 
 ### INSTALLATION ###
 
-#### Beware, you will loose settings after upgrading from < 1.0.2 ####
-***You must uninstall all previous version and install the new one***
-
 - `git clone` / download and unpack the tarball file
 - (re)Name the folder ***anti_brute_force***
 - Put into the extension directory
@@ -52,6 +49,13 @@ would be to do some actual penetration testing to be sure ABF works properly.
 - (optional) See all the banned IPs via Anti Brute Force -> Banned IPs
 - (optional) Manage colored lists entries via Anti Brute Force -> Black/Gray/White list
 
-*Voila !*
+### UPDATING ###
 
-<http://www.deuxhuithuit.com/>
+Updating from >= 1.3 is safe.
+[Click here for older releases](https://github.com/Solutions-Nitriques/anti_brute_force/releases).
+
+### LICENSE
+
+[MIT](http://deuxhuithuit.mit-license.org)
+
+Made in Montréal with love by [Deux Huit Huit](http://deuxhuithuit.com/)
