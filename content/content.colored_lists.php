@@ -189,9 +189,10 @@
 				if (ABF::instance()->isIPValid($ip)) { // protection for not entering the users ip
 									   // since ip='' will become his ip
 					try {
+						$author = Administration::instance()->Author()->getFullName();
 						$ret = ABF::instance()->registerToList(
 											$this->_curColor,
-											extension_anti_brute_force::EXT_NAME,
+											"Manual entry made by $author",
 											$ip
 										);
 
