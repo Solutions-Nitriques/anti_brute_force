@@ -48,7 +48,7 @@ would be to do some actual penetration testing to be sure ABF works properly.
 	- Gray list duration - in days - before expire
 	- Unban via email - Enables/disable this feature
 	- Restrict access from authors - Hide/Show ABF content page to Authors
-	- Remote IP address field name - The $_SERVER field to look for the client's IP.
+	- Remote IP address field name - The `getenv()` field to look for the client's IP.
 - (optional) See all the banned IPs via Anti Brute Force -> Banned IPs
 - (optional) Manage colored lists entries via Anti Brute Force -> Black/Gray/White list
 
