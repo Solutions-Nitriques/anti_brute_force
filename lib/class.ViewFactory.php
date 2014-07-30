@@ -163,9 +163,8 @@
 			}
 
 			// create the label and the input field
-			$wrap = new XMLElement('div');
-			$wrap->setAttribute('class', 'column');
 			$label = Widget::Label();
+			$label->setAttribute('class', 'column');
 			$input = Widget::Input(
 						'settings[' . ABF::SETTING_GROUP . '][' . $settingName .']',
 						(string)$inputText,
@@ -176,18 +175,11 @@
 			// set the input into the label
 			$label->setValue(__($textKey). ' ' . $input->generate() . $err);
 
-			$wrap->appendChild($label);
-
 			// error management
 			if ($hasErrors && isset($errors[$settingName])) {
-				// style
-				$wrap->setAttribute('class', 'invalid');
-				$wrap->setAttribute('id', 'error');
-				// error message
-				$err = new XMLElement('p', $errors[$settingName]);
-				$wrap->appendChild($err);
+				$label = Widget::Error($label, $errors[$settingName]);
 			}
 
-			return $wrap;
+			return $label;
 		}
 	}
