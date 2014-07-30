@@ -433,7 +433,7 @@
 				$where .= $additionalWhere;
 			}
 			$sql ="
-				SELECT SQL_CACHE * FROM $this->TBL_ABF WHERE $where LIMIT 1
+				SELECT * FROM $this->TBL_ABF WHERE $where LIMIT 1
 			" ;
 
 			$rets = array();
@@ -456,7 +456,7 @@
 				$order .= (' ORDER BY ' . $orderedBy);
 			}
 			$sql ="
-				SELECT SQL_CACHE * FROM $this->TBL_ABF $order
+				SELECT * FROM $this->TBL_ABF $order
 			" ;
 
 			$rets = array();
@@ -484,10 +484,8 @@
 			return $this->__getListEntriesByIp($this->getTableName($color), $ip, $additionalWhere);
 		}
 
-		private function __getListEntriesByIp($tbl, $ip='', $additionalWhere='', $cache = true) {
+		private function __getListEntriesByIp($tbl, $ip='', $additionalWhere='') {
 			$ip = $this->getIP($ip);
-
-			$sqlcache = $cache ? 'SQL_CACHE' : '';
 
 			$where = "IP = '$ip'";
 			if (strlen($additionalWhere) > 0) {
@@ -495,7 +493,7 @@
 			}
 
 			$sql ="
-				SELECT $sqlcache * FROM $tbl WHERE $where LIMIT 1
+				SELECT * FROM $tbl WHERE $where LIMIT 1
 			" ;
 
 			$rets = array();
@@ -516,7 +514,7 @@
 				$where = 'WHERE ' . $where;
 			}
 			$sql ="
-				SELECT SQL_CACHE * FROM $tbl $where ORDER BY $order
+				SELECT * FROM $tbl $where ORDER BY $order
 			" ;
 
 			$rets = array();
@@ -548,18 +546,35 @@
 		 */
 		public function getIP($ip='') {
 			if ($this->isIPValid($ip)) {
-				return $ip;
+				return trim($ip);
 			}
 			
-			// client ip
+			// get the client ip
+			$clientip = $this->getRawClientIP();
+			
+			// extract the last item from the list
+			$clientip = trim(end(explode(',', $clientip)));
+			
+			return $clientip;
+		}
+
+		/**
+		 * @return the raw client IP env field value
+		 */
+		public function getRawClientIP() {
+			// Get the name of the field via settings
 			$ipField = $this->_settings[ABF::SETTING_REMOTE_ADDR];
 			$ipEnvValue = null;
+			// If the setting is not empty
 			if (!empty($ipField)) {
-				$ipEnvValue = getenv($ipField);
+				// Get the value
+				$ipEnvValue = @getenv($ipField);
 			}
-			// use user defined and fallback on Symphony's defined value
-			$clientip = !empty($ipEnvValue) ? $ipEnvValue : REMOTE_ADDR;
-			
+			// use user defined or fallback on Symphony's defined value
+			$clientip = $ipEnvValue !== false && !empty($ipEnvValue) ?
+				$ipEnvValue :
+				REMOTE_ADDR;
+
 			return $clientip;
 		}
 
