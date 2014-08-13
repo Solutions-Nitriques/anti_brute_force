@@ -303,6 +303,37 @@
 		}
 
 		/**
+		 * This method is a wrapper around multiple other methods.
+		 * It will:
+		 *   1. Check if the ip is whitelisted
+		 *   2. If not, will call `registerFailure`
+		 *   3. Check if the user is banned
+		 *   4. If so, register it into the gray list
+		 *      and move it to the black one if needed
+		 *
+		 * @since 1.4.6
+		 * @param string $username - the username input
+		 * @param string $source - the source of the ban, normally the name of the extension
+		 * @param string $ip @optional - will take current user's ip
+		 */
+		public function authorLoginFailure($username, $source, $ip='') {
+			// do not do anything is ip is white listed
+			if (!$this->isWhiteListed($ip)) {
+
+				// register failure in DB
+				$this->registerFailure($username, $source, $ip);
+
+				// if user is now banned
+				if ($this->isCurrentlyBanned($ip)) {
+					// register into gray list
+					$this->registerToGrayList($source, $ip);
+					// move to black list if necessary
+					$this->moveGrayToBlack($source, $ip);
+				}
+			}
+		}
+
+		/**
 		 *
 		 * Delete expired entries
 		 */
