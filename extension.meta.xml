@@ -25,6 +25,10 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="1.4.6" date="2014-08-21" min="2.4" max="2.5">
+			- Fixing issue #30 (thanks again @michael-e). The API as a new method
+			`ABF::instance()->authorLoginFailure()`
+		</release>
 		<release version="1.4.5" date="2014-07-31" min="2.4" max="2.5">
 			- Fixing issues #27 and #29 (thanks @michael-e)
 			- Revisited #19: The extension now plays better with http proxies
