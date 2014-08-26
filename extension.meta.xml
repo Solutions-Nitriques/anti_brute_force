@@ -25,7 +25,7 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
-		<release version="1.4.7" date="2014-08-21" min="2.4" max="2.5">
+		<release version="1.4.7" date="2014-08-26" min="2.4" max="2.5">
 			- Fixing Author() difference between 2.4 and 2.5
 		</release>
 		<release version="1.4.6" date="2014-08-21" min="2.4" max="2.5">
