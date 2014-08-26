@@ -186,15 +186,25 @@
 			if (is_array($_POST['insert']) && isset($_POST['insert']['ip'])) {
 				$ip = $_POST['insert']['ip'];
 				
-				if (ABF::instance()->isIPValid($ip)) { // protection for not entering the users ip
-									   // since ip='' will become his ip
+				// protection for not entering the users ip
+				// since ip='' will become his ip
+				if (ABF::instance()->isIPValid($ip)) { 
+					
+					// temporary fix for getting the author
+					$author = null;
+					if (is_callable(array('Symphony', 'Author'))) {
+						$author = Symphony::Author();
+					} else {
+						$author = Administration::instance()->Author;
+					}
+					
 					try {
-						$author = Administration::instance()->Author()->getFullName();
+						$author = $author->getFullName();
 						$ret = ABF::instance()->registerToList(
-											$this->_curColor,
-											"Manual entry made by $author",
-											$ip
-										);
+									$this->_curColor,
+									"Manual entry made by $author",
+									$ip
+								);
 
 						if ($ret) {
 							$this->pageAlert(__('IP added successfuly.'), Alert::SUCCESS);
