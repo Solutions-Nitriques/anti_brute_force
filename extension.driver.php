@@ -244,7 +244,7 @@
 		 * Delegate fired when the extension is updated (when version changes)
 		 * @param string $previousVersion
 		 */
-		public function update($previousVersion) {
+		public function update($previousVersion=false) {
 			$about = ExtensionManager::about('anti_brute_force');
 			return ABF::instance()->update($previousVersion,$about['version']);
 		}
