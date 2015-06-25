@@ -25,6 +25,10 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="1.4.8" date="2015-06-25" min="2.4" max="2.6.x">
+			- Fix method signature.
+			- Mark as Symphony 2.6.x compatible.
+		</release>
 		<release version="1.4.7" date="2014-08-26" min="2.4" max="2.5">
 			- Fixing Author() difference between 2.4 and 2.5
 		</release>
