@@ -6,7 +6,7 @@
 	License: MIT
 	*/
 
-	require_once (TOOLKIT . '/class.extensionmanager.php');
+	require_once TOOLKIT . '/class.extensionmanager.php';
 
 	/**
 	 *

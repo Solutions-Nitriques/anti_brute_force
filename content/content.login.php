@@ -2,8 +2,8 @@
 
 	if(!defined("__IN_SYMPHONY__")) die("<h2>Error</h2><p>You cannot directly access this file</p>");
 
-	require_once(CONTENT . '/content.login.php');
-	require_once(EXTENSIONS . '/anti_brute_force/lib/class.ABF.php');
+	require_once CONTENT . '/content.login.php';
+	require_once EXTENSIONS . '/anti_brute_force/lib/class.ABF.php';
 
 	/*
 	License: MIT
