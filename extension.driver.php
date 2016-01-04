@@ -77,7 +77,7 @@ class extension_anti_brute_force extends Extension
             ),
             array(
                 'page'     => '/backend/',
-                'delegate' => 'InitaliseAdminPageHead',
+                'delegate' => 'InitialiseAdminPageHead',
                 'callback' => 'initaliseAdminPageHead'
             ),
             array(
