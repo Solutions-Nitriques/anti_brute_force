@@ -140,7 +140,7 @@
 
 			$author = Symphony::Database()->fetchRow(0, "SELECT `id`, `email`, `first_name` FROM `tbl_authors` WHERE `email` = '".MySQL::cleanValue($_POST['email'])."'");
 			$failure = ABF::instance()->getFailureByIp();
-			
+
 			$emailSettings = ABF::instance()->getEmailSettings();
 
 			if (is_array($author) && isset($author['email']) &&
@@ -149,16 +149,16 @@
 				try {
 					// use default values
 					$email = Email::create();
-					
+
 					// if no default values are set
 					if (!is_array($emailSettings) || empty($emailSettings['from_address'])) {
 						$email->setFrom($author['email'], Symphony::Configuration()->get('sitename','general'));
 					}
 					// use default settings, as this should help with SPF and DKIM
-					else { 
+					else {
 						$email->setFrom($emailSettings['from_address'], $emailSettings['from_name']);
 					}
-					
+
 					$email->recipients = $author['email'];
 					$email->subject = __('Unban IP link');
 					$email->text_plain =
@@ -172,7 +172,7 @@
 
 				} catch (Exception $e) {
 					//var_dump($e);
-					
+
 					// do nothing
 					$this->_email_sent = false;
 				}

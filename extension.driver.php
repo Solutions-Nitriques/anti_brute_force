@@ -295,7 +295,7 @@
 			$wrapper->appendChild(ViewFactory::generateField(ABF::SETTING_GL_DURATION, 'Gray list duration <em>in days</em>', $this->hasErrors(), $this->errors));
 
 			$out_wrapper->appendChild($wrapper);
-			
+
 			// create a new wrapper
 			$wrapper = new XMLElement('div');
 			$wrapper->setAttribute('class', 'two columns');

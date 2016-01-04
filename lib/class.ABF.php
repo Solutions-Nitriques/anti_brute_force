@@ -53,7 +53,7 @@
 		 * @var string
 		 */
 		const SETTING_RESTRICT_ACCESS = 'restrict-access';
-		
+
 		/**
 		 * Key of the IP (REMOTE_ADDR) server field
 		 * @var string
@@ -344,9 +344,9 @@
 				return Symphony::Database()->delete($this->TBL_ABF, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
 			}
 		}
-		
-		
-		
+
+
+
 		/**
 		 * Database Data queries - COLORED (B/G/W) Public methods
 		 */
@@ -578,7 +578,7 @@
 		/**
 		 * Utilities
 		 */
-		
+
 		/**
 		 * @return boolean - Really simple validation for IP Addresses
 		 */
@@ -587,22 +587,22 @@
 			// hash is 36 char
 			return strlen($ip) > 6 && strlen($ip) < 16;
 		}
-		
+
 		/**
-		 * @return the $ip param if valid. If not, it returns the getenv(field) specified 
+		 * @return the $ip param if valid. If not, it returns the getenv(field) specified
 		 *   by the ABF::SETTING_REMOTE_ADDR setting or the REMOTE_ADDR
 		 */
 		public function getIP($ip='') {
 			if ($this->isIPValid($ip)) {
 				return trim($ip);
 			}
-			
+
 			// get the client ip
 			$clientip = $this->getRawClientIP();
-			
+
 			// extract the last item from the list
 			$clientip = trim(end(explode(',', $clientip)));
-			
+
 			return $clientip;
 		}
 
@@ -825,13 +825,13 @@
 			Symphony::Configuration()->write();
 			return true;
 		}
-		
+
 		private function install_v1_3_4() {
 			Symphony::Configuration()->set(ABF::SETTING_REMOTE_ADDR, 'REMOTE_ADDR', ABF::SETTING_GROUP);
 			Symphony::Configuration()->write();
 			return true;
 		}
-		
+
 		private function install_v1_4_5() {
 			$sql = "
 				ALTER TABLE $this->TBL_ABF
@@ -851,27 +851,27 @@
 		 */
 		public function update($previousVersion, $currentVersion) {
 			$ret = true;
-			
+
 			// less than 1.1
 			if ($ret && version_compare($previousVersion, '1.1') == -1) {
 				$ret = $this->install_v1_1();
 			}
-			
+
 			// less than 1.3.1
 			if ($ret && version_compare($previousVersion, '1.3.1') == -1) {
 				$ret = $this->install_v1_3_1();
 			}
-			
+
 			// less than 1.3.4
 			if ($ret && version_compare($previousVersion, '1.3.4') == -1) {
 				$ret = $this->install_v1_3_4();
 			}
-			
+
 			// less than 1.4.5
 			if ($ret && version_compare($previousVersion, '1.4.5') == -1) {
 				$ret = $this->install_v1_4_5();
 			}
-			
+
 			return $ret;
 		}
 

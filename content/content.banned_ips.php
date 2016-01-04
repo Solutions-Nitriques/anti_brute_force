@@ -40,7 +40,7 @@
 			// Get data
 			$this->_data = ABF::instance()->getFailures('IP ASC');
 			$this->_hasData = is_array($this->_data) && count($this->_data) > 0;
-			
+
 			// Build the page
 			$title = __('Banned IPs');
 

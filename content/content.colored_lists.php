@@ -95,7 +95,7 @@
 
 			// insert form
 			$insertLine = $this->buildInsertForm();
-			
+
 			// append actions
 			$insertLine->appendChild(
 				ViewFactory::buildActions($this->_hasData)
@@ -185,11 +185,11 @@
 		public function __actionInsert() {
 			if (is_array($_POST['insert']) && isset($_POST['insert']['ip'])) {
 				$ip = $_POST['insert']['ip'];
-				
+
 				// protection for not entering the users ip
 				// since ip='' will become his ip
-				if (ABF::instance()->isIPValid($ip)) { 
-					
+				if (ABF::instance()->isIPValid($ip)) {
+
 					// temporary fix for getting the author
 					$author = null;
 					if (is_callable(array('Symphony', 'Author'))) {
@@ -197,7 +197,7 @@
 					} else {
 						$author = Administration::instance()->Author;
 					}
-					
+
 					try {
 						$author = $author->getFullName();
 						$ret = ABF::instance()->registerToList(
