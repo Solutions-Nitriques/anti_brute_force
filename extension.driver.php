@@ -78,7 +78,7 @@ class extension_anti_brute_force extends Extension
             array(
                 'page'     => '/backend/',
                 'delegate' => 'InitialiseAdminPageHead',
-                'callback' => 'initaliseAdminPageHead'
+                'callback' => 'initialiseAdminPageHead'
             ),
             array(
                 'page'     => '/backend/',
@@ -124,7 +124,7 @@ class extension_anti_brute_force extends Extension
      * Delegate fired when the HEAD section will be built
      * @param array $context
      */
-    public function initaliseAdminPageHead($context)
+    public function initialiseAdminPageHead($context)
     {
         // do it here since it is called before
         // processing $_POST['action']
@@ -178,7 +178,7 @@ class extension_anti_brute_force extends Extension
         }
 
         // N.B. We must still do it here
-        // since initaliseAdminPageHead is not fired on some requests
+        // since initialiseAdminPageHead is not fired on some requests
         if ($this->mustCheck($oPage)) {
             $this->doBanCheck();
         }
