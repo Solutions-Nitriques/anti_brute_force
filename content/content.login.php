@@ -1,185 +1,190 @@
 <?php
 
-	if(!defined("__IN_SYMPHONY__")) die("<h2>Error</h2><p>You cannot directly access this file</p>");
+if (!defined("__IN_SYMPHONY__")) die("<h2>Error</h2><p>You cannot directly access this file</p>");
 
-	require_once(CONTENT . '/content.login.php');
-	require_once(EXTENSIONS . '/anti_brute_force/lib/class.ABF.php');
+require_once CONTENT . '/content.login.php';
+require_once EXTENSIONS . '/anti_brute_force/lib/class.ABF.php';
 
-	/*
-	License: MIT
-	*/
+/*
+License: MIT
+*/
 
-	/**
-	 *
-	 * N.B. : Page is named login in order for the Administration Class to
-	 * pretend in the login page via <code>$this->_context['driver']</code>.
-	 * Should certainly be named something else
-	 * @author nicolasbrassard
-	 *
-	 */
-	class contentExtensionAnti_brute_forceLogin extends contentLogin {
+/**
+ *
+ * N.B. : Page is named login in order for the Administration Class to
+ * pretend in the login page via <code>$this->_context['driver']</code>.
+ * Should certainly be named something else
+ * @author nicolasbrassard
+ *
+ */
+class contentExtensionAnti_brute_forceLogin extends contentLogin
+{
+    private $_email_sent = null;
 
-		private $_email_sent = null;
+    /**
+     *
+     * Overrides the view method
+     */
+    public function view()
+    {
+        // if this is the unban request
+        if (isset($this->_context) && is_array($this->_context) && count($this->_context) > 0) {
+            // check if we have a hash present
+            $hash = $this->_context[0];
+            if (strlen($hash) == 36) {
+                // Sanatize user inputed values... ALWAYS
+                $hash = General::sanitize($hash);
+                $this->__unban($hash);
+            }
 
-		/**
-		 *
-		 * Overrides the view method
-		 */
-		public function view() {
+            // redirect not matter what
+            // evil users won't be able to detect anything from the response
+            // they *should* still be blocked since guessing a hash is
+            // practically infeasible
+            redirect(SYMPHONY_URL);
+            die();
 
-			// if this is the unban request
-			if (isset($this->_context) && is_array($this->_context) && count($this->_context) > 0) {
-				// check if we have a hash present
-				$hash = $this->_context[0];
-				if (strlen($hash) == 36) {
-					// Sanatize user inputed values... ALWAYS
-					$hash = General::sanitize($hash);
-					$this->__unban($hash);
-				}
+        } else {
 
-				// redirect not matter what
-				// evil users won't be able to detect anything from the response
-				// they *should* still be blocked since guessing a hash is
-				// practically infeasible
-				redirect(SYMPHONY_URL);
-				die();
+            // not banned ? do not show this page!
+            if (!ABF::instance()->isCurrentlyBanned()) {
+                redirect(SYMPHONY_URL);
+                die();
+            }
 
-			} else {
+            $this->setTitle(sprintf('%1$s &ndash; %2$s', __('Unban via email'), __('Symphony')));
 
-				// not banned ? do not show this page!
-				if (!ABF::instance()->isCurrentlyBanned()) {
-					redirect(SYMPHONY_URL);
-					die();
-				}
+            $this->Form = Widget::Form('', 'post');
+            $this->Form->setAttribute('class', 'frame');
 
-				$this->setTitle(sprintf('%1$s &ndash; %2$s', __('Unban via email'), __('Symphony')));
+            $this->Form->appendChild(new XMLElement('h1', __('Symphony')));
 
-				$this->Form = Widget::Form('', 'post');
-				$this->Form->setAttribute('class', 'frame');
+            $this->__buildFormContent();
 
-				$this->Form->appendChild(new XMLElement('h1', __('Symphony')));
+            $this->Body->appendChild($this->Form);
+        }
+    }
 
-				$this->__buildFormContent();
+    private function __buildFormContent()
+    {
+        $fieldset = new XMLElement('fieldset');
 
-				$this->Body->appendChild($this->Form);
-			}
-		}
+        // email was not send
+        // or first time here (email_sent == NULL)
+        if ($this->_email_sent !== true) {
 
-		private function __buildFormContent() {
-			$fieldset = new XMLElement('fieldset');
+            $fieldset->appendChild(new XMLElement('p', __('Enter your email address to be sent a remote unban link with further instructions.')));
 
-			// email was not send
-			// or first time here (email_sent == NULL)
-			if ($this->_email_sent !== true) {
+            $label = Widget::Label(__('Email Address'));
+            $label->appendChild(Widget::Input('email', $_POST['email'], 'text', array('autofocus','autofocus')));
 
-				$fieldset->appendChild(new XMLElement('p', __('Enter your email address to be sent a remote unban link with further instructions.')));
+        }
 
-				$label = Widget::Label(__('Email Address'));
-				$label->appendChild(Widget::Input('email', $_POST['email'], 'text', array('autofocus','autofocus')));
+        if (isset($this->_email_sent)) {
 
-			}
+            if ($this->_email_sent) {
 
-			if(isset($this->_email_sent)){
+                $div = new XMLElement('div', __('Email sent. Follow the instruction in it.'));
+                $fieldset->appendChild($div);
 
-				if ($this->_email_sent) {
+            } else {
 
-					$div = new XMLElement('div', __('Email sent. Follow the instruction in it.'));
-					$fieldset->appendChild($div);
+                $div = new XMLElement('div', NULL, array('class' => 'invalid'));
+                $div->appendChild($label);
+                $div->appendChild(new XMLElement('p', __('There was a problem locating your account. Please check that you are using the correct email address.')));
+                $fieldset->appendChild($div);
+            }
 
-				} else {
+        } else {
 
-					$div = new XMLElement('div', NULL, array('class' => 'invalid'));
-					$div->appendChild($label);
-					$div->appendChild(new XMLElement('p', __('There was a problem locating your account. Please check that you are using the correct email address.')));
-					$fieldset->appendChild($div);
-				}
+            $fieldset->appendChild($label);
+        }
 
-			} else {
+        $this->Form->appendChild($fieldset);
 
-				$fieldset->appendChild($label);
-			}
+        if ($this->_email_sent !== true) {
+            $div = new XMLElement('div', NULL, array('class' => 'actions'));
+            $div->appendChild(new XMLElement('button', __('Send Email'), array('name' => 'action[send-email]', 'type' => 'submit')));
+            $this->Form->appendChild($div);
+        }
+    }
 
-			$this->Form->appendChild($fieldset);
+    /**
+     *
+     * Overrides the action method
+     */
+    public function action()
+    {
+        // set error flag
+        $this->_email_sent = false;
 
-			if ($this->_email_sent !== true) {
-				$div = new XMLElement('div', NULL, array('class' => 'actions'));
-				$div->appendChild(new XMLElement('button', __('Send Email'), array('name' => 'action[send-email]', 'type' => 'submit')));
-				$this->Form->appendChild($div);
-			}
-		}
+        if (isset($_POST['action']) && is_array($_POST['action'])) {
 
-		/**
-		 *
-		 * Overrides the action method
-		 */
-		public function action(){
+            foreach ($_POST['action'] as $action => $value) {
 
-			// set error flag
-			$this->_email_sent = false;
+                switch ($action) {
+                    case 'send-email':
+                        $this->__sendEmail();
+                        break;
+                }
+            }
+        }
+    }
 
-			if(isset($_POST['action']) && is_array($_POST['action'])){
+    private function __sendEmail()
+    {
+        $emailUnban = ABF::instance()->getConfigVal(ABF::SETTING_AUTO_UNBAN);
+        if ($emailUnban != 'on') {
+            // do nothing
+            $this->_email_sent = null;
 
-				foreach ($_POST['action'] as $action => $value) {
+            return;
+        }
 
-					switch ($action) {
-						case 'send-email':
-							$this->__sendEmail();
-							break;
-					}
-				}
-			}
-		}
+        $author = Symphony::Database()->fetchRow(0, "SELECT `id`, `email`, `first_name` FROM `tbl_authors` WHERE `email` = '".MySQL::cleanValue($_POST['email'])."'");
+        $failure = ABF::instance()->getFailureByIp();
 
-		private function __sendEmail() {
-			$emailUnban = ABF::instance()->getConfigVal(ABF::SETTING_AUTO_UNBAN);
-			if ($emailUnban != 'on') {
-				// do nothing
-				$this->_email_sent = null;
-				return;
-			}
+        $emailSettings = ABF::instance()->getEmailSettings();
 
-			$author = Symphony::Database()->fetchRow(0, "SELECT `id`, `email`, `first_name` FROM `tbl_authors` WHERE `email` = '".MySQL::cleanValue($_POST['email'])."'");
-			$failure = ABF::instance()->getFailureByIp();
-			
-			$emailSettings = ABF::instance()->getEmailSettings();
+        if (is_array($author) && isset($author['email']) &&
+            is_array($failure) && isset($failure[0]) && isset($failure[0]->Hash)) {
+            // safe run
+            try {
+                // use default values
+                $email = Email::create();
 
-			if (is_array($author) && isset($author['email']) &&
-				is_array($failure) && isset($failure[0]) && isset($failure[0]->Hash)) {
-				// safe run
-				try {
-					// use default values
-					$email = Email::create();
-					
-					// if no default values are set
-					if (!is_array($emailSettings) || empty($emailSettings['from_address'])) {
-						$email->setFrom($author['email'], Symphony::Configuration()->get('sitename','general'));
-					}
-					// use default settings, as this should help with SPF and DKIM
-					else { 
-						$email->setFrom($emailSettings['from_address'], $emailSettings['from_name']);
-					}
-					
-					$email->recipients = $author['email'];
-					$email->subject = __('Unban IP link');
-					$email->text_plain =
-							__('Please follow this link to unban your IP: ') .
-							SYMPHONY_URL . ABF::UNBAND_LINK . $failure[0]->Hash . '/' . PHP_EOL .
-							__('If you do not remember your password, follow the "forgot password" link on the login page.') . PHP_EOL .
-							__('The Symphony Team');
+                // if no default values are set
+                if (!is_array($emailSettings) || empty($emailSettings['from_address'])) {
+                    $email->setFrom($author['email'], Symphony::Configuration()->get('sitename','general'));
+                }
+                // use default settings, as this should help with SPF and DKIM
+                else {
+                    $email->setFrom($emailSettings['from_address'], $emailSettings['from_name']);
+                }
 
-					// set error flag
-					$this->_email_sent = $email->validate() && $email->send();
+                $email->setRecipients($author['email']);
+                $email->setSubject(__('Unban IP link'));
+                $email->setTextPlain(
+                    __('Please follow this link to unban your IP: ') .
+                    SYMPHONY_URL . ABF::UNBAND_LINK . $failure[0]->Hash . '/' . PHP_EOL .
+                    __('If you do not remember your password, follow the "forgot password" link on the login page.') . PHP_EOL .
+                    __('The Symphony Team')
+                );
 
-				} catch (Exception $e) {
-					//var_dump($e);
-					
-					// do nothing
-					$this->_email_sent = false;
-				}
-			}
-		}
+                // set error flag
+                $this->_email_sent = $email->validate() && $email->send();
 
-		private function __unban($hash) {
-			ABF::instance()->unregisterFailure($hash);
-		}
-	}
+            } catch (Exception $e) {
+                //var_dump($e);
+
+                // do nothing
+                $this->_email_sent = false;
+            }
+        }
+    }
+
+    private function __unban($hash)
+    {
+        ABF::instance()->unregisterFailure($hash);
+    }
+}
