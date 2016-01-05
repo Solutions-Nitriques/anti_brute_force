@@ -25,6 +25,9 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="2.0" date="2016-01-05" min="2.4" max="2.6.x">
+			- Rename mistyped function (changes the public API)
+		</release>
 		<release version="1.4.8" date="2015-06-25" min="2.4" max="2.6.x">
 			- Fix method signature.
 			- Mark as Symphony 2.6.x compatible.
