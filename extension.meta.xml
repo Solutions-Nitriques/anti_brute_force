@@ -25,7 +25,10 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
-		<release version="2.0" date="2016-01-05" min="2.4" max="2.6.x">
+		<release version="2.0.1" date="2016-03-06" min="2.4" max="2.x.x">
+			- Updated compatibility infos
+		</release>
+		<release version="2.0.0" date="2016-01-05" min="2.4" max="2.6.x">
 			- Rename mistyped function (changes the public API)
 		</release>
 		<release version="1.4.8" date="2015-06-25" min="2.4" max="2.6.x">
