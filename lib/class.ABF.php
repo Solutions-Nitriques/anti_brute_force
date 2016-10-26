@@ -798,6 +798,9 @@ class ABF implements Singleton
             $ret = $this->install_v1_4_5();
         }
         if ($ret) {
+            $ret = $this->install_v2_0_2();
+        }
+        if ($ret) {
             // set default values
             $pseudo_context = array(
                 'settings' => $this->DEFAULTS
@@ -901,6 +904,23 @@ class ABF implements Singleton
         return Symphony::Database()->query($sql);
     }
 
+    private function install_v2_0_2()
+    {
+        $sql = "
+            ALTER TABLE $this->TBL_ABF    CHANGE `IP` `IP` VARCHAR(45) NOT NULL;
+            ALTER TABLE $this->TBL_ABF_WL CHANGE `IP` `IP` VARCHAR(45) NOT NULL;
+            ALTER TABLE $this->TBL_ABF_GL CHANGE `IP` `IP` VARCHAR(45) NOT NULL;
+            ALTER TABLE $this->TBL_ABF_BL CHANGE `IP` `IP` VARCHAR(45) NOT NULL;
+
+            OPTIMIZE TABLE $this->TBL_ABF;
+            OPTIMIZE TABLE $this->TBL_ABF_WL;
+            OPTIMIZE TABLE $this->TBL_ABF_GL;
+            OPTIMIZE TABLE $this->TBL_ABF_BL
+        ";
+
+        return Symphony::Database()->import($sql);
+    }
+
     /**
      *
      * This method will update the extension according to the
@@ -930,6 +950,11 @@ class ABF implements Singleton
         // less than 1.4.5
         if ($ret && version_compare($previousVersion, '1.4.5') == -1) {
             $ret = $this->install_v1_4_5();
+        }
+
+        // less than 2.0.2
+        if ($ret && version_compare($previousVersion, '2.0.2') == -1) {
+            $ret = $this->install_v2_0_2();
         }
 
         return $ret;
