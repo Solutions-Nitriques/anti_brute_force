@@ -131,12 +131,12 @@ class ViewFactory
         $fieldset = new XMLElement('fieldset');
 
         foreach ($options as $key => $o) {
-            $button = new XMLElement('button', __($o));
-            $button->setAttribute('name', "action[$actionkey]");
-            $button->setAttribute('onclick', "document.location='?list=$key'");
+            $button = new XMLElement('a', __($o));
+            $button->setAttribute('class', 'button');
+            $button->setAttribute('href', "?list=$key");
 
             if ($key == $current) {
-                $button->setAttribute('class', 'active selected');
+                $button->setAttribute('class', 'button active selected');
             }
 
             $fieldset->appendChild($button);
