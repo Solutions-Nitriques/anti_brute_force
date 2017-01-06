@@ -25,6 +25,9 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="2.0.3" date="2017-01-06" min="2.4" max="2.x.x">
+			- Fix #38: Removed inline scripts
+		</release>
 		<release version="2.0.2" date="2016-03-06" min="2.4" max="2.x.x">
 			- Fix #36: Database error with IPv6 addresses
 		</release>
