@@ -2,46 +2,31 @@
  * Anti Brute Force
  */
 
-.actions.no-pad {
-	padding-top: 0;
-}
-
-.actions.no-pad button:last-child {
-	margin-right: 0;
-}
-
-.actions button.active {
-	font-weight: bold;
-}
-
-table + fieldset.insert {
-	display: block;
-	margin: 1em 0 1em 1.9rem !important;
-	border-bottom: 1px solid #E4E4DE;
-	padding-bottom: 0;
-}
-
-fieldset.insert legend {
-	margin-left: 1rem;
-}
-
 fieldset.insert label {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+	float: left;
+	margin: 1rem 0 0!important;
+}
+
+fieldset.insert input[type="text"] {
+	margin: 0;
 	width: auto;
-	display: inline-block;
 }
 
-fieldset.insert label .input-ip {
-	width: 150px;
-	margin-top: 0;
-	vertical-align: top;
+fieldset.insert input[type="submit"] {
+	margin: 0 0 0 0.5rem;
 }
 
-fieldset.insert label .input-submit {
-	margin-top: 0;
-	vertical-align: top;
-}
-
-fieldset.insert  .actions{
+fieldset.insert .actions {
 	float: right;
-	padding-top: 0px;
+}
+
+@media (max-width: 766px){
+	fieldset.insert .actions {
+		clear: both;
+		float: left;
+	}
 }

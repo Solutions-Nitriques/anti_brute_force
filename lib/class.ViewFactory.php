@@ -125,13 +125,14 @@ class ViewFactory
      */
     public static function buildSubMenu(Array $options, $current, $actionkey)
     {
-        $tableActions = new XMLElement('div');
+        $tableActions = new XMLElement('ul');
         $tableActions->setAttribute('class', 'actions no-pad');
 
-        $fieldset = new XMLElement('fieldset');
-
         foreach ($options as $key => $o) {
-            $button = new XMLElement('a', __($o));
+            $button = new XMLElement(
+                'a',
+                Widget::SVGIcon('list') . '<span><span>' . __($o) . '</span></span>'
+            );
             $button->setAttribute('class', 'button');
             $button->setAttribute('href', "?list=$key");
 
@@ -139,10 +140,11 @@ class ViewFactory
                 $button->setAttribute('class', 'button active selected');
             }
 
-            $fieldset->appendChild($button);
-        }
+            $li = new XMLElement('li');
+            $li->appendChild($button);
 
-        $tableActions->appendChild($fieldset);
+            $tableActions->appendChild($li);
+        }
 
         return $tableActions;
     }
