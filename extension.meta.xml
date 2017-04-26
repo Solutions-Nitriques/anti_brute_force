@@ -25,6 +25,9 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="4.0.0" date="2017-04-26" min="4.0.0" max="4.x.x">
+			- Update for Symphony 4.x
+		</release>
 		<release version="2.1.3" date="2018-10-01" min="2.4" max="2.x.x">
 			- Purge opcache upon install, since Symphony 2.4+ does not do it
 		</release>
@@ -116,31 +119,31 @@
 			- Added alert when there are banned IPs
 		</release>
 		<release version="1.3" date="2012-11-15" min="2.3">
-			- **Major Security Update:** Make sure the extension warns the user if misconfigured: 
+			- **Major Security Update:** Make sure the extension warns the user if misconfigured:
 			**Do not fail silently.**
 			- UI Update for Symphony 2.3.
 			- Do not display the unband page if current IP is not banned.
 			- Minor security update - make sure we have an email address set and validate before send.
 			- Make the current IP the default value in the input field only for whitelist.
-		</release>  
+		</release>
 		<release version="1.2" date="2012-10-05" min="2.3" max="2.3.0" status="deprecated">
 			- DEPRECATED - Use 1.3: If you still need support for Symphony 2.2.x, use version 1.1
-			- Compatibility update for Symphony 2.3 
-		</release>  
+			- Compatibility update for Symphony 2.3
+		</release>
 		<release version="1.1" date="2011-07-20" min="2.2" max="2.2.5">
-			- Colored list feature added  
-			- Fix issues #5, and #7  
+			- Colored list feature added
+			- Fix issues #5, and #7
 		</release>
 		<release version="1.0.2" date="2011-07-03 " min="2.2" max="2.2.5">
-			- New data base scheme  
-			- New setting group, which was a copy/paste error -- breaks downward compatibility --  
+			- New data base scheme
+			- New setting group, which was a copy/paste error -- breaks downward compatibility --
 			- Fix others errors (not bugs, errors): issue  #3, #4, #6
 		</release>
 		<release version="1.0.1" date="2011-07-02" min="2.2" max="2.2.5">
-			- Fix Issues #1 (typo) and #2 (no more ASDC) 
+			- Fix Issues #1 (typo) and #2 (no more ASDC)
 		</release>
 		<release version="1.0" date="2011-07-01" min="2.2" max="2.2.5">
-			- First release: Block login, Admin content page, ABF Facade/Singleton 
+			- First release: Block login, Admin content page, ABF Facade/Singleton
 		</release>
 	</releases>
 </extension>
