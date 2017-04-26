@@ -24,7 +24,7 @@ fieldset.insert .actions {
 	float: right;
 }
 
-@media (max-width: 766px){
+@media (max-width: 767px){
 	fieldset.insert .actions {
 		clear: both;
 		float: left;
