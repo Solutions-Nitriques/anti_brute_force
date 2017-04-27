@@ -83,6 +83,8 @@ class ViewFactory
                         $td->appendChild($chk);
                     }
 
+                    $td->setAttribute('data-title', $cols[$key]);
+
                     array_push($tds, $td);
                 }
 
