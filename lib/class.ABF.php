@@ -642,7 +642,8 @@ class ABF implements Singleton
         $clientip = $this->getRawClientIP();
 
         // extract the last item from the list
-        $clientip = trim(end(explode(',', $clientip)));
+        $list = explode(',', $clientip);
+        $clientip = trim(end($list));
 
         return $clientip;
     }
