@@ -287,11 +287,11 @@ class ABF implements Singleton
         $useUnbanViaEmail = $this->getConfigVal(ABF::SETTING_AUTO_UNBAN);
         $msg =
             __('Your IP address is currently banned, due to typing too many wrong usernames/passwords.')
-            . '<br/><br/>' .
+            . '<br/>' .
             __('You can ask your administrator to unlock your account or wait %s minutes.', array($length));
 
         if ($useUnbanViaEmail == 'on') {
-            $msg .= ('<br/><br/>' . __('Alternatively, you can <a href="%s">un-ban your IP by email</a>.', array(SYMPHONY_URL . self::UNBAND_LINK)));
+            $msg .= ('<br/>' . __('Alternatively, you can <a href="%s">un-ban your IP by email</a>.', array(SYMPHONY_URL . self::UNBAND_LINK)));
         }
 
         // banned - throw exception
@@ -487,7 +487,7 @@ class ABF implements Singleton
     {
         $msg =
             __('Your IP address is currently <strong>black listed</strong>, due to too many bans.')
-            . '<br/><br/>' .
+            . '<br/>' .
             __('Ask your administrator to unlock your IP.');
 
         // banned - throw exception
