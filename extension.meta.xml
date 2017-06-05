@@ -25,6 +25,9 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="2.0.4" date="2017-06-05" min="2.4" max="2.x.x">
+			- Fix #40: Properly validate IP addresses (v4 and v6)
+		</release>
 		<release version="2.0.3" date="2017-01-06" min="2.4" max="2.x.x">
 			- Fix #38: Removed inline scripts
 		</release>
