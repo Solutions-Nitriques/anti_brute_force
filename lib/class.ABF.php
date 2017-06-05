@@ -620,13 +620,11 @@ class ABF implements Singleton
      */
 
     /**
-     * @return boolean - Really simple validation for IP Addresses
+     * @return boolean - validation for IP addresses
      */
     public function isIPValid($ip)
     {
-        // ip v4 is at least 7 char max 15
-        // hash is 36 char
-        return strlen($ip) > 6 && strlen($ip) < 16;
+        return filter_var($ip, FILTER_VALIDATE_IP);
     }
 
     /**
