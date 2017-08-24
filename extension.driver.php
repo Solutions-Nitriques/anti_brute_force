@@ -287,7 +287,7 @@ class extension_anti_brute_force extends Extension
      * Delegate fired when the extension is updated (when version changes)
      * @param string $previousVersion
      */
-    public function update($previousVersion=false)
+    public function update($previousVersion = false)
     {
         $about = ExtensionManager::about('anti_brute_force');
 

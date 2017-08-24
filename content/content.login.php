@@ -70,7 +70,7 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
         $fieldset = new XMLElement('fieldset');
 
         // email was not send
-        // or first time here (email_sent == NULL)
+        // or first time here (email_sent == null)
         if ($this->_email_sent !== true) {
 
             $fieldset->appendChild(new XMLElement('p', __('Enter your email address to be sent a remote unban link with further instructions.')));
@@ -89,7 +89,7 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
 
             } else {
 
-                $div = new XMLElement('div', NULL, array('class' => 'invalid'));
+                $div = new XMLElement('div', null, array('class' => 'invalid'));
                 $div->appendChild($label);
                 $div->appendChild(new XMLElement('p', __('There was a problem locating your account. Please check that you are using the correct email address.')));
                 $fieldset->appendChild($div);
@@ -103,7 +103,7 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
         $this->Form->appendChild($fieldset);
 
         if ($this->_email_sent !== true) {
-            $div = new XMLElement('div', NULL, array('class' => 'actions'));
+            $div = new XMLElement('div', null, array('class' => 'actions'));
             $div->appendChild(new XMLElement('button', __('Send Email'), array('name' => 'action[send-email]', 'type' => 'submit')));
             $this->Form->appendChild($div);
         }

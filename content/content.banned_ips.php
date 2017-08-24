@@ -61,7 +61,7 @@ class contentExtensionAnti_brute_forceBanned_ips extends AdministrationPage
         // build data table
         $table = Widget::Table(
             Widget::TableHead($aTableHead),
-            NULL,
+            null,
             Widget::TableBody($aTableBody),
             'selectable',
             null,

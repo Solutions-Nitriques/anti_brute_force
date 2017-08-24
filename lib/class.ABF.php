@@ -453,7 +453,7 @@ class ABF implements Singleton
     {
         $ip = $this->getIP($ip);
 
-        return count($this->__getListEntriesByIp($tbl, $ip, NULL, false)) > 0;
+        return count($this->__getListEntriesByIp($tbl, $ip, null, false)) > 0;
     }
 
     public function unregisterToList($color, $ip='')
@@ -506,7 +506,7 @@ class ABF implements Singleton
      * @param string $ip the ip in the select query
      * @param string $additionalWhere @optional additional SQL filters
      */
-    public function getFailureByIp($ip='', $additionalWhere='')
+    public function getFailureByIp($ip = '', $additionalWhere = '')
     {
         $ip = $this->getIP($ip);
         $where = "IP = '$ip'";
@@ -531,7 +531,7 @@ class ABF implements Singleton
      * Method that returns all failures, optionally ordered
      * @param string $orderedBy @optional
      */
-    public function getFailures($orderedBy='')
+    public function getFailures($orderedBy = '')
     {
         $order = '';
         if (strlen($orderedBy) > 0) {
@@ -550,27 +550,27 @@ class ABF implements Singleton
         return $rets;
     }
 
-    public function getBlackListEntriesByIP($ip='', $additionalWhere='')
+    public function getBlackListEntriesByIP($ip = '', $additionalWhere = '')
     {
         return $this->__getListEntriesByIp($this->TBL_ABF_BL, $ip, $additionalWhere);
     }
 
-    public function getGrayListEntriesByIP($ip='', $additionalWhere='')
+    public function getGrayListEntriesByIP($ip = '', $additionalWhere = '')
     {
         return $this->__getListEntriesByIp($this->TBL_ABF_GL, $ip, $additionalWhere);
     }
 
-    public function getWhiteListEntriesByIP($ip='', $additionalWhere='')
+    public function getWhiteListEntriesByIP($ip = '', $additionalWhere = '')
     {
         return $this->__getListEntriesByIp($this->TBL_ABF_WL, $ip, $additionalWhere);
     }
 
-    public function getListEntriesByIP($color, $ip='', $additionalWhere='')
+    public function getListEntriesByIP($color, $ip = '', $additionalWhere = '')
     {
         return $this->__getListEntriesByIp($this->getTableName($color), $ip, $additionalWhere);
     }
 
-    private function __getListEntriesByIp($tbl, $ip='', $additionalWhere='')
+    private function __getListEntriesByIp($tbl, $ip = '', $additionalWhere = '')
     {
         $ip = $this->getIP($ip);
 
@@ -597,7 +597,7 @@ class ABF implements Singleton
         return $this->__getListEntries($this->getTableName($color));
     }
 
-    private function __getListEntries($tbl, $where='', $order='IP ASC')
+    private function __getListEntries($tbl, $where = '', $order = 'IP ASC')
     {
         if (strlen($where) > 0) {
             $where = 'WHERE ' . $where;
@@ -715,7 +715,7 @@ class ABF implements Singleton
     public function getNaviguationGroup()
     {
         return $this->getConfigVal(ABF::SETTING_RESTRICT_ACCESS) == 'on' ?
-            'developer' : NULL;
+            'developer' : null;
     }
 
     /**
@@ -826,8 +826,8 @@ class ABF implements Singleton
         $sql = "
             CREATE TABLE IF NOT EXISTS $this->TBL_ABF(
                 `IP` VARCHAR( 16 ) NOT NULL ,
-                `LastAttempt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-                `FailedCount` INT( 5 ) unsigned NOT NULL DEFAULT  '1',
+                `LastAttempt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+                `FailedCount` INT( 5 ) UNSIGNED NOT NULL DEFAULT  '1',
                 `UA` VARCHAR( 1024 ) NULL,
                 `Username` VARCHAR( 100 ) NULL,
                 `Source` VARCHAR( 100 ) NULL,
@@ -845,8 +845,8 @@ class ABF implements Singleton
         $sql = "
             CREATE TABLE IF NOT EXISTS $this->TBL_ABF_GL (
                 `IP` VARCHAR( 16 ) NOT NULL ,
-                `DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-                `FailedCount` INT( 5 ) unsigned NOT NULL DEFAULT  '1',
+                `DateCreated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+                `FailedCount` INT( 5 ) UNSIGNED NOT NULL DEFAULT  '1',
                 `Source` VARCHAR( 100 ) NULL,
                 PRIMARY KEY (  `IP` )
             ) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
@@ -858,7 +858,7 @@ class ABF implements Singleton
         $sql = "
             CREATE TABLE IF NOT EXISTS $this->TBL_ABF_BL (
                 `IP` VARCHAR( 16 ) NOT NULL ,
-                `DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+                `DateCreated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
                 `Source` VARCHAR( 100 ) NULL,
                 PRIMARY KEY (  `IP` )
             ) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
@@ -870,7 +870,7 @@ class ABF implements Singleton
         $sql = "
             CREATE TABLE IF NOT EXISTS $this->TBL_ABF_WL (
                 `IP` VARCHAR( 16 ) NOT NULL ,
-                `DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+                `DateCreated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
                 `Source` VARCHAR( 100 ) NULL,
                 PRIMARY KEY (  `IP` )
             ) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
