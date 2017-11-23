@@ -25,6 +25,9 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="2.0.5" date="2017-11-23" min="2.4" max="2.x.x">
+			- Fix problem when the email gateway settings is not prefixed with 'email_'
+		</release>
 		<release version="2.0.4" date="2017-06-05" min="2.4" max="2.x.x">
 			- Fix #40: Properly validate IP addresses (v4 and v6)
 		</release>
@@ -111,12 +114,12 @@
 		</release>  
 		<release version="1.1" date="2011-07-20" min="2.2" max="2.2.5">
 			- Colored list feature added  
- 			- Fix issues #5, and #7  
+			- Fix issues #5, and #7  
 		</release>
 		<release version="1.0.2" date="2011-07-03 " min="2.2" max="2.2.5">
 			- New data base scheme  
-  			- New setting group, which was a copy/paste error -- breaks downward compatibility --  
-  			- Fix others errors (not bugs, errors): issue  #3, #4, #6
+			- New setting group, which was a copy/paste error -- breaks downward compatibility --  
+			- Fix others errors (not bugs, errors): issue  #3, #4, #6
 		</release>
 		<release version="1.0.1" date="2011-07-02" min="2.2" max="2.2.5">
 			- Fix Issues #1 (typo) and #2 (no more ASDC) 
