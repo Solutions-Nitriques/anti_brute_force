@@ -700,9 +700,6 @@ class ABF implements Singleton
     {
         $emailGateway = Symphony::Configuration()->get('default_gateway', 'email');
         $emailSettings = Symphony::Configuration()->get('email_'.$emailGateway);
-        if (empty($emailSettings)) {
-            $emailSettings = Symphony::Configuration()->get($emailGateway);
-        }
         return is_array($emailSettings) ? $emailSettings : null;
     }
 
