@@ -172,11 +172,9 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
                 );
 
                 // set error flag
-                $this->_email_sent = $email->validate() && $email->send();
+                $this->_email_sent = $email->send();
 
             } catch (Exception $e) {
-                //var_dump($e);
-
                 // do nothing
                 $this->_email_sent = false;
             }
