@@ -25,6 +25,9 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="2.1.1" date="2018-01-16" min="2.7.1" max="2.x.x">
+			- Sanitize user provided value in form
+		</release>
 		<release version="2.1.0" date="2018-01-15" min="2.7.1" max="2.x.x">
 			- Sanitize Widget's values
 		</release>
