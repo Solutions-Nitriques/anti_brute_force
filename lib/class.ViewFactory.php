@@ -45,7 +45,7 @@ class ViewFactory
                         Widget::TableData(
                             __('None found.'), // text
                             'inactive', // class
-                            NULL, // id
+                            null, // id
                             count($cols)  // span
                         )
                     ),'odd'
@@ -62,7 +62,7 @@ class ViewFactory
                 $datarow = get_object_vars($datarow);
 
                 foreach ($cols as $key => $value) {
-                    $val = $datarow[$key];
+                    $val = General::sanitize($datarow[$key]);
                     $css = 'col';
                     $hasValue = strlen($val) > 0;
 
@@ -77,7 +77,7 @@ class ViewFactory
                     if ($key == 'IP' && $hasValue) {
                         $chk = Widget::Input(
                             "ip[$val]", //name
-                            NULL,
+                            null,
                             'checkbox'
                         );
                         $td->appendChild($chk);
@@ -106,7 +106,7 @@ class ViewFactory
         if ($hasData == true) {
 
             $options = array(
-                array(NULL, false, __('With Selected...')),
+                array(null, false, __('With Selected...')),
                 array('delete', false, __('Delete'), 'confirm'),
             );
 
@@ -171,7 +171,7 @@ class ViewFactory
         $label->setAttribute('class', 'column');
         $input = Widget::Input(
             'settings[' . ABF::SETTING_GROUP . '][' . $settingName .']',
-            (string) $inputText,
+            General::sanitize((string) $inputText),
             $type,
             $inputAttr
         );
