@@ -25,6 +25,9 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="2.1.0" date="2018-01-15" min="2.7.1" max="2.x.x">
+			- Sanitize Widget's values
+		</release>
 		<release version="2.0.6" date="2017-12-29" min="2.4" max="2.x.x">
 			- Revert to 2.0.4 and do not try to fix other extensions
 		</release>
