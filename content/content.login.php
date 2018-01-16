@@ -76,7 +76,7 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
             $fieldset->appendChild(new XMLElement('p', __('Enter your email address to be sent a remote unban link with further instructions.')));
 
             $label = Widget::Label(__('Email Address'));
-            $label->appendChild(Widget::Input('email', $_POST['email'], 'text', array('autofocus','autofocus')));
+            $label->appendChild(Widget::Input('email', General::sanitize($_POST['email']), 'text', array('autofocus','autofocus')));
 
         }
 
