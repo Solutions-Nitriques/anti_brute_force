@@ -25,10 +25,13 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
-		<release version="2.1.1" date="2018-01-16" min="2.7.1" max="2.x.x">
+		<release version="2.1.2" date="2018-01-17" min="2.4" max="2.x.x">
+			- Fix SQL injection in lists
+		</release>
+		<release version="2.1.1" date="2018-01-16" min="2.4" max="2.x.x">
 			- Sanitize user provided value in form
 		</release>
-		<release version="2.1.0" date="2018-01-15" min="2.7.1" max="2.x.x">
+		<release version="2.1.0" date="2018-01-15" min="2.4" max="2.x.x">
 			- Sanitize Widget's values
 		</release>
 		<release version="2.0.6" date="2017-12-29" min="2.4" max="2.x.x">
