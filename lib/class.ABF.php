@@ -384,6 +384,7 @@ class ABF implements Singleton
     private function __registerToList($tbl, $source, $ip='')
     {
         $ip = $this->getIP($ip);
+        $source = MySQL::cleanValue($source);
         $results = $this->__isListed($tbl, $ip);
         $isGray = $tbl == $this->TBL_ABF_GL;
         $ret = false;
