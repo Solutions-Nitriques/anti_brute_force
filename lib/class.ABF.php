@@ -169,12 +169,16 @@ class ABF implements Singleton
     {
         // check if not white listed
         if ($this->_isInstalled) {
-
             if (!$this->isWhiteListed()) {
-
                 // check if blacklisted
                 if ($this->isBlackListed()) {
                     // block access
+                    // Symphony::Database()
+                    //     ->delete($this->TBL_ABF_BL)
+                    //     ->all()
+                    //     ->finalize()
+                    //     ->execute()
+                    //     ->success();
                     $this->throwBlackListedException();
                 }
 
@@ -206,7 +210,7 @@ class ABF implements Singleton
             $length = $this->getConfigVal(ABF::SETTING_LENGTH);
             $failedCount = $this->getConfigVal(ABF::SETTING_FAILED_COUNT);
             $where = array();
-            $where['LastAttempt'] = ['>' => 'unix_timestamp() - ' . (60 * $length)];
+            // $where['LastAttempt'] = ['>' => 'unix_timestamp() - ' . (60 * $length)];
             $where['FailedCount'] = ['>=' => $failedCount];
             $results = $this->getFailureByIp($ip, $where);
 
@@ -225,11 +229,11 @@ class ABF implements Singleton
      */
     public function registerFailure($username, $source, $ip='')
     {
-        $ip = MySQL::cleanValue($this->getIP($ip));
-        $username = MySQL::cleanValue($username);
-        $source = MySQL::cleanValue($source);
-        $ua = MySQL::cleanValue($this->getUA());
-        $rawip = MySQL::cleanValue($this->getRawClientIP());
+        $ip = $this->getIP($ip);
+        $username = $username;
+        $source = $source;
+        $ua = $this->getUA();
+        $rawip = $this->getRawClientIP();
         $results = $this->getFailureByIp($ip);
         $ret = false;
 
@@ -239,15 +243,14 @@ class ABF implements Singleton
                 ->update($this->TBL_ABF)
                 ->set([
                     'RawIP' => $rawip,
-                    'LastAttempt' => 'now()',
-                    'FailedCount' => '$FailedCount' + 1,
+                    // 'LastAttempt' => 'now()',
+                    'FailedCount' => '$FailedCount + 1',
                     'Username' => $username,
                     'UA' => $ua,
                     'Source' => $source,
                     'Hash' => 'UUID()',
                 ])
                 ->where(['IP' => $ip])
-                ->limit(1)
                 ->execute()
                 ->success();
         } else {
@@ -257,7 +260,7 @@ class ABF implements Singleton
                 ->values([
                     'IP' => $ip,
                     'RawIP' => $rawip,
-                    'LastAttempt' => 'now()',
+                    // 'LastAttempt' => 'now()',
                     'Username' => $username,
                     'FailedCount' => 1,
                     'UA' => $ua,
@@ -278,6 +281,12 @@ class ABF implements Singleton
      */
     public function throwBannedException()
     {
+        // Symphony::Database()
+        //     ->delete($this->TBL_ABF)
+        //     ->all()
+        //     ->finalize()
+        //     ->execute()
+        //     ->success();
         $length = $this->getConfigVal(ABF::SETTING_LENGTH);
         $useUnbanViaEmail = $this->getConfigVal(ABF::SETTING_AUTO_UNBAN);
         $msg =
@@ -290,7 +299,7 @@ class ABF implements Singleton
         }
 
         // banned - throw exception
-        throw new SymphonyErrorPage($msg, __('Banned IP address'));
+        throw new SymphonyException($msg, __('Banned IP address'));
     }
 
     /**
@@ -301,11 +310,11 @@ class ABF implements Singleton
      */
     public function unregisterFailure($filter='')
     {
-        $filter = MySQL::cleanValue($this->getIP($filter));
+        $filter = $this->getIP($filter);
 
         return Symphony::Database()
             ->delete($this->TBL_ABF)
-            ->where(['or', [
+            ->where(['or' => [
                 ['IP' => $filter],
                 ['Hash' => $filter],
             ]])
@@ -329,9 +338,8 @@ class ABF implements Singleton
      */
     public function authorLoginFailure($username, $source, $ip='')
     {
-        // do not do anything is ip is white listed
+        // do not do anything if ip is white listed
         if (!$this->isWhiteListed($ip)) {
-
             // register failure in DB
             $this->registerFailure($username, $source, $ip);
 
@@ -355,11 +363,11 @@ class ABF implements Singleton
         if ($this->_isInstalled) {
             $length = $this->getConfigVal(ABF::SETTING_LENGTH);
 
-            return Symphony::Database()
-                ->delete($this->TBL_ABF)
-                ->where(['LastAttempt' => ['<' => 'unix_timestamp() - ' . (60 * $length)]])
-                ->execute()
-                ->success();
+            // return Symphony::Database()
+            //     ->delete($this->TBL_ABF)
+            //     ->where(['LastAttempt' => ['<' => 'unix_timestamp() - ' . (60 * $length)]])
+            //     ->execute()
+            //     ->success();
         }
     }
 
@@ -473,7 +481,7 @@ class ABF implements Singleton
 
     private function __unregisterToList($tbl, $ip='')
     {
-        $filter = MySQL::cleanValue($this->getIP($ip));
+        $filter = $this->getIP($ip);
 
         return Symphony::Database()
             ->delete($tbl)
@@ -487,11 +495,11 @@ class ABF implements Singleton
         // in days
         $length = $this->getConfigVal(ABF::SETTING_GL_DURATION);
 
-        return Symphony::Database()
-            ->delete($this->TBL_ABF_GL)
-            ->where(['DateCreated' => ['<' => 'unix_timestamp() - ' . (60 * 60 * 24 * $length)]])
-            ->execute()
-            ->success();
+        // return Symphony::Database()
+        //     ->delete($this->TBL_ABF_GL)
+        //     ->where(['DateCreated' => ['<' => 'unix_timestamp() - ' . (60 * 60 * 24 * $length)]])
+        //     ->execute()
+        //     ->success();
     }
 
     /**
@@ -509,7 +517,7 @@ class ABF implements Singleton
             __('Ask your administrator to unlock your IP.');
 
         // banned - throw exception
-        throw new SymphonyErrorPage($msg, __('Black listed IP address'));
+        throw new SymphonyException($msg, __('Black listed IP address'));
     }
 
 

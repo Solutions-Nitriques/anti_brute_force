@@ -28,7 +28,7 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
     public function view()
     {
         // if this is the unban request
-        if (isset($this->_context) && is_array($this->_context) && count($this->_context) > 0) {
+        if (isset($this->_context) && is_array($this->_context) && count($this->_context) > 0 && $this->_context[0] !== null) {
             // check if we have a hash present
             $hash = $this->_context[0];
             if (strlen($hash) == 36) {
@@ -141,13 +141,18 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
             return;
         }
 
-        $author = Symphony::Database()->fetchRow(0, "SELECT `id`, `email`, `first_name` FROM `tbl_authors` WHERE `email` = '".MySQL::cleanValue($_POST['email'])."'");
+        $author = Symphony::Database()
+            ->select(['id', 'email', 'first_name'])
+            ->from('tbl_authors')
+            ->where(['email' => $_POST['email']])
+            ->execute()
+            ->rows()[0];
         $failure = ABF::instance()->getFailureByIp();
 
         $emailSettings = ABF::instance()->getEmailSettings();
 
         if (is_array($author) && isset($author['email']) &&
-            is_array($failure) && isset($failure[0]) && isset($failure[0]->Hash)) {
+            is_array($failure) && isset($failure[0]) && isset($failure[0]['Hash'])) {
             // safe run
             try {
                 // use default values
@@ -166,7 +171,7 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
                 $email->setSubject(__('Unban IP link'));
                 $email->setTextPlain(
                     __('Please follow this link to unban your IP: ') .
-                    SYMPHONY_URL . ABF::UNBAND_LINK . $failure[0]->Hash . '/' . PHP_EOL .
+                    SYMPHONY_URL . ABF::UNBAND_LINK . $failure[0]['Hash'] . '/' . PHP_EOL .
                     __('If you do not remember your password, follow the "forgot password" link on the login page.') . PHP_EOL .
                     __('The Symphony Team')
                 );
