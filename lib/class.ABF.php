@@ -254,7 +254,7 @@ class ABF implements Singleton
                 ->update($this->TBL_ABF)
                 ->set([
                     'RawIP' => $rawip,
-                    'LastAttempt' => 'NOW()',
+                    'LastAttempt' => 'now()',
                     'FailedCount' => '$FailedCount' + 1,
                     'Username' => $username,
                     'UA' => $ua,
@@ -293,7 +293,7 @@ class ABF implements Singleton
                 ->values([
                     'IP' => $ip,
                     'RawIP' => $rawip,
-                    'LastAttempt' => 'NOW()',
+                    'LastAttempt' => 'now()',
                     'Username' => $username,
                     'FailedCount' => 1,
                     'UA' => $ua,
@@ -450,7 +450,6 @@ class ABF implements Singleton
                 ->insert($tbl)
                 ->values([
                     'IP' => $ip,
-                    'DateCreated' => 'NOW()',
                     'Source' => $source,
                 ])
                 ->execute()
@@ -486,7 +485,6 @@ class ABF implements Singleton
                 'FailedCount' => '$FailedCount + 1',
             ])
             ->where(['IP' => $ip])
-            ->limit(1)
             ->execute()
             ->success();
     }
