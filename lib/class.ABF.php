@@ -205,9 +205,13 @@ class ABF implements Singleton
         if ($this->_isInstalled) {
             $length = $this->getConfigVal(ABF::SETTING_LENGTH);
             $failedCount = $this->getConfigVal(ABF::SETTING_FAILED_COUNT);
-            $results = $this->getFailureByIp($ip, "
-                AND UNIX_TIMESTAMP(LastAttempt) + (60 * $length) > UNIX_TIMESTAMP()
-                AND FailedCount >= $failedCount");
+            $where = array();
+            $where['LastAttempt'] = ['>' => 'unix_timestamp() - ' . (60 * $length)];
+            $where['FailedCount'] = ['>=' => $failedCount];
+            // $results = $this->getFailureByIp($ip, "
+            //     AND UNIX_TIMESTAMP(LastAttempt) + (60 * $length) > UNIX_TIMESTAMP()
+            //     AND FailedCount >= $failedCount");
+            $results = $this->getFailureByIp($ip, $where);
 
             return count($results) > 0;
         }
@@ -250,12 +254,12 @@ class ABF implements Singleton
                 ->update($this->TBL_ABF)
                 ->set([
                     'RawIP' => $rawip,
-                    'LastAttempt' => NOW(),
+                    'LastAttempt' => 'NOW()',
                     'FailedCount' => '$FailedCount' + 1,
                     'Username' => $username,
                     'UA' => $ua,
                     'Source' => $source,
-                    'Hash' => UUID(),
+                    'Hash' => 'UUID()',
                 ])
                 ->where(['IP' => $ip])
                 ->limit(1)
@@ -289,12 +293,12 @@ class ABF implements Singleton
                 ->values([
                     'IP' => $ip,
                     'RawIP' => $rawip,
-                    'LastAttempt' => NOW(),
+                    'LastAttempt' => 'NOW()',
                     'Username' => $username,
                     'FailedCount' => 1,
                     'UA' => $ua,
                     'Source' => $source,
-                    'Hash' => UUID(),
+                    'Hash' => 'UUID()',
                 ])
                 ->execute()
                 ->success();
@@ -424,7 +428,7 @@ class ABF implements Singleton
     private function __registerToList($tbl, $source, $ip='')
     {
         $ip = $this->getIP($ip);
-        $source = MySQL::cleanValue($source);
+        $source = $source;
         $results = $this->__isListed($tbl, $ip);
         $isGray = $tbl == $this->TBL_ABF_GL;
         $ret = false;
@@ -446,7 +450,7 @@ class ABF implements Singleton
                 ->insert($tbl)
                 ->values([
                     'IP' => $ip,
-                    'DateCreated' => NOW(),
+                    'DateCreated' => 'NOW()',
                     'Source' => $source,
                 ])
                 ->execute()
@@ -511,7 +515,9 @@ class ABF implements Singleton
     {
         $ip = $this->getIP($ip);
 
-        return count($this->__getListEntriesByIp($tbl, $ip, null, false)) > 0;
+        // var_dump('est');
+
+        return count($this->__getListEntriesByIp($tbl, $ip)) > 0;
     }
 
     public function unregisterToList($color, $ip='')
@@ -590,8 +596,8 @@ class ABF implements Singleton
             ->from($this->TBL_ABF)
             ->where(['IP' => $ip]);
 
-        if (count($additionalWhere) > 0) {
-            $q->where($additionalWhere);
+        foreach ($additionalWhere as $key => $value) {
+            $q->where([$key => $value]);
         }
 
         // $rets = array();
@@ -687,14 +693,14 @@ class ABF implements Singleton
             ->from($tbl)
             ->where(['IP' => $ip]);
 
-        if (count($additionalWhere) > 0) {
-            $q->where($additionalWhere);
+        foreach ($additionalWhere as $key => $value) {
+            $q->where([$key => $value]);
         }
 
         $rets = $q
             ->limit(1)
             ->execute()
-            ->success();
+            ->rows();
 
         return $rets;
     }
@@ -729,7 +735,7 @@ class ABF implements Singleton
         $rets = $q
             ->orderBy($order, $orderOP)
             ->execute()
-            ->success();
+            ->rows();
 
         return $rets;
     }
