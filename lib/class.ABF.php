@@ -210,7 +210,7 @@ class ABF implements Singleton
             $length = $this->getConfigVal(ABF::SETTING_LENGTH);
             $failedCount = $this->getConfigVal(ABF::SETTING_FAILED_COUNT);
             $where = array();
-            // $where['LastAttempt'] = ['>' => 'unix_timestamp() - ' . (60 * $length)];
+            $where['LastAttempt'] = ['>' => time() - (60 * $length)];
             $where['FailedCount'] = ['>=' => $failedCount];
             $results = $this->getFailureByIp($ip, $where);
 
@@ -243,7 +243,6 @@ class ABF implements Singleton
                 ->update($this->TBL_ABF)
                 ->set([
                     'RawIP' => $rawip,
-                    // 'LastAttempt' => 'now()',
                     'FailedCount' => '$FailedCount + 1',
                     'Username' => $username,
                     'UA' => $ua,
@@ -260,7 +259,6 @@ class ABF implements Singleton
                 ->values([
                     'IP' => $ip,
                     'RawIP' => $rawip,
-                    // 'LastAttempt' => 'now()',
                     'Username' => $username,
                     'FailedCount' => 1,
                     'UA' => $ua,
@@ -281,12 +279,6 @@ class ABF implements Singleton
      */
     public function throwBannedException()
     {
-        // Symphony::Database()
-        //     ->delete($this->TBL_ABF)
-        //     ->all()
-        //     ->finalize()
-        //     ->execute()
-        //     ->success();
         $length = $this->getConfigVal(ABF::SETTING_LENGTH);
         $useUnbanViaEmail = $this->getConfigVal(ABF::SETTING_AUTO_UNBAN);
         $msg =
@@ -363,11 +355,11 @@ class ABF implements Singleton
         if ($this->_isInstalled) {
             $length = $this->getConfigVal(ABF::SETTING_LENGTH);
 
-            // return Symphony::Database()
-            //     ->delete($this->TBL_ABF)
-            //     ->where(['LastAttempt' => ['<' => 'unix_timestamp() - ' . (60 * $length)]])
-            //     ->execute()
-            //     ->success();
+            return Symphony::Database()
+                ->delete($this->TBL_ABF)
+                ->where(['LastAttempt' => ['<' => time() - (60 * $length)]])
+                ->execute()
+                ->success();
         }
     }
 
@@ -495,11 +487,11 @@ class ABF implements Singleton
         // in days
         $length = $this->getConfigVal(ABF::SETTING_GL_DURATION);
 
-        // return Symphony::Database()
-        //     ->delete($this->TBL_ABF_GL)
-        //     ->where(['DateCreated' => ['<' => 'unix_timestamp() - ' . (60 * 60 * 24 * $length)]])
-        //     ->execute()
-        //     ->success();
+        return Symphony::Database()
+            ->delete($this->TBL_ABF_GL)
+            ->where(['DateCreated' => ['<' => time() - (60 * 60 * 24 * $length)]])
+            ->execute()
+            ->success();
     }
 
     /**
