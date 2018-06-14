@@ -59,8 +59,6 @@ class ViewFactory
 
                 $tds = array();
 
-                // $datarow = get_object_vars($datarow);
-
                 foreach ($cols as $key => $value) {
                     $val = General::sanitize($datarow[$key]);
                     $css = 'col';
