@@ -289,9 +289,7 @@ class extension_anti_brute_force extends Extension
      */
     public function update($previousVersion = false)
     {
-        $about = ExtensionManager::about('anti_brute_force');
-
-        return ABF::instance()->update($previousVersion,$about['version']);
+        return ABF::instance()->update($previousVersion);
     }
 
     /**

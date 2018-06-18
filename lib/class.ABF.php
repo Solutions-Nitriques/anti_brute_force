@@ -1021,9 +1021,8 @@ class ABF implements Singleton
      * This method will update the extension according to the
      * previous and current version parameters.
      * @param string $previousVersion
-     * @param string $currentVersion
      */
-    public function update($previousVersion, $currentVersion)
+    public function update($previousVersion)
     {
         $ret = true;
 
