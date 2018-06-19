@@ -146,7 +146,7 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
             ->from('tbl_authors')
             ->where(['email' => $_POST['email']])
             ->execute()
-            ->rows()[0];
+            ->next();
         $failure = ABF::instance()->getFailureByIp();
 
         $emailSettings = ABF::instance()->getEmailSettings();
