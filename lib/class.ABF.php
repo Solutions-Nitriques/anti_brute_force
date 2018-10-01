@@ -810,6 +810,11 @@ class ABF implements Singleton
             $this->_settings = empty($this->_settings) ? $this->DEFAULTS : $this->_settings;
 
             $ext_driver->save($pseudo_context);
+
+            // purge op cache to prevent errors
+            if (function_exists('opcache_invalidate')) {
+                @opcache_invalidate(CONFIG, true);
+            }
         }
 
         return $ret;
