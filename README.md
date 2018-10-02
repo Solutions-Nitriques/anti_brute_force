@@ -1,7 +1,5 @@
 # Anti Brute Force #
 
-Version: 2.0.x
-
 > Secure your Symphony backend against brute force and dictionary attacks
 
 Prevents ***people and softwares*** to brute force your authors/developers accounts.
