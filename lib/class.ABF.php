@@ -833,8 +833,6 @@ class ABF implements Singleton
         return Symphony::Database()
             ->create($this->TBL_ABF)
             ->ifNotExists()
-            ->charset('utf8')
-            ->collate('utf8_unicode_ci')
             ->fields([
                 'IP' => 'varchar(16)',
                 'LastAttempt' => 'timestamp',
@@ -869,8 +867,6 @@ class ABF implements Singleton
         $retGL = Symphony::Database()
             ->create($this->TBL_ABF_GL)
             ->ifNotExists()
-            ->charset('utf8')
-            ->collate('utf8_unicode_ci')
             ->fields([
                 'IP' => 'varchar(16)',
                 'DateCreated' => 'timestamp',
@@ -893,8 +889,6 @@ class ABF implements Singleton
         $retBL = Symphony::Database()
             ->create($this->TBL_ABF_BL)
             ->ifNotExists()
-            ->charset('utf8')
-            ->collate('utf8_unicode_ci')
             ->fields([
                 'IP' => 'varchar(16)',
                 'DateCreated' => 'timestamp',
@@ -913,8 +907,6 @@ class ABF implements Singleton
         $retWL = Symphony::Database()
             ->create($this->TBL_ABF_WL)
             ->ifNotExists()
-            ->charset('utf8')
-            ->collate('utf8_unicode_ci')
             ->fields([
                 'IP' => 'varchar(16)',
                 'DateCreated' => 'timestamp',
