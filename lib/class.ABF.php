@@ -385,12 +385,11 @@ class ABF implements Singleton
     {
         $ip = $this->getIP($ip);
         $source = MySQL::cleanValue($source);
-        $results = $this->__isListed($tbl, $ip);
         $isGray = $tbl == $this->TBL_ABF_GL;
         $ret = false;
 
         // do not re-register existing entries
-        if ($results != null && count($results) > 0) {
+        if ($this->__isListed($tbl, $ip)) {
             if ($isGray) {
                 $ret = $this->incrementGrayList($ip);
             }
