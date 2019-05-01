@@ -211,11 +211,10 @@ class ABF implements Singleton
         if ($this->_isInstalled) {
             $length = $this->getConfigVal(ABF::SETTING_LENGTH);
             $failedCount = $this->getConfigVal(ABF::SETTING_FAILED_COUNT);
-            $lastAttempt = date(ABF::DATE_FORMAT, time() - (60 * $length));
-            $where = [
-                'LastAttempt' => ['>' => $lastAttempt],
-                'FailedCount' => ['>=' => $failedCount],
-            ];
+            $where = array();
+            $where['LastAttempt'] = ['>' => time() - (60 * $length)];
+            $where['LastAttempt'] = ['>' => DateTimeObj::get('Y-m-d H:i:s', time() - (60 * $length))];
+            $where['FailedCount'] = ['>=' => $failedCount];
             $results = $this->getFailureByIp($ip, $where);
 
             return count($results) > 0;
@@ -358,11 +357,10 @@ class ABF implements Singleton
         // in minutes
         if ($this->_isInstalled) {
             $length = $this->getConfigVal(ABF::SETTING_LENGTH);
-            $lastAttempt = date(ABF::DATE_FORMAT, time() - (60 * $length));
 
             return Symphony::Database()
                 ->delete($this->TBL_ABF)
-                ->where(['LastAttempt' => ['<' => $lastAttempt]])
+                ->where(['LastAttempt' => ['<' => DateTimeObj::get('Y-m-d H:i:s', time() - (60 * $length))]])
                 ->execute()
                 ->success();
         }
@@ -491,11 +489,10 @@ class ABF implements Singleton
     {
         // in days
         $length = $this->getConfigVal(ABF::SETTING_GL_DURATION);
-        $dateCreated = date(ABF::DATE_FORMAT, time() - (60 * 60 * 24 * $length));
 
         return Symphony::Database()
             ->delete($this->TBL_ABF_GL)
-            ->where(['DateCreated' => ['<' => $dateCreated]])
+            ->where(['DateCreated' => ['<' => DateTimeObj::get('Y-m-d H:i:s', time() - (60 * 60 * 24 * $length))]])
             ->execute()
             ->success();
     }
