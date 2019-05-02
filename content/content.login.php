@@ -28,7 +28,7 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
     public function view()
     {
         // if this is the unban request
-        if (isset($this->_context) && is_array($this->_context) && count($this->_context) > 0) {
+        if (isset($this->_context) && is_array($this->_context) && count($this->_context) > 0 && $this->_context[0] !== null) {
             // check if we have a hash present
             $hash = $this->_context[0];
             if (strlen($hash) == 36) {
@@ -70,7 +70,7 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
         $fieldset = new XMLElement('fieldset');
 
         // email was not send
-        // or first time here (email_sent == NULL)
+        // or first time here (email_sent == null)
         if ($this->_email_sent !== true) {
 
             $fieldset->appendChild(new XMLElement('p', __('Enter your email address to be sent a remote unban link with further instructions.')));
@@ -89,7 +89,7 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
 
             } else {
 
-                $div = new XMLElement('div', NULL, array('class' => 'invalid'));
+                $div = new XMLElement('div', null, array('class' => 'invalid'));
                 $div->appendChild($label);
                 $div->appendChild(new XMLElement('p', __('There was a problem locating your account. Please check that you are using the correct email address.')));
                 $fieldset->appendChild($div);
@@ -103,7 +103,7 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
         $this->Form->appendChild($fieldset);
 
         if ($this->_email_sent !== true) {
-            $div = new XMLElement('div', NULL, array('class' => 'actions'));
+            $div = new XMLElement('div', null, array('class' => 'actions'));
             $div->appendChild(new XMLElement('button', __('Send Email'), array('name' => 'action[send-email]', 'type' => 'submit')));
             $this->Form->appendChild($div);
         }
@@ -141,13 +141,18 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
             return;
         }
 
-        $author = Symphony::Database()->fetchRow(0, "SELECT `id`, `email`, `first_name` FROM `tbl_authors` WHERE `email` = '".MySQL::cleanValue($_POST['email'])."'");
+        $author = Symphony::Database()
+            ->select(['id', 'email', 'first_name'])
+            ->from('tbl_authors')
+            ->where(['email' => $_POST['email']])
+            ->execute()
+            ->next();
         $failure = ABF::instance()->getFailureByIp();
 
         $emailSettings = ABF::instance()->getEmailSettings();
 
         if (is_array($author) && isset($author['email']) &&
-            is_array($failure) && isset($failure[0]) && isset($failure[0]->Hash)) {
+            is_array($failure) && isset($failure[0]) && isset($failure[0]['Hash'])) {
             // safe run
             try {
                 // use default values
@@ -166,7 +171,7 @@ class contentExtensionAnti_brute_forceLogin extends contentLogin
                 $email->setSubject(__('Unban IP link'));
                 $email->setTextPlain(
                     __('Please follow this link to unban your IP: ') .
-                    SYMPHONY_URL . ABF::UNBAND_LINK . $failure[0]->Hash . '/' . PHP_EOL .
+                    SYMPHONY_URL . ABF::UNBAND_LINK . $failure[0]['Hash'] . '/' . PHP_EOL .
                     __('If you do not remember your password, follow the "forgot password" link on the login page.') . PHP_EOL .
                     __('The Symphony Team')
                 );

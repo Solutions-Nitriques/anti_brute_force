@@ -116,6 +116,8 @@ class ABF implements Singleton
      */
     const UNBAND_LINK =  '/extension/anti_brute_force/login/';
 
+    const DATE_FORMAT = 'Y-m-d H:i:s';
+
     /**
      * Singleton implementation
      */
@@ -143,9 +145,8 @@ class ABF implements Singleton
         unset($s);
 
         // now an array
-        $validStatuses = EXTENSION_ENABLED;
-        $about = ExtensionManager::about('anti_brute_force');
-        $status = ExtensionManager::fetchStatus($about);
+        $validStatuses = Extension::EXTENSION_ENABLED;
+        $status = Symphony::ExtensionManager()->fetchStatus(array('handle' => 'anti_brute_force'));
         $this->_isInstalled = in_array($validStatuses, $status);
 
         // only if already installed
@@ -170,12 +171,16 @@ class ABF implements Singleton
     {
         // check if not white listed
         if ($this->_isInstalled) {
-
             if (!$this->isWhiteListed()) {
-
                 // check if blacklisted
                 if ($this->isBlackListed()) {
                     // block access
+                    // Symphony::Database()
+                    //     ->delete($this->TBL_ABF_BL)
+                    //     ->all()
+                    //     ->finalize()
+                    //     ->execute()
+                    //     ->success();
                     $this->throwBlackListedException();
                 }
 
@@ -206,9 +211,11 @@ class ABF implements Singleton
         if ($this->_isInstalled) {
             $length = $this->getConfigVal(ABF::SETTING_LENGTH);
             $failedCount = $this->getConfigVal(ABF::SETTING_FAILED_COUNT);
-            $results = $this->getFailureByIp($ip, "
-                AND UNIX_TIMESTAMP(LastAttempt) + (60 * $length) > UNIX_TIMESTAMP()
-                AND FailedCount >= $failedCount");
+            $where = array();
+            $where['LastAttempt'] = ['>' => time() - (60 * $length)];
+            $where['LastAttempt'] = ['>' => DateTimeObj::get('Y-m-d H:i:s', time() - (60 * $length))];
+            $where['FailedCount'] = ['>=' => $failedCount];
+            $results = $this->getFailureByIp($ip, $where);
 
             return count($results) > 0;
         }
@@ -225,52 +232,44 @@ class ABF implements Singleton
      */
     public function registerFailure($username, $source, $ip='')
     {
-        $ip = MySQL::cleanValue($this->getIP($ip));
-        $username = MySQL::cleanValue($username);
-        $source = MySQL::cleanValue($source);
-        $ua = MySQL::cleanValue($this->getUA());
-        $rawip = MySQL::cleanValue($this->getRawClientIP());
+        $ip = $this->getIP($ip);
+        $username = $username;
+        $source = $source;
+        $ua = $this->getUA();
+        $rawip = $this->getRawClientIP();
         $results = $this->getFailureByIp($ip);
         $ret = false;
 
         if ($results != null && count($results) > 0) {
             // UPDATE
-            $ret = Symphony::Database()->query("
-                UPDATE $this->TBL_ABF
-                    SET `RawIP` = '$rawip',
-                        `LastAttempt` = NOW(),
-                        `FailedCount` = `FailedCount` + 1,
-                        `Username` = '$username',
-                        `UA` = '$ua',
-                        `Source` = '$source',
-                        `Hash` = UUID()
-                    WHERE IP = '$ip'
-                    LIMIT 1
-            ");
-
+            $ret = Symphony::Database()
+                ->update($this->TBL_ABF)
+                ->set([
+                    'RawIP' => $rawip,
+                    'FailedCount' => '$FailedCount + 1',
+                    'Username' => $username,
+                    'UA' => $ua,
+                    'Source' => $source,
+                    'Hash' => 'UUID()',
+                ])
+                ->where(['IP' => $ip])
+                ->execute()
+                ->success();
         } else {
             // INSERT
-            $ret = Symphony::Database()->query("
-                INSERT INTO $this->TBL_ABF (
-                    `IP`,
-                    `RawIP`,
-                    `LastAttempt`,
-                    `Username`,
-                    `FailedCount`,
-                    `UA`,
-                    `Source`,
-                    `Hash`
-                ) VALUES (
-                    '$ip',
-                    '$rawip',
-                    NOW(),
-                    '$username',
-                    1,
-                    '$ua',
-                    '$source',
-                    UUID()
-                )
-            ");
+            $ret = Symphony::Database()
+                ->insert($this->TBL_ABF)
+                ->values([
+                    'IP' => $ip,
+                    'RawIP' => $rawip,
+                    'Username' => $username,
+                    'FailedCount' => 1,
+                    'UA' => $ua,
+                    'Source' => $source,
+                    'Hash' => 'UUID()',
+                ])
+                ->execute()
+                ->success();
         }
 
         return $ret;
@@ -287,15 +286,15 @@ class ABF implements Singleton
         $useUnbanViaEmail = $this->getConfigVal(ABF::SETTING_AUTO_UNBAN);
         $msg =
             __('Your IP address is currently banned, due to typing too many wrong usernames/passwords.')
-            . '<br/><br/>' .
+            . '<br/>' .
             __('You can ask your administrator to unlock your account or wait %s minutes.', array($length));
 
         if ($useUnbanViaEmail == 'on') {
-            $msg .= ('<br/><br/>' . __('Alternatively, you can <a href="%s">un-ban your IP by email</a>.', array(SYMPHONY_URL . self::UNBAND_LINK)));
+            $msg .= ('<br/>' . __('Alternatively, you can <a href="%s">un-ban your IP by email</a>.', array(SYMPHONY_URL . self::UNBAND_LINK)));
         }
 
         // banned - throw exception
-        throw new SymphonyErrorPage($msg, __('Banned IP address'));
+        throw new SymphonyException($msg, __('Banned IP address'));
     }
 
     /**
@@ -306,9 +305,16 @@ class ABF implements Singleton
      */
     public function unregisterFailure($filter='')
     {
-        $filter = MySQL::cleanValue($this->getIP($filter));
+        $filter = $this->getIP($filter);
 
-        return Symphony::Database()->delete($this->TBL_ABF, "IP = '$filter' OR Hash = '$filter'");
+        return Symphony::Database()
+            ->delete($this->TBL_ABF)
+            ->where(['or' => [
+                ['IP' => $filter],
+                ['Hash' => $filter],
+            ]])
+            ->execute()
+            ->success();
     }
 
     /**
@@ -327,9 +333,8 @@ class ABF implements Singleton
      */
     public function authorLoginFailure($username, $source, $ip='')
     {
-        // do not do anything is ip is white listed
+        // do not do anything if ip is white listed
         if (!$this->isWhiteListed($ip)) {
-
             // register failure in DB
             $this->registerFailure($username, $source, $ip);
 
@@ -353,7 +358,11 @@ class ABF implements Singleton
         if ($this->_isInstalled) {
             $length = $this->getConfigVal(ABF::SETTING_LENGTH);
 
-            return Symphony::Database()->delete($this->TBL_ABF, "UNIX_TIMESTAMP(LastAttempt) + (60 * $length) < UNIX_TIMESTAMP()");
+            return Symphony::Database()
+                ->delete($this->TBL_ABF)
+                ->where(['LastAttempt' => ['<' => DateTimeObj::get('Y-m-d H:i:s', time() - (60 * $length))]])
+                ->execute()
+                ->success();
         }
     }
 
@@ -384,7 +393,7 @@ class ABF implements Singleton
     private function __registerToList($tbl, $source, $ip='')
     {
         $ip = $this->getIP($ip);
-        $source = MySQL::cleanValue($source);
+        $source = $source;
         $results = $this->__isListed($tbl, $ip);
         $isGray = $tbl == $this->TBL_ABF_GL;
         $ret = false;
@@ -396,12 +405,14 @@ class ABF implements Singleton
             }
         } else {
             // INSERT -- gray list will get the default values for others columns
-            $ret = Symphony::Database()->query("
-                INSERT INTO $tbl
-                    (`IP`, `DateCreated`, `Source`)
-                    VALUES
-                    ('$ip', NOW(),        '$source')
-            ");
+            $ret = Symphony::Database()
+                ->insert($tbl)
+                ->values([
+                    'IP' => $ip,
+                    'Source' => $source,
+                ])
+                ->execute()
+                ->success();
         }
 
         return $ret;
@@ -419,14 +430,14 @@ class ABF implements Singleton
 
     private function incrementGrayList($ip)
     {
-        $tbl = $this->TBL_ABF_GL;
-        // UPDATE -- only Gray list
-        return Symphony::Database()->query("
-            UPDATE $tbl
-                SET `FailedCount` = `FailedCount` + 1
-                WHERE IP = '$ip'
-                LIMIT 1
-        ");
+        return Symphony::Database()
+            ->update($this->TBL_ABF_GL)
+            ->set([
+                'FailedCount' => '$FailedCount + 1',
+            ])
+            ->where(['IP' => $ip])
+            ->execute()
+            ->success();
     }
 
     public function isBlackListed($ip='')
@@ -453,7 +464,9 @@ class ABF implements Singleton
     {
         $ip = $this->getIP($ip);
 
-        return count($this->__getListEntriesByIp($tbl, $ip, NULL, false)) > 0;
+        // var_dump('est');
+
+        return count($this->__getListEntriesByIp($tbl, $ip)) > 0;
     }
 
     public function unregisterToList($color, $ip='')
@@ -463,9 +476,13 @@ class ABF implements Singleton
 
     private function __unregisterToList($tbl, $ip='')
     {
-        $filter = MySQL::cleanValue($this->getIP($ip));
+        $filter = $this->getIP($ip);
 
-        return Symphony::Database()->delete($tbl, "IP = '$filter'");
+        return Symphony::Database()
+            ->delete($tbl)
+            ->where(['IP' => $filter])
+            ->execute()
+            ->success();
     }
 
     public function removeExpiredListEntries()
@@ -473,7 +490,11 @@ class ABF implements Singleton
         // in days
         $length = $this->getConfigVal(ABF::SETTING_GL_DURATION);
 
-        return Symphony::Database()->delete($this->TBL_ABF_GL, "UNIX_TIMESTAMP(DateCreated) + (60 * 60 * 24 * $length) < UNIX_TIMESTAMP()");
+        return Symphony::Database()
+            ->delete($this->TBL_ABF_GL)
+            ->where(['DateCreated' => ['<' => DateTimeObj::get('Y-m-d H:i:s', time() - (60 * 60 * 24 * $length))]])
+            ->execute()
+            ->success();
     }
 
     /**
@@ -487,11 +508,11 @@ class ABF implements Singleton
     {
         $msg =
             __('Your IP address is currently <strong>black listed</strong>, due to too many bans.')
-            . '<br/><br/>' .
+            . '<br/>' .
             __('Ask your administrator to unlock your IP.');
 
         // banned - throw exception
-        throw new SymphonyErrorPage($msg, __('Black listed IP address'));
+        throw new SymphonyException($msg, __('Black listed IP address'));
     }
 
 
@@ -506,90 +527,81 @@ class ABF implements Singleton
      * @param string $ip the ip in the select query
      * @param string $additionalWhere @optional additional SQL filters
      */
-    public function getFailureByIp($ip='', $additionalWhere='')
+    public function getFailureByIp($ip = '', $additionalWhere = array())
     {
         $ip = $this->getIP($ip);
-        $where = "IP = '$ip'";
-        if (strlen($additionalWhere) > 0) {
-            $where .= $additionalWhere;
-        }
-        $sql ="
-            SELECT * FROM $this->TBL_ABF WHERE $where LIMIT 1
-        " ;
+        $q = Symphony::Database()
+            ->select(['*'])
+            ->from($this->TBL_ABF)
+            ->where(['IP' => $ip]);
 
-        $rets = array();
-
-        if (Symphony::Database()->query($sql)) {
-            $rets = Symphony::Database()->fetch();
+        foreach ($additionalWhere as $key => $value) {
+            $q->where([$key => $value]);
         }
 
-        return $rets;
+        return $q
+            ->limit(1)
+            ->execute()
+            ->rows();
     }
 
     /**
      *
      * Method that returns all failures, optionally ordered
-     * @param string $orderedBy @optional
+     * @param string $order @optional
+     * @param string $orderOP @optional
      */
-    public function getFailures($orderedBy='')
+    public function getFailures($order = '', $orderOP = 'ASC')
     {
-        $order = '';
-        if (strlen($orderedBy) > 0) {
-            $order .= (' ORDER BY ' . $orderedBy);
-        }
-        $sql ="
-            SELECT * FROM $this->TBL_ABF $order
-        " ;
+        $q = Symphony::Database()
+            ->select(['*'])
+            ->from($this->TBL_ABF);
 
-        $rets = array();
-
-        if (Symphony::Database()->query($sql)) {
-            $rets = Symphony::Database()->fetch();
+        if (strlen($order) > 0) {
+            $q->orderBy($order, $orderOP);
         }
 
-        return $rets;
+        return $q
+            ->execute()
+            ->rows();
     }
 
-    public function getBlackListEntriesByIP($ip='', $additionalWhere='')
+    public function getBlackListEntriesByIP($ip = '', $additionalWhere = array())
     {
         return $this->__getListEntriesByIp($this->TBL_ABF_BL, $ip, $additionalWhere);
     }
 
-    public function getGrayListEntriesByIP($ip='', $additionalWhere='')
+    public function getGrayListEntriesByIP($ip = '', $additionalWhere = array())
     {
         return $this->__getListEntriesByIp($this->TBL_ABF_GL, $ip, $additionalWhere);
     }
 
-    public function getWhiteListEntriesByIP($ip='', $additionalWhere='')
+    public function getWhiteListEntriesByIP($ip = '', $additionalWhere = array())
     {
         return $this->__getListEntriesByIp($this->TBL_ABF_WL, $ip, $additionalWhere);
     }
 
-    public function getListEntriesByIP($color, $ip='', $additionalWhere='')
+    public function getListEntriesByIP($color, $ip = '', $additionalWhere = array())
     {
         return $this->__getListEntriesByIp($this->getTableName($color), $ip, $additionalWhere);
     }
 
-    private function __getListEntriesByIp($tbl, $ip='', $additionalWhere='')
+    private function __getListEntriesByIp($tbl, $ip = '', $additionalWhere = array())
     {
         $ip = $this->getIP($ip);
+        $q = Symphony::Database()
+            ->select(['*'])
+            ->from($tbl)
+            ->where(['IP' => $ip]);
 
-        $where = "IP = '$ip'";
-        if (strlen($additionalWhere) > 0) {
-            $where .= $additionalWhere;
+        foreach ($additionalWhere as $key => $value) {
+            $q->where([$key => $value]);
         }
 
-        $sql ="
-            SELECT * FROM $tbl WHERE $where LIMIT 1
-        " ;
-
-        $rets = array();
-
-        if (Symphony::Database()->query($sql)) {
-            $rets = Symphony::Database()->fetch();
-        }
-
-        return $rets;
+        return $q
+            ->limit(1)
+            ->execute()
+            ->rows();
     }
 
     public function getListEntries($color)
@@ -597,22 +609,20 @@ class ABF implements Singleton
         return $this->__getListEntries($this->getTableName($color));
     }
 
-    private function __getListEntries($tbl, $where='', $order='IP ASC')
+    private function __getListEntries($tbl, $where = array(), $order = 'IP', $orderOP = 'ASC')
     {
-        if (strlen($where) > 0) {
-            $where = 'WHERE ' . $where;
-        }
-        $sql ="
-            SELECT * FROM $tbl $where ORDER BY $order
-        " ;
+        $q = Symphony::Database()
+            ->select(['*'])
+            ->from($tbl);
 
-        $rets = array();
-
-        if (Symphony::Database()->query($sql)) {
-            $rets = Symphony::Database()->fetch();
+        foreach ($where as $key => $value) {
+            $q->where([$key => $value]);
         }
 
-        return $rets;
+        return $q
+            ->orderBy($order, $orderOP)
+            ->execute()
+            ->rows();
     }
 
 
@@ -642,7 +652,8 @@ class ABF implements Singleton
         $clientip = $this->getRawClientIP();
 
         // extract the last item from the list
-        $clientip = trim(end(explode(',', $clientip)));
+        $list = explode(',', $clientip);
+        $clientip = trim(end($list));
 
         return $clientip;
     }
@@ -714,7 +725,7 @@ class ABF implements Singleton
     public function getNaviguationGroup()
     {
         return $this->getConfigVal(ABF::SETTING_RESTRICT_ACCESS) == 'on' ?
-            'developer' : NULL;
+            'developer' : null;
     }
 
     /**
@@ -758,7 +769,7 @@ class ABF implements Singleton
 
         // verify it is a good domain
         if ($valid) {
-            // set config                    (name, value, group)
+            // set config(name, value, group)
             Symphony::Configuration()->set($key, $input, ABF::SETTING_GROUP);
             $this->_settings[$key] = $input;
 
@@ -822,60 +833,96 @@ class ABF implements Singleton
 
     private function install_v1_0()
     {
-        $sql = "
-            CREATE TABLE IF NOT EXISTS $this->TBL_ABF(
-                `IP` VARCHAR( 16 ) NOT NULL ,
-                `LastAttempt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-                `FailedCount` INT( 5 ) unsigned NOT NULL DEFAULT  '1',
-                `UA` VARCHAR( 1024 ) NULL,
-                `Username` VARCHAR( 100 ) NULL,
-                `Source` VARCHAR( 100 ) NULL,
-                `Hash` CHAR( 36 ) NOT NULL,
-                PRIMARY KEY ( `IP` )
-            ) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-        ";
-
-        return Symphony::Database()->query($sql);
+        return Symphony::Database()
+            ->create($this->TBL_ABF)
+            ->ifNotExists()
+            ->fields([
+                'IP' => 'varchar(16)',
+                'LastAttempt' => 'timestamp',
+                'FailedCount' => [
+                    'type' => 'int(5)',
+                    'default' => 1,
+                ],
+                'UA' => [
+                    'type' => 'varchar(1024)',
+                    'null' => true,
+                ],
+                'Username' => [
+                    'type' => 'varchar(100)',
+                    'null' => true,
+                ],
+                'Source' => [
+                    'type' => 'varchar(100)',
+                    'null' => true,
+                ],
+                'Hash' => 'char(36)',
+            ])
+            ->keys([
+                'IP' => 'primary',
+            ])
+            ->execute()
+            ->success();
     }
 
     private function install_v1_1()
     {
         // GRAY
-        $sql = "
-            CREATE TABLE IF NOT EXISTS $this->TBL_ABF_GL (
-                `IP` VARCHAR( 16 ) NOT NULL ,
-                `DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-                `FailedCount` INT( 5 ) unsigned NOT NULL DEFAULT  '1',
-                `Source` VARCHAR( 100 ) NULL,
-                PRIMARY KEY (  `IP` )
-            ) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-        ";
-
-        $retGL = Symphony::Database()->query($sql);
+        $retGL = Symphony::Database()
+            ->create($this->TBL_ABF_GL)
+            ->ifNotExists()
+            ->fields([
+                'IP' => 'varchar(16)',
+                'DateCreated' => 'timestamp',
+                'FailedCount' => [
+                    'type' => 'int(5)',
+                    'default' => 1,
+                ],
+                'Source' => [
+                    'type' => 'varchar(100)',
+                    'null' => true,
+                ],
+            ])
+            ->keys([
+                'IP' => 'primary',
+            ])
+            ->execute()
+            ->success();
 
         //BLACK
-        $sql = "
-            CREATE TABLE IF NOT EXISTS $this->TBL_ABF_BL (
-                `IP` VARCHAR( 16 ) NOT NULL ,
-                `DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-                `Source` VARCHAR( 100 ) NULL,
-                PRIMARY KEY (  `IP` )
-            ) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-        ";
-
-        $retBL = Symphony::Database()->query($sql);
+        $retBL = Symphony::Database()
+            ->create($this->TBL_ABF_BL)
+            ->ifNotExists()
+            ->fields([
+                'IP' => 'varchar(16)',
+                'DateCreated' => 'timestamp',
+                'Source' => [
+                    'type' => 'varchar(100)',
+                    'null' => true,
+                ],
+            ])
+            ->keys([
+                'IP' => 'primary',
+            ])
+            ->execute()
+            ->success();
 
         // WHITE
-        $sql = "
-            CREATE TABLE IF NOT EXISTS $this->TBL_ABF_WL (
-                `IP` VARCHAR( 16 ) NOT NULL ,
-                `DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-                `Source` VARCHAR( 100 ) NULL,
-                PRIMARY KEY (  `IP` )
-            ) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-        ";
-
-        $retWL = Symphony::Database()->query($sql);
+        $retWL = Symphony::Database()
+            ->create($this->TBL_ABF_WL)
+            ->ifNotExists()
+            ->fields([
+                'IP' => 'varchar(16)',
+                'DateCreated' => 'timestamp',
+                'Source' => [
+                    'type' => 'varchar(100)',
+                    'null' => true,
+                ],
+            ])
+            ->keys([
+                'IP' => 'primary',
+            ])
+            ->execute()
+            ->success();
 
         return $retGL && $retBL && $retWL;
     }
@@ -898,30 +945,70 @@ class ABF implements Singleton
 
     private function install_v1_4_5()
     {
-        $sql = "
-            ALTER TABLE $this->TBL_ABF
-                ADD COLUMN `RawIP` VARCHAR( 1024 ) NOT NULL
-                AFTER `IP`
-        ";
-
-        return Symphony::Database()->query($sql);
+        return Symphony::Database()
+            ->alter($this->TBL_ABF)
+            ->add([
+                'RawIP' => 'varchar(1024)',
+            ])
+            ->after('IP')
+            ->execute()
+            ->success();
     }
 
     private function install_v2_0_2()
     {
-        $sql = "
-            ALTER TABLE $this->TBL_ABF    CHANGE `IP` `IP` VARCHAR(45) NOT NULL;
-            ALTER TABLE $this->TBL_ABF_WL CHANGE `IP` `IP` VARCHAR(45) NOT NULL;
-            ALTER TABLE $this->TBL_ABF_GL CHANGE `IP` `IP` VARCHAR(45) NOT NULL;
-            ALTER TABLE $this->TBL_ABF_BL CHANGE `IP` `IP` VARCHAR(45) NOT NULL;
+        $rets[] = Symphony::Database()
+            ->alter($this->TBL_ABF)
+            ->modify([
+                'IP' => 'varchar(45)',
+            ])
+            ->execute()
+            ->success();
+        $rets[] = Symphony::Database()
+            ->alter($this->TBL_ABF_WL)
+            ->modify([
+                'IP' => 'varchar(45)',
+            ])
+            ->execute()
+            ->success();
+        $rets[] = Symphony::Database()
+            ->alter($this->TBL_ABF_GL)
+            ->modify([
+                'IP' => 'varchar(45)',
+            ])
+            ->execute()
+            ->success();
+        $rets[] = Symphony::Database()
+            ->alter($this->TBL_ABF_BL)
+            ->modify([
+                'IP' => 'varchar(45)',
+            ])
+            ->execute()
+            ->success();
 
-            OPTIMIZE TABLE $this->TBL_ABF;
-            OPTIMIZE TABLE $this->TBL_ABF_WL;
-            OPTIMIZE TABLE $this->TBL_ABF_GL;
-            OPTIMIZE TABLE $this->TBL_ABF_BL
-        ";
+        $rets[] = Symphony::Database()
+            ->optimize($this->TBL_ABF)
+            ->execute()
+            ->success();
+        $rets[] = Symphony::Database()
+            ->optimize($this->TBL_ABF_WL)
+            ->execute()
+            ->success();
+        $rets[] = Symphony::Database()
+            ->optimize($this->TBL_ABF_GL)
+            ->execute()
+            ->success();
+        $rets[] = Symphony::Database()
+            ->optimize($this->TBL_ABF_BL)
+            ->execute()
+            ->success();
 
-        return Symphony::Database()->import($sql);
+        if(in_array(false, $rets, true)) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     /**
@@ -929,9 +1016,8 @@ class ABF implements Singleton
      * This method will update the extension according to the
      * previous and current version parameters.
      * @param string $previousVersion
-     * @param string $currentVersion
      */
-    public function update($previousVersion, $currentVersion)
+    public function update($previousVersion)
     {
         $ret = true;
 
@@ -970,32 +1056,32 @@ class ABF implements Singleton
     public function uninstall()
     {
         // Banned IPs
-        $sql = "
-            DROP TABLE IF EXISTS $this->TBL_ABF
-        ";
-
-        $retABF = Symphony::Database()->query($sql);
+        $retABF = Symphony::Database()
+            ->drop($this->TBL_ABF)
+            ->ifExists()
+                ->execute()
+                ->success();
 
         // Black
-        $sql = "
-            DROP TABLE IF EXISTS $this->TBL_ABF_BL
-        ";
-
-        $retABF_BL = Symphony::Database()->query($sql);
+        $retABF_BL = Symphony::Database()
+            ->drop($this->TBL_ABF_BL)
+            ->ifExists()
+                ->execute()
+                ->success();
 
         // Gray
-        $sql = "
-            DROP TABLE IF EXISTS $this->TBL_ABF_GL
-        ";
-
-        $retABF_GL = Symphony::Database()->query($sql);
+        $retABF_GL = Symphony::Database()
+            ->drop($this->TBL_ABF_GL)
+            ->ifExists()
+                ->execute()
+                ->success();
 
         // White
-        $sql = "
-            DROP TABLE IF EXISTS $this->TBL_ABF_WL
-        ";
-
-        $retABF_WL = Symphony::Database()->query($sql);
+        $retABF_WL = Symphony::Database()
+            ->drop($this->TBL_ABF_WL)
+            ->ifExists()
+                ->execute()
+                ->success();
 
         Symphony::Configuration()->remove(ABF::SETTING_GROUP, ABF::SETTING_GROUP);
         Symphony::Configuration()->write();

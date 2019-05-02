@@ -59,8 +59,6 @@ class ViewFactory
 
                 $tds = array();
 
-                $datarow = get_object_vars($datarow);
-
                 foreach ($cols as $key => $value) {
                     $val = General::sanitize($datarow[$key]);
                     $css = 'col';
@@ -82,6 +80,8 @@ class ViewFactory
                         );
                         $td->appendChild($chk);
                     }
+
+                    $td->setAttribute('data-title', $cols[$key]);
 
                     array_push($tds, $td);
                 }
@@ -125,13 +125,19 @@ class ViewFactory
      */
     public static function buildSubMenu(Array $options, $current, $actionkey)
     {
-        $tableActions = new XMLElement('div');
+        $tableActions = new XMLElement('ul');
         $tableActions->setAttribute('class', 'actions no-pad');
 
-        $fieldset = new XMLElement('fieldset');
+        Widget::registerSVGIcon(
+            'list',
+            '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="22px" height="12px" viewBox="0 0 22 12"><path fill="currentColor" d="M21,12H1c-0.6,0-1-0.4-1-1s0.4-1,1-1h20c0.6,0,1,0.4,1,1S21.6,12,21,12z"/><path fill="currentColor" d="M21,7H1C0.4,7,0,6.6,0,6s0.4-1,1-1h20c0.6,0,1,0.4,1,1S21.6,7,21,7z"/><path fill="currentColor" d="M21,2H1C0.4,2,0,1.6,0,1s0.4-1,1-1h20c0.6,0,1,0.4,1,1S21.6,2,21,2z"/></svg>'
+        );
 
         foreach ($options as $key => $o) {
-            $button = new XMLElement('a', __($o));
+            $button = new XMLElement(
+                'a',
+                Widget::SVGIcon('list') . '<span><span>' . __($o) . '</span></span>'
+            );
             $button->setAttribute('class', 'button');
             $button->setAttribute('href', "?list=$key");
 
@@ -139,10 +145,11 @@ class ViewFactory
                 $button->setAttribute('class', 'button active selected');
             }
 
-            $fieldset->appendChild($button);
-        }
+            $li = new XMLElement('li');
+            $li->appendChild($button);
 
-        $tableActions->appendChild($fieldset);
+            $tableActions->appendChild($li);
+        }
 
         return $tableActions;
     }

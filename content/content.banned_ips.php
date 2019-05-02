@@ -40,7 +40,7 @@ class contentExtensionAnti_brute_forceBanned_ips extends AdministrationPage
     public function __viewIndex()
     {
         // Get data
-        $this->_data = ABF::instance()->getFailures('IP ASC');
+        $this->_data = ABF::instance()->getFailures('IP', 'ASC');
         $this->_hasData = is_array($this->_data) && count($this->_data) > 0;
 
         // Build the page
@@ -61,7 +61,7 @@ class contentExtensionAnti_brute_forceBanned_ips extends AdministrationPage
         // build data table
         $table = Widget::Table(
             Widget::TableHead($aTableHead),
-            NULL,
+            null,
             Widget::TableBody($aTableBody),
             'selectable',
             null,

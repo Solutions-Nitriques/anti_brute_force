@@ -84,6 +84,11 @@ class extension_anti_brute_force extends Extension
                 'page'     => '/backend/',
                 'delegate' => 'AppendPageAlert',
                 'callback' => 'appendPageAlert'
+            ),
+            array(
+                'page'     => '/backend/',
+                'delegate' => 'NavigationPreRender',
+                'callback' => 'navigationPreRender'
             )
         );
     }
@@ -91,6 +96,34 @@ class extension_anti_brute_force extends Extension
     /**
      * Delegate fired to add a link to the Banned IPs Administration page
      */
+
+    public function navigationPreRender($context) {
+        $c = Administration::instance()->getPageCallback();
+        if(isset($_GET['list'])) {
+            $list = $_GET['list'];
+        } elseif(isset($_POST['list'])) {
+            $list = $_POST['list'];
+        } else {
+            $list = '';
+        }
+
+        if($list != '') {
+            foreach ($context['navigation'] as $key => $section) {
+                if ($section['name'] == __(self::EXT_NAME)) {
+                    $context['navigation'][$key]['class'] = 'active opened';
+
+                    foreach ($context['navigation'][$key]['children'] as $subkey => $subsection) {
+                        if (strpos($subsection['link'], '?list=' . $list)) {
+                            $context['navigation'][$key]['children'][$subkey]['class'] = 'active';
+                        } else {
+                            $context['navigation'][$key]['children'][$subkey]['class'] = '';
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public function fetchNavigation()
     {
         return array(
@@ -254,11 +287,9 @@ class extension_anti_brute_force extends Extension
      * Delegate fired when the extension is updated (when version changes)
      * @param string $previousVersion
      */
-    public function update($previousVersion=false)
+    public function update($previousVersion = false)
     {
-        $about = ExtensionManager::about('anti_brute_force');
-
-        return ABF::instance()->update($previousVersion,$about['version']);
+        return ABF::instance()->update($previousVersion);
     }
 
     /**
