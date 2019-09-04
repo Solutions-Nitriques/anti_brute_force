@@ -46,6 +46,7 @@ would be to do some actual penetration testing to be sure ABF works properly.
 	- Remote IP address field name - The `getenv()` field to look for the client's IP.
 - (optional) See all the banned IPs via Anti Brute Force -> Banned IPs
 - (optional) Manage colored lists entries via Anti Brute Force -> Black/Gray/White list
+- (optional) Configure a cron job to run `cron/remove_expired.php` at regular interval
 
 ### UPDATING ###
 
