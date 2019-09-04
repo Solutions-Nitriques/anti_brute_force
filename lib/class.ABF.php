@@ -143,7 +143,7 @@ class ABF implements Singleton
         unset($s);
 
         // now an array
-        $validStatuses = EXTENSION_ENABLED;
+        $validStatuses = Extension::EXTENSION_ENABLED;
         $about = ExtensionManager::about('anti_brute_force');
         $status = ExtensionManager::fetchStatus($about);
         $this->_isInstalled = in_array($validStatuses, $status);
